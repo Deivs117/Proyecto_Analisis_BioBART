@@ -58,7 +58,7 @@ cd Proyecto_Analisis_BioBART
 ### 2) Crear entorno virtual e instalar dependencias
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # En Windows: .venv\\Scripts\\activate
+source .venv/bin/activate   # En Windows: .venv\Scripts\activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
