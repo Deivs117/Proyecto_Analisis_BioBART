@@ -1,0 +1,76 @@
+[project]
+name = "proyecto-analisis-biobart"
+version = "0.1.0"
+description = "Análisis e inferencia con BioBART para generación de texto biomédico"
+requires-python = ">=3.10"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Dependencias de producción
+# Se instalan con: uv pip install -e .
+# ──────────────────────────────────────────────────────────────────────────────
+dependencies = [
+    # Motor principal de modelos pre-entrenados (Encoder-Decoder, tokenizadores, etc.)
+    "transformers>=4.40.0",
+
+    # Backend de cómputo tensorial (CPU/GPU); versión estable para Hugging Face
+    "torch>=2.2.0",
+
+    # Tokenizador SentencePiece requerido por BioBART (subword tokenization)
+    "sentencepiece>=0.1.99",
+
+    # Aceleración de inferencia con Hugging Face Accelerate
+    "accelerate>=0.28.0",
+
+    # Entorno interactivo para ejecutar el notebook de sustentación
+    "jupyterlab>=4.2.0",
+    "ipykernel>=6.29.0",
+
+    # Utilidades para visualización de progreso (usado por transformers internamente)
+    "tqdm>=4.66.0",
+
+    # Scikit-learn para métricas opcionales (ROUGE, etc.)
+    "rouge-score>=0.1.2",
+]
+
+[project.optional-dependencies]
+# Dependencias de desarrollo (linting, formateo, etc.) — no necesarias para la demo
+dev = [
+    "ruff>=0.4.0",
+    "black>=24.0.0",
+]
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Configuración de herramientas
+# ──────────────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# INSTRUCCIONES DE USO CON uv
+# ──────────────────────────────────────────────────────────────────────────────
+# 1) Instalar uv (si no está instalado):
+#       curl -Lsf https://astral.sh/uv/install.sh | sh
+#
+# 2) Crear entorno virtual aislado:
+#       uv venv .venv
+#
+# 3) Activar el entorno:
+#       source .venv/bin/activate          # Linux / macOS
+#       .venv\Scripts\activate             # Windows PowerShell
+#
+# 4) Instalar todas las dependencias declaradas aquí:
+#       uv pip install -e .
+#
+# 5) Registrar el kernel de Jupyter para este entorno:
+#       python -m ipykernel install --user --name biobart-env --display-name "BioBART (uv)"
+#
+# 6) Lanzar JupyterLab:
+#       jupyter lab
+#
+# 7) Abrir: notebooks/biobart_inferencia.ipynb  y seleccionar kernel "BioBART (uv)"
+# ──────────────────────────────────────────────────────────────────────────────

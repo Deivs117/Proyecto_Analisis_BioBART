@@ -312,6 +312,160 @@
       </details>
     </section>
 
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         SECCIÓN: BioBART en Acción — Inferencia y Casos de Uso
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <section style="margin-top:28px;">
+      <h2>6) BioBART en Acción: Inferencia y Casos de Uso</h2>
+
+      <!-- ── Analizar vs. Generar ── -->
+      <div class="card" style="margin-bottom:14px; border-left:4px solid var(--accent);">
+        <span class="chip">Concepto clave</span>
+        <h3 style="color:var(--accent2); margin-bottom:8px;">Analizar texto vs. Generar texto</h3>
+        <div class="grid" style="margin:0;">
+          <article class="card" style="background:#12203d; border-color:#2a5298;">
+            <span class="chip" style="background:rgba(255,209,102,.15); border-color:rgba(255,209,102,.4); color:var(--warning);">Solo-Encoder (BERT)</span>
+            <p style="margin-top:8px;">
+              <strong style="color:var(--text);">Analiza</strong> el texto de entrada produciendo
+              embeddings contextuales ricos. Ideal para clasificación, NER y comprensión.
+              <br/><br/>
+              <strong style="color:var(--warning);">Limitación:</strong> No posee un decoder causal,
+              por lo que <em>no puede redactar</em> texto nuevo token a token. Un encoder solo
+              no tiene mecanismo de Masked Self-Attention + Cross-Attention que guíe la generación.
+            </p>
+          </article>
+          <article class="card" style="background:#0f2a1a; border-color:#1a7a3a;">
+            <span class="chip" style="background:rgba(128,255,219,.15); border-color:rgba(128,255,219,.4); color:var(--accent2);">Encoder-Decoder (BioBART)</span>
+            <p style="margin-top:8px;">
+              <strong style="color:var(--text);">Genera</strong> texto nuevo de forma autorregresiva.
+              El encoder comprime la entrada en estados contextuales; el decoder los consume
+              via Cross-Attention para producir cada token de salida.
+              <br/><br/>
+              <strong style="color:var(--accent2);">Ventaja:</strong> Puede redactar resúmenes,
+              respuestas y reportes clínicos coherentes, no solo etiquetarlos o clasificarlos.
+            </p>
+          </article>
+        </div>
+      </div>
+
+      <!-- ── Casos de uso ── -->
+      <h3 style="color:var(--text); margin:18px 0 10px;">Casos de uso demostrados en el notebook</h3>
+      <div class="grid">
+        <article class="card">
+          <span class="chip">Tarea 1</span>
+          <h3 style="color:var(--accent2); margin-bottom:6px;">📄 Resumen de Historias Clínicas</h3>
+          <p>
+            BioBART recibe un abstract o historia de admisión completa y produce un
+            <strong style="color:var(--text);">resumen ejecutivo de 2-4 oraciones</strong>,
+            destacando diagnósticos, hallazgos críticos y plan terapéutico.
+          </p>
+          <p>
+            Estrategia de generación: <code>Beam Search</code> con <code>num_beams=4</code>
+            y <code>no_repeat_ngram_size=3</code> para evitar los bucles del Greedy Search
+            y maximizar la probabilidad conjunta de la secuencia completa.
+          </p>
+        </article>
+        <article class="card">
+          <span class="chip">Tarea 2</span>
+          <h3 style="color:var(--accent2); margin-bottom:6px;">💬 Diálogo / QA Médico</h3>
+          <p>
+            Dado un contexto clínico (nota de UCI, resultados de laboratorio) y una pregunta,
+            BioBART <strong style="color:var(--text);">genera una respuesta en lenguaje natural</strong>,
+            sintetizando la información relevante del contexto.
+          </p>
+          <p>
+            A diferencia de modelos extractivos (que ubican un fragmento existente), BioBART
+            <em>redacta</em> la respuesta. Estrategia: <code>Nucleus Sampling</code>
+            (<code>top_p=0.92</code>) + <code>temperature=0.7</code> para equilibrar
+            coherencia clínica y fluidez natural.
+          </p>
+        </article>
+      </div>
+
+      <!-- ── Hiperparámetros ── -->
+      <details style="margin-top:10px;">
+        <summary>¿Por qué Beam Search y Nucleus Sampling? — El problema del Greedy Search</summary>
+        <div class="grid" style="margin-top:12px;">
+          <div class="card" style="background:#1c1230; border-color:#5c3d99;">
+            <span class="chip" style="background:rgba(220,100,100,.15); border-color:rgba(220,100,100,.4); color:#ff9a9a;">❌ Greedy Search</span>
+            <p>
+              Selecciona el token de mayor probabilidad en <em>cada paso</em> independientemente.
+              Puede quedar atrapado en <strong style="color:#ff9a9a;">máximos locales</strong> y
+              generar frases repetitivas e incoherentes — especialmente problemático en terminología
+              biomédica densa.
+            </p>
+            <p><code>argmax P(token_t | contexto)</code> → miope, sin visión global.</p>
+          </div>
+          <div class="card" style="background:#0f2218; border-color:#2a6644;">
+            <span class="chip" style="background:rgba(128,255,219,.15); border-color:rgba(128,255,219,.4); color:var(--accent2);">✅ Beam Search</span>
+            <p>
+              Mantiene las <strong style="color:var(--text);">K hipótesis más probables</strong>
+              en paralelo. Maximiza la probabilidad conjunta
+              <code>P(y₁,...,yₙ | x)</code> al finalizar la secuencia completa,
+              no solo token a token.
+            </p>
+          </div>
+          <div class="card" style="background:#0f1f2a; border-color:#2a5a7a;">
+            <span class="chip">✅ Nucleus Sampling</span>
+            <p>
+              <code>top_p</code>: selecciona el conjunto mínimo de tokens con probabilidad
+              acumulada ≥ P. El tamaño del conjunto se adapta al contexto: pequeño cuando
+              el modelo está seguro, grande cuando no lo está. Combina diversidad y coherencia.
+            </p>
+          </div>
+        </div>
+      </details>
+
+      <!-- ── Instrucciones de ejecución con uv ── -->
+      <div style="
+        background: #0a1628;
+        border: 1px solid var(--accent);
+        border-radius: 14px;
+        padding: 18px 20px;
+        margin-top: 18px;
+      ">
+        <h3 style="color:var(--accent); margin:0 0 12px;">
+          ⚡ Instrucciones de Ejecución — Entorno con <code style="background:none; color:var(--accent2); border:none; padding:0;">uv</code>
+        </h3>
+        <p style="margin-top:0; font-size:.9rem;">
+          Ejecutar estos comandos <strong style="color:var(--text);">antes de la sustentación</strong>
+          para levantar el entorno y registrar el kernel de Jupyter:
+        </p>
+        <pre style="
+          background: #050d1a;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          padding: 14px;
+          color: #b9fbc0;
+          font-size: .85rem;
+          overflow-x: auto;
+          margin: 0;
+          line-height: 1.7;
+        "><span style="color:#4cc9f0;"># 1) Instalar uv (una sola vez)</span>
+curl -Lsf https://astral.sh/uv/install.sh | sh
+
+<span style="color:#4cc9f0;"># 2) Crear entorno virtual aislado</span>
+uv venv .venv
+
+<span style="color:#4cc9f0;"># 3) Activar el entorno</span>
+source .venv/bin/activate        <span style="color:#888;"># Linux / macOS</span>
+<span style="color:#555;"># .venv\Scripts\activate          # Windows PowerShell</span>
+
+<span style="color:#4cc9f0;"># 4) Instalar dependencias desde pyproject.toml</span>
+uv pip install -e .
+
+<span style="color:#4cc9f0;"># 5) Registrar kernel para JupyterLab</span>
+python -m ipykernel install --user --name biobart-env --display-name "BioBART (uv)"
+
+<span style="color:#4cc9f0;"># 6) Lanzar JupyterLab</span>
+jupyter lab</pre>
+        <p style="font-size:.82rem; color:var(--warning); margin:10px 0 0;">
+          💡 Abrir <code>notebooks/biobart_inferencia.ipynb</code> y seleccionar kernel
+          <strong>"BioBART (uv)"</strong> en el menú Kernel → Change Kernel.
+        </p>
+      </div>
+    </section>
+
     <section class="card" style="margin-top:18px;">
       <h2>Glosario rápido</h2>
       <dl class="glossary">

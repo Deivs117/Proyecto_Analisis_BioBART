@@ -19,6 +19,7 @@ Proyecto_Analisis_BioBART/
 │   ├── biobart_inferencia.ipynb
 │   └── README.md
 ├── .gitignore
+├── pyproject.toml
 ├── requirements.txt
 └── README.md
 ```
@@ -26,7 +27,8 @@ Proyecto_Analisis_BioBART/
 - `docs/`: guía teórica visual e interactiva en HTML para repaso técnico.
 - `notebooks/`: notebook de inferencia comentada y material de apoyo para la exposición.
 - `.gitignore`: configuración para excluir artefactos de Python/Jupyter y archivos temporales.
-- `requirements.txt`: dependencias base para ejecutar inferencia y notebooks.
+- `pyproject.toml`: dependencias y metadatos del proyecto gestionados con `uv`.
+- `requirements.txt`: lista de dependencias de respaldo (referencia).
 
 ---
 
@@ -47,27 +49,32 @@ Proyecto_Analisis_BioBART/
 
 ---
 
-## ⚙️ Instalación y ejecución del notebook
+## ⚙️ Instalación y ejecución del notebook (con `uv`)
 
-### 1) Clonar e ingresar al repositorio
+### 1) Instalar `uv` (una sola vez)
+```bash
+curl -Lsf https://astral.sh/uv/install.sh | sh
+```
+
+### 2) Clonar e ingresar al repositorio
 ```bash
 git clone https://github.com/Deivs117/Proyecto_Analisis_BioBART.git
 cd Proyecto_Analisis_BioBART
 ```
 
-### 2) Crear entorno virtual e instalar dependencias
+### 3) Crear entorno virtual e instalar dependencias
 ```bash
-python -m venv .venv
-source .venv/bin/activate   # En Windows: .venv\Scripts\activate
-pip install --upgrade pip
-pip install -r requirements.txt
+uv venv .venv
+source .venv/bin/activate          # En Windows: .venv\Scripts\activate
+uv pip install -e .
 ```
 
-### 3) Ejecutar Jupyter y abrir el notebook
+### 4) Registrar el kernel de Jupyter y ejecutar JupyterLab
 ```bash
+python -m ipykernel install --user --name biobart-env --display-name "BioBART (uv)"
 jupyter lab
 ```
-Luego abre: `notebooks/biobart_inferencia.ipynb`
+Luego abre `notebooks/biobart_inferencia.ipynb` y selecciona el kernel **"BioBART (uv)"**.
 
 ---
 
