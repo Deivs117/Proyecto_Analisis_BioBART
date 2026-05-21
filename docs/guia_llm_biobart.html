@@ -3,455 +3,1407 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Guía Visual LLMs: Encoder-Decoder, BART y BioBART</title>
+  <title>Guía Exhaustiva: BioBART y la Arquitectura Transformer</title>
   <style>
+    /* ─── CSS Variables ─── */
     :root {
-      --bg: #0b1020;
-      --panel: #141b33;
-      --card: #1a2342;
-      --text: #e7ecff;
-      --muted: #b7c2f5;
+      --bg: #070c1a;
+      --panel: #0d1428;
+      --card: #111b35;
+      --text: #e0e9ff;
+      --muted: #8fa4d4;
       --accent: #4cc9f0;
-      --accent2: #80ffdb;
+      --accent2: #7df9c4;
+      --accent3: #a78bfa;
       --warning: #ffd166;
-      --border: #2a3664;
+      --danger: #ff6b6b;
+      --border: #1e2d5a;
+      --encoder-color: #4cc9f0;
+      --decoder-color: #a78bfa;
+      --biobart-color: #7df9c4;
     }
-    * { box-sizing: border-box; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
     body {
-      margin: 0;
-      background: radial-gradient(circle at top right, #1f2a52, var(--bg) 45%);
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(76,201,240,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(167,139,250,0.06) 0%, transparent 50%);
       color: var(--text);
-      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
-      line-height: 1.55;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.65;
+      font-size: 15px;
     }
-    .container { max-width: 1120px; margin: 0 auto; padding: 32px 20px 60px; }
+
+    /* ─── Navigation ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,12,26,0.93);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    nav ul {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav ul::-webkit-scrollbar { display: none; }
+    nav a {
+      display: block;
+      padding: 5px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    nav a:hover { background: rgba(76,201,240,0.12); color: var(--accent); }
+
+    /* ─── Layout ─── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+    section { margin-bottom: 48px; }
+
+    /* ─── Hero ─── */
     .hero {
-      background: linear-gradient(135deg, rgba(76,201,240,.2), rgba(128,255,219,.1));
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      background: linear-gradient(135deg, rgba(76,201,240,0.1), rgba(167,139,250,0.07), rgba(125,249,196,0.05));
+      border: 1px solid rgba(76,201,240,0.2);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
     }
-    h1, h2, h3 { margin-top: 0; }
-    h1 { font-size: 1.9rem; }
-    h2 { color: var(--accent2); margin-bottom: 12px; }
-    p, li { color: var(--muted); }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 14px;
-      margin: 16px 0 26px;
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(76,201,240,0.08), transparent 70%);
+      pointer-events: none;
     }
+    .hero h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .hero .subtitle { color: var(--muted); font-size: 1rem; max-width: 700px; }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .tag {
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .tag-blue  { background: rgba(76,201,240,0.1);  border: 1px solid rgba(76,201,240,0.3);  color: var(--accent); }
+    .tag-purple{ background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3); color: var(--accent3); }
+    .tag-green { background: rgba(125,249,196,0.1); border: 1px solid rgba(125,249,196,0.3); color: var(--accent2); }
+    .tag-yellow{ background: rgba(255,209,102,0.1); border: 1px solid rgba(255,209,102,0.3); color: var(--warning); }
+
+    /* ─── Section Headers ─── */
+    .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .section-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .section-num { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+    .section-header h2 { font-size: 1.4rem; font-weight: 700; }
+    .section-separator { width: 56px; height: 3px; border-radius: 3px; margin-bottom: 24px; }
+    .sep-enc  { background: var(--encoder-color); }
+    .sep-dec  { background: var(--decoder-color); }
+    .sep-bio  { background: var(--biobart-color); }
+    .sep-blue { background: var(--accent); }
+    .sep-warn { background: var(--warning); }
+
+    /* ─── Cards ─── */
+    .grid  { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }
+    .grid-2{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+    .grid-3{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: 16px;
+      padding: 20px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
+    .card:hover {
+      border-color: rgba(76,201,240,0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+    }
+    .card p, .card li { color: var(--muted); font-size: 0.91rem; }
+    .card-title { font-size: 0.98rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+
+    /* Colored top borders */
+    .card-enc  { border-top: 3px solid var(--encoder-color); }
+    .card-dec  { border-top: 3px solid var(--decoder-color); }
+    .card-bio  { border-top: 3px solid var(--biobart-color); }
+    .card-warn { border-top: 3px solid var(--warning); }
+    .card-danger { border-top: 3px solid var(--danger); }
+
+    /* ─── Chips ─── */
     .chip {
-      display: inline-block;
-      padding: 2px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
       border-radius: 999px;
-      background: rgba(76,201,240,.18);
-      border: 1px solid rgba(76,201,240,.35);
-      color: var(--accent);
-      font-size: .82rem;
-      margin-bottom: 8px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      margin-bottom: 10px;
     }
+    .chip-blue  { background: rgba(76,201,240,0.1);  border: 1px solid rgba(76,201,240,0.3);  color: var(--accent); }
+    .chip-purple{ background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3); color: var(--accent3); }
+    .chip-green { background: rgba(125,249,196,0.1); border: 1px solid rgba(125,249,196,0.3); color: var(--accent2); }
+    .chip-yellow{ background: rgba(255,209,102,0.1); border: 1px solid rgba(255,209,102,0.3); color: var(--warning); }
+    .chip-red   { background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3); color: var(--danger); }
+
+    /* ─── Math Blocks ─── */
+    .math-block {
+      background: linear-gradient(135deg, #080f24, #0c1530);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 14px 0;
+      overflow-x: auto;
+      font-family: 'Courier New', 'Consolas', monospace;
+      font-size: 0.86rem;
+      color: #c8d8ff;
+      line-height: 1.85;
+    }
+    .math-block .label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.71rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .math-block em   { color: var(--accent2); font-style: normal; }
+    .math-block strong { color: var(--warning); font-weight: 600; }
+
+    /* ─── Details/Accordion ─── */
     details {
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 12px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      overflow: hidden;
     }
     summary {
       cursor: pointer;
-      color: var(--text);
+      padding: 14px 18px;
       font-weight: 600;
+      color: var(--text);
       list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      transition: background 0.2s;
     }
+    summary:hover { background: rgba(76,201,240,0.04); }
     summary::before {
       content: "▸";
-      margin-right: 8px;
       color: var(--accent);
+      font-size: 0.88rem;
+      transition: transform 0.2s;
+      flex-shrink: 0;
     }
-    details[open] summary::before { content: "▾"; }
+    details[open] summary::before { transform: rotate(90deg); }
+    details > *:not(summary) { padding: 0 18px 16px; }
+
+    /* ─── Code ─── */
     code {
-      background: #0f1730;
+      background: #0c1428;
       border: 1px solid var(--border);
-      padding: 1px 6px;
-      border-radius: 7px;
-      color: #b9fbc0;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-family: 'Courier New', 'Consolas', monospace;
+      font-size: 0.84em;
+      color: #a8f4c8;
     }
-    .math {
-      display: block;
-      background: #0f1730;
-      border-left: 4px solid var(--accent);
-      border-radius: 8px;
-      padding: 10px;
-      margin: 10px 0;
-      color: #d1dbff;
+    pre {
+      background: #050c1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      overflow-x: auto;
+      font-size: 0.84rem;
+      line-height: 1.75;
+      margin: 14px 0;
+    }
+
+    /* ─── Flow Diagrams ─── */
+    .flow-container {
+      background: #08112a;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      margin: 16px 0;
       overflow-x: auto;
     }
-    .flow {
-      background: #101a37;
-      border: 1px dashed var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-top: 10px;
-    }
     .flow-row {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: 1fr auto 1fr auto 1fr;
+      display: flex;
       align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
-    .box {
-      background: #1e2b54;
-      border: 1px solid #3d4f86;
-      border-radius: 10px;
-      padding: 12px;
+    .flow-box {
+      background: #101e3d;
+      border: 1px solid #2a3f70;
+      border-radius: 12px;
+      padding: 10px 14px;
       text-align: center;
-      color: #dce6ff;
-      font-size: .93rem;
+      font-size: 0.83rem;
+      color: var(--text);
+      min-width: 110px;
+      line-height: 1.4;
     }
-    .arrow { color: var(--accent2); font-weight: bold; text-align: center; }
-    .footnote {
-      color: var(--warning);
-      font-size: .9rem;
-      margin-top: 10px;
+    .flow-box.enc  { border-color: rgba(76,201,240,0.4); }
+    .flow-box.dec  { border-color: rgba(167,139,250,0.4); }
+    .flow-box.out  { border-color: rgba(125,249,196,0.4); }
+    .flow-box.spec { background: rgba(76,201,240,0.07); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+    .flow-arrow { color: var(--accent2); font-size: 1.1rem; flex-shrink: 0; }
+
+    /* ─── Info Boxes ─── */
+    .info-box { border-radius: 14px; padding: 16px 20px; margin: 14px 0; }
+    .info-box-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .info-box p, .info-box li { font-size: 0.87rem; }
+    .info-box ul { padding-left: 20px; }
+    .info-box li { margin-bottom: 5px; }
+
+    .info-note    { background: rgba(76,201,240,0.05);  border: 1px solid rgba(76,201,240,0.18); }
+    .info-note    .info-box-title { color: var(--accent); }
+    .info-note    p, .info-note li { color: #7aadca; }
+
+    .info-warn    { background: rgba(255,209,102,0.05); border: 1px solid rgba(255,209,102,0.18); }
+    .info-warn    .info-box-title { color: var(--warning); }
+    .info-warn    p, .info-warn li { color: #b09050; }
+
+    .info-key     { background: rgba(167,139,250,0.05); border: 1px solid rgba(167,139,250,0.18); }
+    .info-key     .info-box-title { color: var(--accent3); }
+    .info-key     p, .info-key li { color: #9080b8; }
+
+    .info-success { background: rgba(125,249,196,0.05); border: 1px solid rgba(125,249,196,0.18); }
+    .info-success .info-box-title { color: var(--accent2); }
+    .info-success p, .info-success li { color: #6aaa88; }
+
+    /* ─── KV Visual ─── */
+    .kv-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    .kv-box { border-radius: 12px; padding: 14px; text-align: center; }
+    .kv-k { background: rgba(76,201,240,0.07);  border: 1px solid rgba(76,201,240,0.22); }
+    .kv-v { background: rgba(167,139,250,0.07); border: 1px solid rgba(167,139,250,0.22); }
+    .kv-box .kv-label { font-size: 1.7rem; font-weight: 800; margin-bottom: 5px; }
+    .kv-k .kv-label { color: var(--accent); }
+    .kv-v .kv-label { color: var(--accent3); }
+    .kv-box .kv-name { font-size: 0.78rem; color: var(--muted); }
+
+    /* ─── Compare Table ─── */
+    .compare-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.86rem; }
+    .compare-table th {
+      background: #0d1830;
+      color: var(--accent);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border-bottom: 2px solid var(--border);
     }
-    .glossary dt { color: var(--accent); font-weight: 700; margin-top: 10px; }
-    .glossary dd { margin: 0 0 8px 0; color: var(--muted); }
+    .compare-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ─── Glossary ─── */
+    .glossary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+    .glossary-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+    .glossary-term { color: var(--accent); font-weight: 700; font-size: 0.88rem; margin-bottom: 5px; }
+    .glossary-def  { color: var(--muted); font-size: 0.83rem; }
+
+    /* ─── Divider ─── */
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 36px 0; }
+
+    /* ─── Footnote ─── */
+    .footnote { font-size: 0.84rem; color: var(--warning); display: flex; align-items: flex-start; gap: 8px; margin-top: 12px; }
+
+    /* ─── Utilities ─── */
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.05rem; color: var(--text); }
+    p  { color: var(--muted); margin-bottom: 10px; }
+    li { color: var(--muted); }
+    strong { color: var(--text); }
+    em { color: var(--accent2); font-style: normal; }
+    .text-accent  { color: var(--accent)  !important; }
+    .text-accent2 { color: var(--accent2) !important; }
+    .text-accent3 { color: var(--accent3) !important; }
+    .text-warn    { color: var(--warning) !important; }
+    .text-danger  { color: var(--danger)  !important; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-20 { margin-bottom: 20px; }
+
+    /* ─── Responsive ─── */
     @media (max-width: 820px) {
-      .flow-row { grid-template-columns: 1fr; }
-      .arrow { transform: rotate(90deg); }
+      .hero h1 { font-size: 1.55rem; }
+      .grid-3  { grid-template-columns: 1fr; }
+      .flow-row { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+      .kv-visual { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 20px 14px 60px; }
+      .hero { padding: 24px; }
     }
   </style>
 </head>
 <body>
+
+  <!-- ═══ NAVIGATION ═══ -->
+  <nav>
+    <ul>
+      <li><a href="#fundamentos">⚡ Fundamentos</a></li>
+      <li><a href="#encoder">🔍 Encoder</a></li>
+      <li><a href="#decoder">✍️ Decoder</a></li>
+      <li><a href="#inferencia">🎲 Inferencia</a></li>
+      <li><a href="#bart">🏗️ BART</a></li>
+      <li><a href="#biobart">🧬 BioBART</a></li>
+      <li><a href="#accion">🚀 En Acción</a></li>
+      <li><a href="#glosario">📖 Glosario</a></li>
+      <li><a href="#setup">⚙️ Setup</a></li>
+    </ul>
+  </nav>
+
   <div class="container">
+
+    <!-- ═══ HERO ═══ -->
     <section class="hero">
-      <h1>Guía Visual de LLMs: Transformer Encoder-Decoder, BART y BioBART</h1>
-      <p>
-        Material de repaso académico para <strong>Procesamiento de Datos Secuenciales (Módulo PLN)</strong>.
-        Esta guía explica, con foco técnico y aplicado, por qué un modelo generativo biomédico como <strong>BioBART</strong>
-        es ideal cuando la tarea exige redactar texto nuevo y coherente.
+      <h1>Guía Exhaustiva: BioBART y la Arquitectura Transformer</h1>
+      <p class="subtitle">
+        Material de referencia académica para <strong>Procesamiento de Datos Secuenciales · Módulo PLN</strong>.
+        Documenta en profundidad la arquitectura Transformer, el flujo Encoder–Decoder, el modelo BART
+        y su adaptación biomédica <strong>BioBART</strong>, con énfasis en el razonamiento matemático
+        que justifica cada decisión de diseño.
       </p>
-    </section>
-
-    <section>
-      <h2>1) Introducción general de la arquitectura</h2>
-      <div class="grid">
-        <article class="card">
-          <span class="chip">Datos secuenciales</span>
-          <p>
-            Un texto es una secuencia ordenada de tokens. El significado depende del contexto y de la posición
-            relativa en la frase (ej. negaciones, anáforas, entidades biomédicas).
-          </p>
-        </article>
-        <article class="card">
-          <span class="chip">Paralelización Transformer</span>
-          <p>
-            A diferencia de RNN/LSTM, el Transformer procesa todos los tokens en paralelo, reduciendo tiempos
-            y mejorando captura de dependencias largas.
-          </p>
-        </article>
-        <article class="card">
-          <span class="chip">Positional Encoding</span>
-          <p>
-            Como la atención es paralela, se pierde el orden temporal si no se inyecta posición.
-            Se suma una codificación posicional al embedding para preservar la estructura secuencial.
-          </p>
-          <span class="math">PE(pos,2i)=sin(pos/10000^(2i/d_model))<br/>PE(pos,2i+1)=cos(pos/10000^(2i/d_model))</span>
-        </article>
+      <div class="hero-tags">
+        <span class="tag tag-blue">Transformers</span>
+        <span class="tag tag-blue">Self-Attention</span>
+        <span class="tag tag-purple">Encoder–Decoder</span>
+        <span class="tag tag-purple">Autorregresión</span>
+        <span class="tag tag-green">BART</span>
+        <span class="tag tag-green">BioBART</span>
+        <span class="tag tag-yellow">NLP Biomédico</span>
+        <span class="tag tag-yellow">Generación de Texto</span>
       </div>
     </section>
 
-    <section>
-      <h2>2) Encoder (el “compresor” del mundo real)</h2>
-      <details open>
-        <summary>Flujo de entrada y representación contextual</summary>
-        <p>
-          Entrada = <code>Embeddings + Positional Encoding</code>. Cada bloque del encoder aplica
-          <strong>Multi-Head Self-Attention</strong> bidireccional para que cada token “mire” a toda la secuencia y
-          refine su significado contextual.
-        </p>
-      </details>
-      <details>
-        <summary>Self-Attention multi-cabeza</summary>
-        <p>
-          Por cabeza, se proyectan matrices <code>Q, K, V</code> y se calcula:
-        </p>
-        <span class="math">Attention(Q,K,V)=softmax((QKᵀ)/√d<sub>k</sub>)V</span>
-        <p>
-          Varias cabezas capturan relaciones distintas (sintácticas, semánticas, terminología clínica, etc.).
-        </p>
-      </details>
-      <details>
-        <summary>Add & Norm + Feed Forward</summary>
-        <p>
-          Cada subcapa se estabiliza con conexión residual (Add) y normalización (Norm), seguida de una red
-          Feed Forward (MLP) para transformación no lineal token a token.
-        </p>
-      </details>
-      <details>
-        <summary>Salida del Encoder</summary>
-        <p>
-          El encoder produce estados contextuales finales que funcionarán como <strong>memoria fuente</strong> del decoder.
-          En cross-attention, estos estados proveen las <strong>K</strong> y <strong>V</strong> definitivas.
-        </p>
-      </details>
-    </section>
-
-    <section>
-      <h2>3) Decoder (el “generador autorregresivo”)</h2>
-      <details open>
-        <summary>Instante cero y arranque con BOS</summary>
-        <p>
-          La inferencia inicia con <code>&lt;s&gt;</code> / <code>&lt;BOS&gt;</code>. Desde ahí, el decoder predice un token por paso:
-          salida<sub>t</sub> depende de salida<sub>&lt;t</sub> + contexto del encoder.
-        </p>
-      </details>
-      <details>
-        <summary>Bloque 1: Masked Self-Attention</summary>
-        <p>
-          Se aplica una máscara triangular superior con <code>-∞</code> para impedir acceso a posiciones futuras.
-          Así se evita “hacer trampa” durante entrenamiento y se respeta causalidad autoregresiva.
-        </p>
-        <span class="math">score = (QKᵀ)/√d<sub>k</sub> + mask, donde mask<sub>i,j</sub>= -∞ si j &gt; i</span>
-      </details>
-      <details>
-        <summary>Bloque 2: Cross-Attention (puente vital)</summary>
-        <p>
-          <strong>Q</strong> proviene del decoder (lo que va escribiendo). <strong>K</strong> y <strong>V</strong> provienen del encoder (fuente original).
-          Conceptualmente: “¿Qué parte de la información de entrada necesito ahora para escribir el siguiente token?”
-        </p>
-      </details>
-      <details>
-        <summary>Bloque 3: Feed Forward + Add & Norm</summary>
-        <p>
-          Después de la integración contextual, el decoder pasa por MLP y normalización residual para producir
-          una representación lista para proyectarse al vocabulario.
-        </p>
-      </details>
-
-      <div class="flow">
-        <h3>Pipeline del Decoder (flujo visual)</h3>
-        <div class="flow-row">
-          <div class="box">Entrada parcial generada<br/>(&lt;BOS&gt;, y<sub>1</sub>, ..., y<sub>t-1</sub>)</div>
-          <div class="arrow">→</div>
-          <div class="box">Masked Multi-Head<br/>Self-Attention</div>
-          <div class="arrow">→</div>
-          <div class="box">Cross-Attention<br/>(Q<sub>dec</sub>, K/V<sub>enc</sub>)</div>
-        </div>
-        <div class="flow-row" style="margin-top:10px; grid-template-columns: 1fr auto 1fr;">
-          <div class="box">Feed Forward + Add & Norm</div>
-          <div class="arrow">→</div>
-          <div class="box">Linear + Softmax → Token t</div>
+    <!-- ═══════════════════════════════════════════════════════
+         SECCIÓN 1 — FUNDAMENTOS DE LA ARQUITECTURA TRANSFORMER
+         ═══════════════════════════════════════════════════════ -->
+    <section id="fundamentos">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(76,201,240,0.1); color:var(--accent);">⚡</div>
+        <div>
+          <div class="section-num">Sección 1</div>
+          <h2 style="color:var(--accent);">Fundamentos de la Arquitectura Transformer</h2>
         </div>
       </div>
-    </section>
+      <div class="section-separator sep-blue"></div>
 
-    <section>
-      <h2>4) Etapa final de generación e inferencia</h2>
-      <div class="grid">
-        <article class="card">
-          <span class="chip">Linear + Softmax</span>
-          <p>
-            El estado del decoder se proyecta al tamaño del vocabulario. Softmax convierte logits en
-            distribución de probabilidad para seleccionar el siguiente token.
-          </p>
-        </article>
-        <article class="card">
-          <span class="chip">Greedy Search</span>
-          <p>
-            Elige siempre el token más probable. Es simple y rápido, pero puede caer en repeticiones
-            y bucles semánticos cuando la probabilidad local domina.
-          </p>
-        </article>
-        <article class="card">
-          <span class="chip">Muestreo controlado</span>
-          <p>
-            <strong>Temperature</strong> ajusta entropía; <strong>Top-K</strong> limita candidatos a K tokens;
-            <strong>Top-P (nucleus)</strong> usa el mínimo conjunto con probabilidad acumulada P.
-            Mejora diversidad manteniendo coherencia.
-          </p>
-        </article>
-      </div>
-      <p class="footnote">
-        Criterio de parada: la generación termina al producir <code>&lt;EOS&gt;</code> o alcanzar longitud máxima.
-      </p>
-    </section>
-
-    <section>
-      <h2>5) Arquitectura BART (base de BioBART)</h2>
-      <details open>
-        <summary>BART como híbrido Encoder-Decoder</summary>
+      <div class="card mb-20">
+        <div class="chip chip-blue">🕰️ El problema del procesamiento secuencial</div>
+        <h3>Por qué los RNN/LSTM se quedaron atrás</h3>
         <p>
-          BART combina comprensión contextual global (encoder) con generación autoregresiva (decoder).
-          Es adecuado para resumen, parafraseo, simplificación y generación condicionada.
+          Las redes recurrentes (RNN, LSTM, GRU) procesan el texto <strong>token a token</strong>,
+          actualizando un estado oculto h<sub>t</sub> en cada paso a partir de h<sub>t-1</sub>.
+          Esta decisión de diseño introduce tres limitaciones fundamentales:
         </p>
-      </details>
-      <details>
-        <summary>Contraste con BERT</summary>
-        <p>
-          BERT es solo encoder: excelente para clasificación, extracción y comprensión, pero no está diseñado
-          para redactar texto token a token con un decoder causal.
-        </p>
-      </details>
-      <details>
-        <summary>¿Por qué BioBART en biomedicina?</summary>
-        <p>
-          BioBART adapta BART al dominio biomédico. Esto mejora terminología especializada y permite generar
-          texto clínico/científico coherente, no solo entenderlo. En problemas donde se requiere producción de
-          lenguaje (resúmenes médicos, abstracción de literatura, borradores técnicos), supera enfoques solo-encoder.
-        </p>
-      </details>
-    </section>
-
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         SECCIÓN: BioBART en Acción — Inferencia y Casos de Uso
-         ═══════════════════════════════════════════════════════════════════════ -->
-    <section style="margin-top:28px;">
-      <h2>6) BioBART en Acción: Inferencia y Casos de Uso</h2>
-
-      <!-- ── Analizar vs. Generar ── -->
-      <div class="card" style="margin-bottom:14px; border-left:4px solid var(--accent);">
-        <span class="chip">Concepto clave</span>
-        <h3 style="color:var(--accent2); margin-bottom:8px;">Analizar texto vs. Generar texto</h3>
-        <div class="grid" style="margin:0;">
-          <article class="card" style="background:#12203d; border-color:#2a5298;">
-            <span class="chip" style="background:rgba(255,209,102,.15); border-color:rgba(255,209,102,.4); color:var(--warning);">Solo-Encoder (BERT)</span>
-            <p style="margin-top:8px;">
-              <strong style="color:var(--text);">Analiza</strong> el texto de entrada produciendo
-              embeddings contextuales ricos. Ideal para clasificación, NER y comprensión.
-              <br/><br/>
-              <strong style="color:var(--warning);">Limitación:</strong> No posee un decoder causal,
-              por lo que <em>no puede redactar</em> texto nuevo token a token. Un encoder solo
-              no tiene mecanismo de Masked Self-Attention + Cross-Attention que guíe la generación.
-            </p>
-          </article>
-          <article class="card" style="background:#0f2a1a; border-color:#1a7a3a;">
-            <span class="chip" style="background:rgba(128,255,219,.15); border-color:rgba(128,255,219,.4); color:var(--accent2);">Encoder-Decoder (BioBART)</span>
-            <p style="margin-top:8px;">
-              <strong style="color:var(--text);">Genera</strong> texto nuevo de forma autorregresiva.
-              El encoder comprime la entrada en estados contextuales; el decoder los consume
-              via Cross-Attention para producir cada token de salida.
-              <br/><br/>
-              <strong style="color:var(--accent2);">Ventaja:</strong> Puede redactar resúmenes,
-              respuestas y reportes clínicos coherentes, no solo etiquetarlos o clasificarlos.
-            </p>
-          </article>
-        </div>
-      </div>
-
-      <!-- ── Casos de uso ── -->
-      <h3 style="color:var(--text); margin:18px 0 10px;">Casos de uso demostrados en el notebook</h3>
-      <div class="grid">
-        <article class="card">
-          <span class="chip">Tarea 1</span>
-          <h3 style="color:var(--accent2); margin-bottom:6px;">📄 Resumen de Historias Clínicas</h3>
-          <p>
-            BioBART recibe un abstract o historia de admisión completa y produce un
-            <strong style="color:var(--text);">resumen ejecutivo de 2-4 oraciones</strong>,
-            destacando diagnósticos, hallazgos críticos y plan terapéutico.
-          </p>
-          <p>
-            Estrategia de generación: <code>Beam Search</code> con <code>num_beams=4</code>
-            y <code>no_repeat_ngram_size=3</code> para evitar los bucles del Greedy Search
-            y maximizar la probabilidad conjunta de la secuencia completa.
-          </p>
-        </article>
-        <article class="card">
-          <span class="chip">Tarea 2</span>
-          <h3 style="color:var(--accent2); margin-bottom:6px;">💬 Diálogo / QA Médico</h3>
-          <p>
-            Dado un contexto clínico (nota de UCI, resultados de laboratorio) y una pregunta,
-            BioBART <strong style="color:var(--text);">genera una respuesta en lenguaje natural</strong>,
-            sintetizando la información relevante del contexto.
-          </p>
-          <p>
-            A diferencia de modelos extractivos (que ubican un fragmento existente), BioBART
-            <em>redacta</em> la respuesta. Estrategia: <code>Nucleus Sampling</code>
-            (<code>top_p=0.92</code>) + <code>temperature=0.7</code> para equilibrar
-            coherencia clínica y fluidez natural.
-          </p>
-        </article>
-      </div>
-
-      <!-- ── Hiperparámetros ── -->
-      <details style="margin-top:10px;">
-        <summary>¿Por qué Beam Search y Nucleus Sampling? — El problema del Greedy Search</summary>
-        <div class="grid" style="margin-top:12px;">
-          <div class="card" style="background:#1c1230; border-color:#5c3d99;">
-            <span class="chip" style="background:rgba(220,100,100,.15); border-color:rgba(220,100,100,.4); color:#ff9a9a;">❌ Greedy Search</span>
-            <p>
-              Selecciona el token de mayor probabilidad en <em>cada paso</em> independientemente.
-              Puede quedar atrapado en <strong style="color:#ff9a9a;">máximos locales</strong> y
-              generar frases repetitivas e incoherentes — especialmente problemático en terminología
-              biomédica densa.
-            </p>
-            <p><code>argmax P(token_t | contexto)</code> → miope, sin visión global.</p>
+        <div class="grid mt-12">
+          <div class="card card-danger" style="background:#140b0b;">
+            <div class="chip chip-red">❌ Gradiente Desvanecido</div>
+            <p>La señal de gradiente se multiplica recursivamente por los pesos de la recurrencia.
+            Para secuencias largas, el gradiente tiende exponencialmente a cero, haciendo imposible
+            aprender dependencias entre tokens distantes — como la correferencia entre
+            <em>"el fármaco"</em> y <em>"inhibe"</em> separados por 30 tokens.</p>
           </div>
-          <div class="card" style="background:#0f2218; border-color:#2a6644;">
-            <span class="chip" style="background:rgba(128,255,219,.15); border-color:rgba(128,255,219,.4); color:var(--accent2);">✅ Beam Search</span>
-            <p>
-              Mantiene las <strong style="color:var(--text);">K hipótesis más probables</strong>
-              en paralelo. Maximiza la probabilidad conjunta
-              <code>P(y₁,...,yₙ | x)</code> al finalizar la secuencia completa,
-              no solo token a token.
-            </p>
+          <div class="card card-danger" style="background:#140b0b;">
+            <div class="chip chip-red">❌ Cuello de Botella Temporal</div>
+            <p>El paso t+1 <strong>no puede ejecutarse</strong> hasta que el paso t termine.
+            La paralelización en GPU durante el entrenamiento es imposible, lo que aumenta
+            drásticamente los tiempos de cómputo para corpus grandes como PubMed.</p>
           </div>
-          <div class="card" style="background:#0f1f2a; border-color:#2a5a7a;">
-            <span class="chip">✅ Nucleus Sampling</span>
-            <p>
-              <code>top_p</code>: selecciona el conjunto mínimo de tokens con probabilidad
-              acumulada ≥ P. El tamaño del conjunto se adapta al contexto: pequeño cuando
-              el modelo está seguro, grande cuando no lo está. Combina diversidad y coherencia.
-            </p>
+          <div class="card card-danger" style="background:#140b0b;">
+            <div class="chip chip-red">❌ Memoria de Longitud Fija</div>
+            <p>En la arquitectura seq2seq clásica (Sutskever et al., 2014), toda la secuencia
+            de entrada se comprime en un único vector de contexto de dimensión fija. Para textos
+            clínicos largos, este "resumen" de longitud fija pierde información crítica.</p>
           </div>
         </div>
+      </div>
+
+      <div class="card mb-20">
+        <div class="chip chip-blue">✅ La revolución: "Attention Is All You Need"</div>
+        <h3>Vaswani et al., 2017 — El Transformer original</h3>
+        <p>
+          La propuesta radical del Transformer es <strong>eliminar completamente la recurrencia</strong>
+          y reemplazarla con el mecanismo de <strong>Self-Attention</strong>: cada token computa
+          directamente su relación con <em>todos los demás tokens simultáneamente</em>.
+        </p>
+        <div class="info-box info-note mt-12">
+          <div class="info-box-title">💡 La analogía fundamental</div>
+          <p>
+            Imagina que debes entender <em>"el fármaco inhibió la enzima que degrada el sustrato"</em>.
+            Con un RNN, cuando llegas a "sustrato" ya has olvidado parte de "fármaco".
+            Con Self-Attention, el token "sustrato" mira directamente a "fármaco" en
+            <strong>un solo paso</strong>, sin importar cuántos tokens los separen.
+          </p>
+        </div>
+        <div class="grid-2 mt-16">
+          <div>
+            <h3 style="margin-bottom:10px; font-size:0.95rem;">RNN: O(n) pasos secuenciales</h3>
+            <div class="flow-container">
+              <div class="flow-row">
+                <div class="flow-box" style="background:#1a0808; border-color:#7a2020;">x₁</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box" style="background:#1a0808; border-color:#7a2020;">x₂</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box" style="background:#1a0808; border-color:#7a2020;">x₃</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box" style="background:#1a0808; border-color:#7a2020;">x₄</div>
+              </div>
+              <p style="text-align:center; font-size:0.78rem; margin-top:10px; color:var(--danger);">
+                Cada paso depende del anterior → sin paralelismo posible
+              </p>
+            </div>
+          </div>
+          <div>
+            <h3 style="margin-bottom:10px; font-size:0.95rem;">Transformer: O(1) pasos paralelos</h3>
+            <div class="flow-container">
+              <div class="flow-row">
+                <div class="flow-box enc">x₁</div>
+                <div class="flow-box enc">x₂</div>
+                <div class="flow-box enc">x₃</div>
+                <div class="flow-box enc">x₄</div>
+              </div>
+              <p style="text-align:center; font-size:0.78rem; margin-top:6px; color:var(--muted);">↕ todos se "ven" entre sí en paralelo ↕</p>
+              <p style="text-align:center; color:var(--accent2); font-size:0.84rem; margin-top:4px;">✓ Plenamente paralelizable en GPU</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-20">
+        <div class="chip chip-yellow">📍 La necesidad matemática del Positional Encoding</div>
+        <h3>Inyectar orden temporal en un mecanismo sin memoria secuencial</h3>
+        <p>
+          El mecanismo de Self-Attention es <strong>invariante a la permutación</strong>: si desordenamos
+          los tokens, el resultado de la atención es idéntico. Esto es matemáticamente problemático
+          porque el significado lingüístico depende críticamente del orden.
+        </p>
+        <div class="info-box info-warn">
+          <div class="info-box-title">⚠️ El problema concreto</div>
+          <p>
+            <em>"El médico trató al paciente"</em> vs. <em>"El paciente trató al médico"</em>
+            comparten exactamente los mismos tokens con los mismos embeddings. Sin información
+            posicional, el modelo las trataría como representaciones idénticas.
+          </p>
+        </div>
+        <div class="info-box info-note mt-12">
+          <div class="info-box-title">💡 La solución: sumar (no concatenar) un vector posicional</div>
+          <p>
+            Se <strong>suma</strong> un vector de codificación posicional al embedding del token.
+            Esto preserva la dimensionalidad d<sub>model</sub> y permite al modelo aprender a
+            decodificar la posición a partir de los patrones sinusoidales superpuestos.
+          </p>
+        </div>
+        <div class="math-block">
+          <span class="label">Positional Encoding — Vaswani et al. 2017</span>
+          PE(pos, 2i)   = sin( pos / 10000^(2i / d_model) )
+          PE(pos, 2i+1) = cos( pos / 10000^(2i / d_model) )
+
+          Embedding final:  z(pos) = TokenEmbedding(pos) + PE(pos)
+        </div>
+        <div class="grid mt-12">
+          <div class="card" style="background:#0d1628;">
+            <div class="chip chip-blue">pos</div>
+            <p>Posición del token en la secuencia (0, 1, 2, ..., n-1).</p>
+          </div>
+          <div class="card" style="background:#0d1628;">
+            <div class="chip chip-blue">i</div>
+            <p>Dimensión del embedding. Para d<sub>model</sub>=768, i va de 0 a 383.</p>
+          </div>
+          <div class="card" style="background:#0d1628;">
+            <div class="chip chip-blue">Propiedad clave</div>
+            <p>PE(pos+k) puede expresarse como transformación lineal de PE(pos), permitiendo
+            inferir <strong>distancias relativas</strong> entre posiciones.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="chip chip-blue">🏗️ Pipeline de entrada: de texto crudo a vectores de atención</div>
+        <div class="flow-container mt-12">
+          <div class="flow-row">
+            <div class="flow-box">Texto raw<br/><small>string</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">Tokenizador<br/><small>BPE</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box enc">Token IDs<br/><small>[5, 231, ...]</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box enc">Embedding<br/><small>E ∈ ℝ^(V×d)</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box spec">+ PE(pos)<br/><small>sumar posición</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box out">x₁,...,xₙ ∈ ℝ^d</div>
+          </div>
+        </div>
+        <p class="footnote">
+          💡 En BioBART, el tokenizador BPE especializado fragmenta términos como
+          "hiperlipidemia" en subpalabras morfológicamente significativas, preservando
+          raíces clínicas frecuentes en el vocabulario.
+        </p>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECCIÓN 2 — EL ENCODER
+         ═══════════════════════════════════════════════════════ -->
+    <section id="encoder">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(76,201,240,0.1); color:var(--encoder-color);">🔍</div>
+        <div>
+          <div class="section-num">Sección 2</div>
+          <h2 style="color:var(--encoder-color);">El Encoder — El "Analista" Bidireccional</h2>
+        </div>
+      </div>
+      <div class="section-separator sep-enc"></div>
+
+      <div class="info-box info-note mb-20">
+        <div class="info-box-title">🔭 Concepto central del Encoder</div>
+        <p>
+          El encoder es una arquitectura <strong>puramente bidireccional</strong>: cada token puede
+          "observar" todos los demás tokens simultáneamente, tanto los anteriores como los posteriores.
+          No existe ninguna restricción causal. Su propósito es construir una
+          <strong>representación contextual profunda</strong> de la secuencia de entrada completa
+          antes de que el decoder comience a generar.
+        </p>
+      </div>
+
+      <div class="card card-enc mb-20">
+        <div class="chip chip-blue">📐 Arquitectura de un bloque Encoder</div>
+        <h3>Flujo: entradas → representación contextual profunda</h3>
+        <div class="flow-container mt-12">
+          <div class="flow-row">
+            <div class="flow-box enc">Embeddings<br/>+ PE<br/><small>x₁,...,xₙ</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box enc">Multi-Head<br/>Self-Attention<br/><small>bidireccional</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box enc">Add &amp; Norm<br/><small>residual</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box enc">Feed Forward<br/><small>MLP token-wise</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box enc">Add &amp; Norm<br/><small>residual</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box spec">H<sub>enc</sub><br/><small>(→ K, V)</small></div>
+          </div>
+        </div>
+        <p style="font-size:0.82rem; margin-top:10px; color:var(--muted);">
+          Este bloque se apila N veces (BART-base: N=6, BART-large: N=12).
+          Cada capa añade una capa de abstracción progresivamente mayor.
+        </p>
+      </div>
+
+      <details open>
+        <summary>🎯 Multi-Head Self-Attention — El corazón del Encoder</summary>
+        <div class="grid-2">
+          <div>
+            <p>
+              Para cada token, el encoder proyecta su embedding en tres vectores:
+              <strong class="text-accent">Query (Q)</strong>,
+              <strong class="text-accent3">Key (K)</strong> y
+              <strong class="text-accent2">Value (V)</strong>.
+            </p>
+            <div class="math-block">
+              <span class="label">Proyecciones lineales</span>
+              Q = X · W^Q   (W^Q ∈ ℝ^(d × d_k))
+              K = X · W^K   (W^K ∈ ℝ^(d × d_k))
+              V = X · W^V   (W^V ∈ ℝ^(d × d_v))
+            </div>
+            <div class="math-block">
+              <span class="label">Scaled Dot-Product Attention</span>
+              Attention(Q,K,V) = softmax( Q·K^T / √d_k ) · V
+
+              Sin √d_k: para d_k grande los productos escalares
+              crecen → softmax entra en zona de gradiente ≈ 0.
+              La escala corrige la varianza del producto escalar.
+            </div>
+          </div>
+          <div>
+            <div class="info-box info-key">
+              <div class="info-box-title">🧠 Intuición de Q, K y V</div>
+              <ul>
+                <li><strong class="text-accent">Q (Query):</strong> "¿Qué información estoy buscando?"</li>
+                <li><strong class="text-accent3">K (Key):</strong> "¿Qué información puedo ofrecer?"</li>
+                <li><strong class="text-accent2">V (Value):</strong> "¿Cuál es mi contenido real?"</li>
+              </ul>
+              <p style="margin-top:10px;">
+                El score Q·K^T mide afinidad. El softmax normaliza en pesos de probabilidad
+                que ponderan los Values, produciendo una mezcla ponderada del contenido
+                de toda la secuencia.
+              </p>
+            </div>
+            <div class="info-box info-note" style="margin-top:12px;">
+              <div class="info-box-title">🔀 ¿Por qué múltiples cabezas?</div>
+              <p>
+                Con h cabezas (BART-base: h=16), el modelo puede atender simultáneamente
+                a <em>distintos tipos de relaciones</em>: una cabeza en relaciones sintácticas,
+                otra en correferencias, otra en terminología clínica, etc.
+              </p>
+              <div class="math-block" style="margin-top:8px;">
+                <span class="label">Multi-Head Attention</span>
+                MultiHead(Q,K,V) = Concat(h₁,...,hₙ) · W^O
+                head_i = Attention(Q·W_i^Q, K·W_i^K, V·W_i^V)
+              </div>
+            </div>
+          </div>
+        </div>
       </details>
 
-      <!-- ── Instrucciones de ejecución con uv ── -->
-      <div style="
-        background: #0a1628;
-        border: 1px solid var(--accent);
-        border-radius: 14px;
-        padding: 18px 20px;
-        margin-top: 18px;
-      ">
-        <h3 style="color:var(--accent); margin:0 0 12px;">
-          ⚡ Instrucciones de Ejecución — Entorno con <code style="background:none; color:var(--accent2); border:none; padding:0;">uv</code>
+      <details>
+        <summary>🔄 Add &amp; Norm — Conexiones Residuales y Estabilización</summary>
+        <div class="grid-2">
+          <div>
+            <div class="math-block">
+              <span class="label">Residual + Layer Norm</span>
+              Output = LayerNorm( x + Sublayer(x) )
+
+              LayerNorm: µ=0, σ=1 a través de las d features,
+              con parámetros γ y β aprendidos.
+            </div>
+          </div>
+          <div>
+            <div class="info-box info-note">
+              <div class="info-box-title">💡 ¿Por qué son críticas las conexiones residuales?</div>
+              <ul>
+                <li>Previenen el <strong>gradiente desvanecido</strong> en redes de 12+ capas.</li>
+                <li>Crean un "camino de autopista" para el gradiente desde la pérdida hasta las primeras capas.</li>
+                <li>Cada capa aprende <em>correcciones incrementales</em>, no representaciones desde cero.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>⚙️ Feed Forward Network (MLP) — Transformación no lineal token a token</summary>
+        <div class="grid-2">
+          <div>
+            <div class="math-block">
+              <span class="label">FFN por token (posición a posición)</span>
+              FFN(x) = max(0, x·W₁ + b₁) · W₂ + b₂
+
+              Dimensiones BART-base:
+              d_model = 1024,  d_ff = 4096  (expansión 4×)
+            </div>
+          </div>
+          <div>
+            <div class="info-box info-key">
+              <div class="info-box-title">🎯 Rol complementario del FFN</div>
+              <p>
+                Si Self-Attention <em>mezcla</em> información entre tokens (comunicación horizontal),
+                el FFN <em>transforma</em> cada token independientemente.
+                Los pesos W₁ actúan como <strong>"memorias clave-valor"</strong> que almacenan
+                conocimiento factual (Geva et al., 2021): en BioBART codifican asociaciones
+                como <em>gen → enfermedad</em> o <em>fármaco → receptor</em>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <div class="card card-enc mt-16">
+        <div class="chip chip-blue">🏁 Salida del Encoder — Las Matrices de Conocimiento</div>
+        <h3>H_enc: las matrices definitivas de K (Keys) y V (Values)</h3>
+        <p>
+          Tras N capas encoder, la secuencia se transforma en H_enc ∈ ℝ^(n × d_model):
+          cada fila encapsula el significado del token enriquecido con todo el contexto
+          bidireccional de la secuencia.
+        </p>
+        <div class="kv-visual">
+          <div class="kv-box kv-k">
+            <div class="kv-label">K</div>
+            <div style="font-size:0.85rem; color:var(--text); font-weight:600; margin-bottom:4px;">Keys</div>
+            <div class="kv-name">H_enc · W^K<br/>Índices de búsqueda para el decoder</div>
+          </div>
+          <div class="kv-box kv-v">
+            <div class="kv-label">V</div>
+            <div style="font-size:0.85rem; color:var(--text); font-weight:600; margin-bottom:4px;">Values</div>
+            <div class="kv-name">H_enc · W^V<br/>Contenido que leerá el decoder vía Cross-Attention</div>
+          </div>
+        </div>
+        <div class="info-box info-note mt-12">
+          <div class="info-box-title">🔑 Analogía: La Biblioteca de Conocimiento</div>
+          <p>
+            Las <strong class="text-accent">Keys (K)</strong> son el catálogo: permiten al decoder
+            <em>buscar</em> qué secciones son relevantes.
+            Los <strong class="text-accent3">Values (V)</strong> son el contenido real de los libros:
+            lo que el decoder <em>lee y sintetiza</em> al redactar su respuesta.
+            Estas matrices se fijan una vez procesada la entrada y se transfieren íntegramente
+            al decoder vía Cross-Attention en cada capa del decoder.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECCIÓN 3 — EL DECODER
+         ═══════════════════════════════════════════════════════ -->
+    <section id="decoder">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(167,139,250,0.1); color:var(--decoder-color);">✍️</div>
+        <div>
+          <div class="section-num">Sección 3</div>
+          <h2 style="color:var(--decoder-color);">El Decoder — El "Redactor" Autorregresivo</h2>
+        </div>
+      </div>
+      <div class="section-separator sep-dec"></div>
+
+      <div class="info-box info-key mb-20">
+        <div class="info-box-title">📝 Concepto central del Decoder</div>
+        <p>
+          El decoder genera texto <strong>un token a la vez</strong>, de forma autorregresiva:
+          el token generado en el paso t se convierte en entrada para generar el token t+1.
+          A diferencia del encoder, el decoder opera bajo restricción causal estricta: en el
+          paso t, solo puede "ver" los tokens en posiciones ≤ t.
+          Esta es la <strong>causalidad autoregresiva</strong>.
+        </p>
+      </div>
+
+      <div class="card card-dec mb-20">
+        <div class="chip chip-purple">⚡ El Instante Cero</div>
+        <h3>Arranque Forzado con el Token Especial &lt;BOS&gt;</h3>
+        <p>
+          La inferencia no puede "comenzar de la nada": el decoder necesita una señal de inicio.
+          Esta señal es el <strong>token especial BOS (Beginning Of Sequence)</strong>,
+          representado como <code>&lt;s&gt;</code> en BioBART.
+        </p>
+        <div class="flow-container mt-12">
+          <div style="text-align:center; margin-bottom:14px; font-size:0.83rem; color:var(--muted);">
+            Evolución temporal del decoder durante inferencia:
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center;">
+              <div class="flow-box spec" style="min-width:60px;">t = 0</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box dec"><code>&lt;BOS&gt;</code><br/><small>único token de entrada</small></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box out">Decoder predice y₁</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center;">
+              <div class="flow-box spec" style="min-width:60px;">t = 1</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box dec"><code>&lt;BOS&gt;</code>, y₁<br/><small>secuencia acumulada</small></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box out">Decoder predice y₂</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center;">
+              <div class="flow-box spec" style="min-width:60px;">t = T</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box dec"><code>&lt;BOS&gt;</code>, y₁, ..., y_(T-1)</div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box spec"><code>&lt;EOS&gt;</code><br/><small>fin de generación</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="info-box info-warn mt-12">
+          <div class="info-box-title">⚠️ Teacher Forcing (entrenamiento) vs. Autoregresión (inferencia)</div>
+          <p>
+            Durante el <strong>entrenamiento</strong>, se usa "teacher forcing":
+            se alimentan los tokens <em>reales</em> de referencia como entrada del decoder en cada paso,
+            permitiendo un forward pass paralelo eficiente. Sin embargo, introduce <em>exposure bias</em>:
+            durante la <strong>inferencia</strong>, el modelo consume sus propias predicciones
+            (potencialmente erróneas), creando una distribución diferente a la del entrenamiento.
+          </p>
+        </div>
+      </div>
+
+      <details open>
+        <summary style="color:var(--accent3);">🔒 Bloque 1 — Masked Self-Attention: La Restricción Causal</summary>
+        <div class="grid-2">
+          <div>
+            <p>
+              El decoder aplica Self-Attention con una <strong>máscara causal triangular inferior</strong>:
+              en la posición t no puede "ver" los tokens en posiciones t+1, ..., n.
+              Se implementa sumando −∞ a los scores de posiciones futuras antes del softmax.
+            </p>
+            <div class="math-block">
+              <span class="label">Causal Mask Triangular</span>
+              M_(i,j) = 0   si j ≤ i  (atención permitida)
+              M_(i,j) = −∞  si j > i  (posición futura: bloqueada)
+
+              score = ( Q · K^T / √d_k ) + M
+
+              softmax(−∞) → 0: posiciones futuras contribuyen
+              con peso exactamente cero.
+            </div>
+          </div>
+          <div>
+            <div class="info-box info-key">
+              <div class="info-box-title">📐 Visualización para 4 tokens de salida</div>
+              <div style="font-family:monospace; font-size:0.82rem; background:#0d1428; border-radius:10px; padding:14px; margin-top:8px;">
+                <div style="color:var(--muted); margin-bottom:6px;">✓ = atiende | ✗ = −∞ bloqueado</div>
+                <div style="color:var(--muted); padding-left:24px; margin-bottom:2px;">y₁  y₂  y₃  y₄</div>
+                <div><span style="color:var(--accent3);">y₁  </span><span style="color:var(--accent2);">✓   </span><span style="color:var(--danger);">✗   ✗   ✗</span></div>
+                <div><span style="color:var(--accent3);">y₂  </span><span style="color:var(--accent2);">✓   ✓   </span><span style="color:var(--danger);">✗   ✗</span></div>
+                <div><span style="color:var(--accent3);">y₃  </span><span style="color:var(--accent2);">✓   ✓   ✓   </span><span style="color:var(--danger);">✗</span></div>
+                <div><span style="color:var(--accent3);">y₄  </span><span style="color:var(--accent2);">✓   ✓   ✓   ✓</span></div>
+              </div>
+              <p style="margin-top:8px;">El patrón triangular garantiza causalidad estricta.</p>
+            </div>
+            <div class="info-box info-warn mt-12">
+              <div class="info-box-title">🎓 ¿Por qué es crítica esta restricción?</div>
+              <p>
+                Sin la máscara, el modelo podría "hacer trampa" leyendo los tokens objetivo
+                futuros durante el entrenamiento, haciendo imposible la inferencia real
+                donde esos tokens todavía no existen.
+              </p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary style="color:var(--accent3);">🌉 Bloque 2 — Cross-Attention: El Puente Encoder → Decoder</summary>
+        <div class="grid-2">
+          <div>
+            <p>
+              La Cross-Attention es el <strong>puente central</strong> del paradigma seq2seq:
+              conecta la comprensión del encoder con la generación del decoder.
+            </p>
+            <div class="math-block">
+              <span class="label">Cross-Attention — Orígenes de Q, K, V</span>
+              Q = H_dec · W^Q  ← del Decoder (variable en cada paso)
+              K = H_enc · W^K  ← del Encoder (fija para toda la generación)
+              V = H_enc · W^V  ← del Encoder (fija para toda la generación)
+
+              CrossAttention = softmax( Q · K^T / √d_k ) · V
+            </div>
+          </div>
+          <div>
+            <div class="info-box info-note">
+              <div class="info-box-title">💡 La pregunta implícita del decoder</div>
+              <p>
+                En cada paso t, el decoder pregunta implícitamente:
+                <em>"Dado que he generado [BOS, y₁, ..., y_(t-1)], ¿qué parte
+                del texto de entrada es más relevante para producir y_t?"</em>
+              </p>
+              <p style="margin-top:8px;">
+                Para generar un resumen clínico, si el decoder está escribiendo
+                <em>"diagnóstico: insuficiencia renal"</em>, la Cross-Attention
+                pondrá pesos altos sobre los fragmentos del texto fuente que mencionan
+                síntomas renales, creatinina o historia nefrológica.
+              </p>
+            </div>
+            <div class="kv-visual mt-12">
+              <div class="kv-box kv-v" style="background:rgba(167,139,250,0.07); border-color:rgba(167,139,250,0.22);">
+                <div class="kv-label" style="font-size:1.3rem;">Q</div>
+                <div class="kv-name">Del <strong class="text-accent3">Decoder</strong><br/>"¿qué necesito ahora?"</div>
+              </div>
+              <div class="kv-box kv-k">
+                <div class="kv-label" style="font-size:1.3rem;">K, V</div>
+                <div class="kv-name">Del <strong class="text-accent">Encoder</strong><br/>"biblioteca de conocimiento"</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary style="color:var(--accent3);">⚙️ Bloque 3 — Feed Forward + Add &amp; Norm</summary>
+        <p>
+          Idéntico al encoder: una red FFN de dos capas aplica una transformación no lineal
+          token a token, seguida de conexión residual y Layer Normalization.
+          Esta subcapa <strong>integra y consolida</strong> la información fusionada por
+          las dos capas de atención anteriores.
+        </p>
+        <div class="math-block">
+          <span class="label">Decoder FFN — BART usa GELU en lugar de ReLU</span>
+          FFN(x) = GELU( x · W₁ + b₁ ) · W₂ + b₂
+
+          GELU(x) = x · Φ(x)  donde Φ es la CDF Gaussiana estándar.
+          Más suave que ReLU y empíricamente superior en LLMs modernos.
+        </div>
+      </details>
+
+      <div class="card card-dec mt-16">
+        <div class="chip chip-purple">🎬 Pipeline completo del Decoder — un paso de generación</div>
+        <div class="flow-container mt-12">
+          <div class="flow-row">
+            <div class="flow-box dec">&lt;BOS&gt;, y₁,...,y_(t-1)<br/><small>tokens generados</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box dec">Embedding<br/>+ PE</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box dec">Masked<br/>Self-Attn<br/><small>solo ve pasado</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box dec">Add &amp; Norm</div>
+          </div>
+          <div class="flow-row" style="margin-top:12px;">
+            <div class="flow-box enc">H_enc (K, V)<br/><small>del Encoder (fijo)</small></div>
+            <div class="flow-arrow">↘</div>
+            <div class="flow-box spec">Cross-Attn<br/>(Q_dec, K/V_enc)</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box dec">Add &amp; Norm</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box dec">FFN<br/>+ Add &amp; Norm</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box out">h_t ∈ ℝ^d</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECCIÓN 4 — INFERENCIA
+         ═══════════════════════════════════════════════════════ -->
+    <section id="inferencia">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(255,209,102,0.1); color:var(--warning);">🎲</div>
+        <div>
+          <div class="section-num">Sección 4</div>
+          <h2 style="color:var(--warning);">Proyección al Vocabulario y Estrategias de Inferencia</h2>
+        </div>
+      </div>
+      <div class="section-separator sep-warn"></div>
+
+      <div class="card mb-20">
+        <div class="chip chip-yellow">📊 Proyección al Vocabulario</div>
+        <h3>De representación oculta a distribución de probabilidad</h3>
+        <p>
+          La representación h_t del decoder (d_model dimensiones) se proyecta linealmente al
+          vocabulario |V| (BioBART: ~50.264 tokens) y softmax genera la distribución del siguiente token:
+        </p>
+        <div class="math-block">
+          <span class="label">Proyección final (Language Model Head)</span>
+          logits = h_t · W_lm   (W_lm ∈ ℝ^(d × |V|))
+          P(y_t | y_{&lt;t}, x) = softmax( logits / T )
+
+          T = temperatura:
+            T &lt; 1 → más concentrada (más determinista)
+            T &gt; 1 → más plana (más aleatoria / creativa)
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card card-danger">
+          <div class="chip chip-red">❌ Greedy Search</div>
+          <div class="card-title">Selección Miope (argmax local)</div>
+          <p>Elige siempre el token de mayor probabilidad: <code>y_t = argmax P(y_t | ctx)</code></p>
+          <p style="margin-top:8px; color:var(--danger);">
+            <strong>Problema:</strong> Queda atrapado en máximos locales y genera repeticiones.
+            Sin visión global de la secuencia completa.
+          </p>
+        </div>
+        <div class="card card-enc">
+          <div class="chip chip-blue">✅ Beam Search</div>
+          <div class="card-title">Búsqueda en Haz (k hipótesis)</div>
+          <p>
+            Mantiene las <strong>k hipótesis más probables</strong> en paralelo y expande cada una.
+          </p>
+          <div class="math-block" style="font-size:0.79rem;">
+            <span class="label">Criterio Beam</span>
+            score = log P(y₁,...,yₙ | x) / n^α
+            α ∈ [0,1]: penaliza secuencias muy cortas
+          </div>
+          <p style="color:var(--accent2);">
+            <strong>Ventaja:</strong> Maximiza probabilidad conjunta de toda la secuencia.
+            Ideal para resúmenes clínicos.
+          </p>
+        </div>
+        <div class="card card-bio">
+          <div class="chip chip-green">✅ Nucleus Sampling (top-p)</div>
+          <div class="card-title">Muestreo de Núcleo Adaptativo</div>
+          <p>
+            Selecciona del subconjunto mínimo cuya probabilidad acumulada ≥ p (e.g., 0.92).
+            El tamaño del conjunto se adapta dinámicamente al contexto.
+          </p>
+          <p style="margin-top:8px;">
+            Modelo seguro → conjunto pequeño.<br/>
+            Modelo incierto → conjunto grande → diversidad natural.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid mt-16">
+        <div class="card">
+          <div class="chip chip-yellow">🌡️ Temperature Sampling</div>
+          <div class="card-title">Control de Aleatoriedad</div>
+          <ul style="padding-left:18px; margin-top:8px;">
+            <li><strong>T &lt; 1</strong> (e.g., 0.7): más determinista, más coherente</li>
+            <li><strong>T = 1</strong>: distribución del modelo sin modificar</li>
+            <li><strong>T &gt; 1</strong>: más creativo, más riesgo de incoherencia</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="chip chip-yellow">🏆 Top-K Sampling</div>
+          <div class="card-title">Vocabulario Restringido</div>
+          <p>
+            Trunca el vocabulario a los K tokens de mayor probabilidad antes de muestrear.
+          </p>
+          <p style="margin-top:8px; color:var(--danger);">
+            <strong>Limitación:</strong> K fijo no se adapta al nivel de certeza. Top-P resuelve esto.
+          </p>
+        </div>
+        <div class="card">
+          <div class="chip chip-yellow">🛑 Criterios de Parada</div>
+          <div class="card-title">Cuándo detener la generación</div>
+          <ul style="padding-left:18px;">
+            <li>Generación del token <code>&lt;EOS&gt;</code></li>
+            <li>Alcanzar <code>max_new_tokens</code></li>
+            <li>Todos los beams terminaron con EOS</li>
+            <li><code>no_repeat_ngram_size</code>: penaliza n-gramas repetidos</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECCIÓN 5 — ARQUITECTURA BART
+         ═══════════════════════════════════════════════════════ -->
+    <section id="bart">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(125,249,196,0.1); color:var(--accent2);">🏗️</div>
+        <div>
+          <div class="section-num">Sección 5</div>
+          <h2 style="color:var(--accent2);">Arquitectura BART — Base de BioBART</h2>
+        </div>
+      </div>
+      <div class="section-separator sep-bio"></div>
+
+      <div class="grid-2 mb-20">
+        <div class="card card-enc">
+          <div class="chip chip-blue">Encoder BART</div>
+          <h3>Basado en BERT: Bidireccional</h3>
+          <p>
+            El encoder de BART es bidireccional, inspirado en BERT. Lee toda la secuencia sin
+            restricciones causales. N capas: 6 (base) o 12 (large).
+          </p>
+        </div>
+        <div class="card card-dec">
+          <div class="chip chip-purple">Decoder BART</div>
+          <h3>Basado en GPT: Autorregresivo</h3>
+          <p>
+            El decoder de BART es autorregresivo, inspirado en GPT. Genera tokens de izquierda a
+            derecha con Masked Self-Attention. Completamente unidireccional.
+          </p>
+        </div>
+      </div>
+
+      <details open>
+        <summary>⚖️ BART vs. BERT vs. GPT — El espacio de diseño de los LLMs</summary>
+        <div style="overflow-x:auto;">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Modelo</th><th>Arquitectura</th><th>Pre-entrenamiento</th>
+                <th>Fortalezas</th><th>Limitaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong class="text-warn">BERT</strong></td>
+                <td>Solo Encoder</td><td>MLM + NSP</td>
+                <td>Clasificación, NER, comprensión, similitud semántica</td>
+                <td>No genera texto token a token — carece de decoder causal</td>
+              </tr>
+              <tr>
+                <td><strong class="text-accent3">GPT</strong></td>
+                <td>Solo Decoder</td><td>Causal Language Model</td>
+                <td>Generación libre, escritura creativa, few-shot prompting</td>
+                <td>No condicionado explícitamente a una entrada fuente</td>
+              </tr>
+              <tr>
+                <td><strong class="text-accent2">BART / BioBART</strong></td>
+                <td>Encoder–Decoder</td><td>Denoising Autoencoder</td>
+                <td>Resumen, traducción, parafraseo, QA abstractivo</td>
+                <td>Mayor tamaño y costo que modelos de único bloque</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <details>
+        <summary>🧹 Pre-entrenamiento BART como Denoising Autoencoder</summary>
+        <p>
+          BART (Lewis et al., 2020) se pre-entrena como un <strong>autoencoder denoising</strong>:
+          el texto original se corrompe de varias maneras y el modelo debe reconstruirlo exactamente.
+        </p>
+        <div class="grid mt-12">
+          <div class="card" style="background:#0d1628;">
+            <div class="chip chip-yellow">Token Masking</div>
+            <p>Tokens aleatorios reemplazados por <code>[MASK]</code>. Similar a BERT MLM.</p>
+          </div>
+          <div class="card" style="background:#0d1628;">
+            <div class="chip chip-yellow">Token Deletion</div>
+            <p>Tokens eliminados. El modelo debe inferir qué falta <em>y dónde</em>.</p>
+          </div>
+          <div class="card" style="background:#0d1628;">
+            <div class="chip chip-yellow">Text Infilling ⭐</div>
+            <p>Spans de texto reemplazados por un único <code>[MASK]</code>. Predice
+            cuántos tokens faltan y cuáles son. La tarea más efectiva para generación.</p>
+          </div>
+          <div class="card" style="background:#0d1628;">
+            <div class="chip chip-yellow">Sentence Permutation</div>
+            <p>Oraciones del documento reordenadas. El modelo aprende la estructura global del discurso.</p>
+          </div>
+          <div class="card" style="background:#0d1628;">
+            <div class="chip chip-yellow">Document Rotation</div>
+            <p>Documento rotado para comenzar en un token aleatorio. El modelo aprende el inicio real.</p>
+          </div>
+        </div>
+        <div class="info-box info-note mt-12">
+          <div class="info-box-title">⭐ Text Infilling: la tarea más valiosa para generación</div>
+          <p>
+            Lewis et al. encontraron que <strong>Text Infilling</strong> es la tarea más efectiva
+            para downstream tasks de generación, forzando al modelo a predecir longitudes variables
+            de texto ausente — habilidad directamente relevante para resúmenes médicos.
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>🎯 Fine-tuning de BART para Downstream Tasks</summary>
+        <div class="math-block">
+          <span class="label">Función de pérdida durante fine-tuning</span>
+          L(θ) = −Σ_(t=1)^T  log P(y_t | y_{&lt;t}, x ; θ)
+
+          Se optimizan todos los parámetros θ (encoder + decoder) con
+          Adam/AdaFactor y learning rate scheduling (warmup + decay lineal).
+        </div>
+      </details>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECCIÓN 6 — BIOBART
+         ═══════════════════════════════════════════════════════ -->
+    <section id="biobart">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(125,249,196,0.1); color:var(--biobart-color);">🧬</div>
+        <div>
+          <div class="section-num">Sección 6</div>
+          <h2 style="color:var(--biobart-color);">BioBART — Adaptación al Dominio Biomédico</h2>
+        </div>
+      </div>
+      <div class="section-separator sep-bio"></div>
+
+      <div class="card card-bio mb-20">
+        <div class="chip chip-green">🧬 ¿Qué es BioBART?</div>
+        <h3>BART pre-entrenado en corpus biomédico especializado</h3>
+        <p>
+          BioBART (Yuan et al., 2022) es una variante de BART pre-entrenada exclusivamente sobre
+          <strong>PubMed Central (PMC) Open Access Subset</strong>. Esto le otorga:
+        </p>
+        <div class="grid mt-12">
+          <div class="card" style="background:#0a1f14; border-color:#1a5a30;">
+            <div class="chip chip-green">🔬 Terminología Clínica</div>
+            <p>Fármacos, enfermedades raras, procedimientos, marcadores biológicos,
+            abreviaturas médicas estándar (MI, ICU, CABG, HbA1c, eGFR...).</p>
+          </div>
+          <div class="card" style="background:#0a1f14; border-color:#1a5a30;">
+            <div class="chip chip-green">📋 Estructura de Informes</div>
+            <p>Notas de admisión, resúmenes de alta, reportes radiológicos,
+            abstracts de artículos científicos.</p>
+          </div>
+          <div class="card" style="background:#0a1f14; border-color:#1a5a30;">
+            <div class="chip chip-green">🔗 Relaciones Biomédicas</div>
+            <p>Asociaciones gen-enfermedad, interacciones fármaco-receptor, relaciones causales
+            en fisiopatología, terminología ontológica (MeSH, SNOMED CT, ICD-10).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-20" style="border-left:4px solid var(--accent2);">
+        <div class="chip chip-green">⚖️ La diferencia crítica: Analizar vs. Generar</div>
+        <div class="grid-2 mt-12">
+          <div class="card" style="background:#121218; border-color:#3a3860;">
+            <div class="chip chip-yellow">Solo-Encoder (BioBERT / PubMedBERT)</div>
+            <p style="margin-top:8px;"><strong>Puede:</strong> Clasificar, extraer entidades (NER),
+            QA extractivo, similitud semántica.</p>
+            <p style="color:var(--danger); margin-top:10px;">
+              <strong>No puede:</strong> Generar texto token a token. Carece de Masked Self-Attention
+              + Cross-Attention. Un encoder solo <em>analiza</em>, nunca <em>escribe</em>.
+            </p>
+          </div>
+          <div class="card" style="background:#0a1f14; border-color:#1a5a30;">
+            <div class="chip chip-green">Encoder-Decoder (BioBART)</div>
+            <p style="margin-top:8px;"><strong>Puede:</strong> Todo lo anterior <em>más</em>
+            generar texto nuevo: resúmenes ejecutivos, respuestas abstractivas,
+            simplificaciones clínicas, borradores de informes.</p>
+            <p style="color:var(--accent2); margin-top:10px;">
+              <strong>Ventaja decisiva:</strong> Para tareas donde la salida debe ser texto
+              <em>redactado</em>, BioBART es la arquitectura correcta.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <details>
+        <summary>📐 Variantes de BioBART: Base vs. Large</summary>
+        <div style="overflow-x:auto;">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Variante</th><th>Enc. capas</th><th>Dec. capas</th>
+                <th>d_model</th><th>Attn. Heads</th><th>Parámetros</th><th>Uso recomendado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong class="text-accent2">BioBART-base</strong></td>
+                <td>6</td><td>6</td><td>768</td><td>12</td><td>~140 M</td>
+                <td>Investigación académica, hardware limitado, experimentos rápidos</td>
+              </tr>
+              <tr>
+                <td><strong class="text-accent2">BioBART-large</strong></td>
+                <td>12</td><td>12</td><td>1024</td><td>16</td><td>~400 M</td>
+                <td>Producción clínica, máxima calidad (requiere GPU &ge;16 GB)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECCIÓN 7 — BIOBART EN ACCIÓN
+         ═══════════════════════════════════════════════════════ -->
+    <section id="accion">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(125,249,196,0.1); color:var(--accent2);">🚀</div>
+        <div>
+          <div class="section-num">Sección 7</div>
+          <h2 style="color:var(--accent2);">BioBART en Acción — Casos del Notebook</h2>
+        </div>
+      </div>
+      <div class="section-separator sep-bio"></div>
+
+      <div class="grid mb-20">
+        <div class="card card-bio">
+          <div class="chip chip-green">Tarea 1</div>
+          <h3 style="color:var(--accent2);">📄 Resumen de Historias Clínicas</h3>
+          <p>
+            BioBART recibe una nota clínica extensa y genera un <strong>resumen ejecutivo</strong>
+            de 2-4 oraciones destacando diagnósticos, hallazgos críticos y plan terapéutico.
+          </p>
+          <div class="info-box info-note mt-12">
+            <div class="info-box-title">⚙️ Configuración recomendada</div>
+            <p><code>num_beams=4</code> — Beam Search para maximizar coherencia clínica.</p>
+            <p><code>no_repeat_ngram_size=3</code> — Previene bucles de n-gramas repetitivos.</p>
+            <p><code>max_new_tokens=150</code> — Limita extensión del resumen.</p>
+          </div>
+        </div>
+        <div class="card card-bio">
+          <div class="chip chip-green">Tarea 2</div>
+          <h3 style="color:var(--accent2);">💬 QA Médico Abstractivo</h3>
+          <p>
+            Dado un contexto clínico y una pregunta médica, BioBART
+            <strong>redacta</strong> la respuesta — no solo extrae un fragmento existente.
+          </p>
+          <div class="info-box info-note mt-12">
+            <div class="info-box-title">⚙️ Configuración recomendada</div>
+            <p><code>do_sample=True</code> — Activa muestreo estocástico.</p>
+            <p><code>top_p=0.92</code> — Nucleus Sampling para diversidad controlada.</p>
+            <p><code>temperature=0.7</code> — Respuestas más coherentes y naturales.</p>
+          </div>
+        </div>
+      </div>
+
+      <details>
+        <summary>🔬 Análisis: ¿Por qué Beam Search para resúmenes y Nucleus Sampling para QA?</summary>
+        <div class="grid-2">
+          <div class="card" style="background:#0d1f35; border-color:#1a4066;">
+            <div class="chip chip-blue">📄 Resúmenes → Beam Search</div>
+            <p>Alta <strong>fidelidad factual</strong> requerida. Beam Search maximiza la
+            probabilidad conjunta de toda la secuencia → salida estadísticamente más segura.</p>
+            <p style="margin-top:8px; color:var(--accent);">Prioridad: <strong>Precisión &gt; Diversidad</strong></p>
+          </div>
+          <div class="card" style="background:#0a1f14; border-color:#1a5a30;">
+            <div class="chip chip-green">💬 QA → Nucleus Sampling</div>
+            <p>Respuestas conversacionales se benefician de variabilidad natural en la redacción.
+            Nucleus Sampling genera texto fluido, coherente vía <code>temperature=0.7</code>.</p>
+            <p style="margin-top:8px; color:var(--accent2);">Prioridad: <strong>Fluidez + Precisión</strong></p>
+          </div>
+        </div>
+      </details>
+
+      <div id="setup" style="background:#080f1e; border:1px solid var(--accent); border-radius:18px; padding:24px; margin-top:20px;">
+        <h3 style="color:var(--accent); margin-bottom:14px;">
+          ⚡ Instrucciones de Ejecución — Entorno con
+          <code style="background:none; color:var(--accent2); border:none; padding:0; font-size:inherit;">uv</code>
         </h3>
-        <p style="margin-top:0; font-size:.9rem;">
-          Ejecutar estos comandos <strong style="color:var(--text);">antes de la sustentación</strong>
-          para levantar el entorno y registrar el kernel de Jupyter:
+        <p style="font-size:0.9rem; margin-bottom:16px;">
+          Ejecutar los siguientes comandos <strong>antes de la sustentación</strong>:
         </p>
-        <pre style="
-          background: #050d1a;
-          border: 1px solid var(--border);
-          border-radius: 10px;
-          padding: 14px;
-          color: #b9fbc0;
-          font-size: .85rem;
-          overflow-x: auto;
-          margin: 0;
-          line-height: 1.7;
-        "><span style="color:#4cc9f0;"># 1) Instalar uv (una sola vez)</span>
+        <pre style="background:#030810; border:1px solid var(--border); border-radius:12px; padding:18px; color:#b9fbc0; font-size:0.83rem; overflow-x:auto; margin:0 0 14px; line-height:1.8;"><span style="color:#4cc9f0;"># 1) Instalar uv (gestor de entornos Python moderno — una sola vez)</span>
 curl -Lsf https://astral.sh/uv/install.sh | sh
 
-<span style="color:#4cc9f0;"># 2) Crear entorno virtual aislado</span>
+<span style="color:#4cc9f0;"># 2) Crear entorno virtual aislado en el directorio del proyecto</span>
 uv venv .venv
 
 <span style="color:#4cc9f0;"># 3) Activar el entorno</span>
-source .venv/bin/activate        <span style="color:#888;"># Linux / macOS</span>
-<span style="color:#555;"># .venv\Scripts\activate          # Windows PowerShell</span>
+source .venv/bin/activate          <span style="color:#556;"># Linux / macOS</span>
+<span style="color:#445;"># .venv\Scripts\activate            # Windows PowerShell</span>
 
-<span style="color:#4cc9f0;"># 4) Instalar dependencias desde pyproject.toml</span>
+<span style="color:#4cc9f0;"># 4) Instalar dependencias del proyecto (desde pyproject.toml)</span>
 uv pip install -e .
 
 <span style="color:#4cc9f0;"># 5) Registrar kernel para JupyterLab</span>
@@ -459,28 +1411,104 @@ python -m ipykernel install --user --name biobart-env --display-name "BioBART (u
 
 <span style="color:#4cc9f0;"># 6) Lanzar JupyterLab</span>
 jupyter lab</pre>
-        <p style="font-size:.82rem; color:var(--warning); margin:10px 0 0;">
-          💡 Abrir <code>notebooks/biobart_inferencia.ipynb</code> y seleccionar kernel
-          <strong>"BioBART (uv)"</strong> en el menú Kernel → Change Kernel.
+        <p style="font-size:0.82rem; color:var(--warning); margin:0;">
+          💡 En JupyterLab, abrir <code>notebooks/biobart_inferencia.ipynb</code> y
+          seleccionar el kernel <strong>"BioBART (uv)"</strong> en Kernel &rarr; Change Kernel.
         </p>
       </div>
     </section>
 
-    <section class="card" style="margin-top:18px;">
-      <h2>Glosario rápido</h2>
-      <dl class="glossary">
-        <dt>Q (Query)</dt>
-        <dd>Lo que “pregunta” un token para encontrar información relevante.</dd>
-        <dt>K (Key)</dt>
-        <dd>Claves contra las que se compara la Query para calcular afinidad.</dd>
-        <dt>V (Value)</dt>
-        <dd>Contenido que se combina ponderadamente según los pesos de atención.</dd>
-        <dt>BOS (&lt;BOS&gt; / &lt;s&gt;)</dt>
-        <dd>Token de inicio que dispara la generación en el decoder.</dd>
-        <dt>EOS (&lt;EOS&gt;)</dt>
-        <dd>Token de fin que indica detener la inferencia.</dd>
-      </dl>
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SECCIÓN 8 — GLOSARIO
+         ═══════════════════════════════════════════════════════ -->
+    <section id="glosario">
+      <div class="section-header">
+        <div class="section-icon" style="background:rgba(167,139,250,0.1); color:var(--accent3);">📖</div>
+        <div>
+          <div class="section-num">Sección 8</div>
+          <h2 style="color:var(--accent3);">Glosario Técnico</h2>
+        </div>
+      </div>
+      <div class="section-separator" style="background:var(--accent3);"></div>
+
+      <div class="glossary-grid">
+        <div class="glossary-item">
+          <div class="glossary-term">Q — Query</div>
+          <div class="glossary-def">Vector que representa "la pregunta" de un token al buscar información relevante. Proviene del estado actual del token que atiende.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">K — Key</div>
+          <div class="glossary-def">Vector que actúa como "índice" de cada token. Se compara con la Query mediante producto escalar para calcular el score de afinidad.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">V — Value</div>
+          <div class="glossary-def">Contenido real de un token que se transfiere ponderado por los pesos de atención. Es lo que "fluye" hacia el token que consulta.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">d_model</div>
+          <div class="glossary-def">Dimensionalidad de los embeddings y estados ocultos. BART-base: 768. BART-large: 1024. Define el "ancho" de la red.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">d_k</div>
+          <div class="glossary-def">Dimensión de los vectores Q y K. Típicamente d_model / num_heads. La escala 1/√d_k previene saturación del softmax.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">BOS / &lt;s&gt;</div>
+          <div class="glossary-def">Token especial "Beginning Of Sequence". Se inyecta como primera entrada del decoder para iniciar la generación autorregresiva.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">EOS / &lt;/s&gt;</div>
+          <div class="glossary-def">Token especial "End Of Sequence". Su generación señala al modelo que debe detener la inferencia.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">Autorregresivo</div>
+          <div class="glossary-def">Proceso donde la salida en el paso t se usa como entrada en el paso t+1. El decoder Transformer es inherentemente autorregresivo durante inferencia.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">Teacher Forcing</div>
+          <div class="glossary-def">Técnica donde se proveen los tokens reales de referencia al decoder durante el entrenamiento. Acelera convergencia pero introduce exposure bias.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">Positional Encoding</div>
+          <div class="glossary-def">Vector sinusoidal sumado al embedding del token para codificar su posición. Necesario porque Self-Attention es invariante a la permutación.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">Layer Normalization</div>
+          <div class="glossary-def">Normalización de activaciones (µ=0, σ=1) a través de la dimensión de features. Estabiliza el entrenamiento de redes profundas.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">Beam Search</div>
+          <div class="glossary-def">Estrategia de decodificación que mantiene K hipótesis en paralelo, seleccionando la secuencia con mayor log-probabilidad conjunta.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">Nucleus Sampling (top-p)</div>
+          <div class="glossary-def">Muestreo del subconjunto mínimo de tokens cuya probabilidad acumulada ≥ p. Adapta dinámicamente el conjunto al nivel de certeza del modelo.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">Cross-Attention</div>
+          <div class="glossary-def">Mecanismo del decoder donde Q proviene del decoder y K, V del encoder. Puente central del paradigma seq2seq.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">Denoising Autoencoder</div>
+          <div class="glossary-def">Paradigma de pre-entrenamiento de BART: reconstruir el texto original a partir de versiones corrompidas (masks, deleciones, reordenamientos).</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">BPE (Byte-Pair Encoding)</div>
+          <div class="glossary-def">Algoritmo de tokenización que divide el texto en subpalabras frecuentes. Maneja vocabulario abierto sin tokens OOV y es sensible a morfología médica.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">Exposure Bias</div>
+          <div class="glossary-def">Discrepancia entre entrenamiento (teacher forcing) e inferencia (tokens predichos propios). El modelo nunca ve sus propios errores en el entrenamiento.</div>
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">GELU</div>
+          <div class="glossary-def">Gaussian Error Linear Unit. GELU(x) = x·Φ(x). Activación más suave que ReLU, empíricamente superior en Transformers modernos.</div>
+        </div>
+      </div>
     </section>
-  </div>
+
+  </div><!-- /container -->
 </body>
 </html>
