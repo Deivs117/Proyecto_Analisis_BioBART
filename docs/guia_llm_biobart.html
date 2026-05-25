@@ -551,31 +551,130 @@
           <div class="info-box-title">💡 La solución: sumar (no concatenar) un vector posicional</div>
           <p>
             Se <strong>suma</strong> un vector de codificación posicional al embedding del token.
-            Esto preserva la dimensionalidad d<sub>model</sub> y permite al modelo aprender a
-            decodificar la posición a partir de los patrones sinusoidales superpuestos.
+            Esto preserva la dimensionalidad d<sub>model</sub> y permite al modelo codificar
+            la posición sin cambiar el tamaño de los vectores.
           </p>
         </div>
-        <div class="math-block">
-          <span class="label">Positional Encoding — Vaswani et al. 2017</span>
-          PE(pos, 2i)   = sin( pos / 10000^(2i / d_model) )
-          PE(pos, 2i+1) = cos( pos / 10000^(2i / d_model) )
 
-          Embedding final:  z(pos) = TokenEmbedding(pos) + PE(pos)
+        <!-- COMPARACIÓN: SINUSOIDAL vs LEARNED -->
+        <div class="grid-2 mt-16">
+          <div class="card" style="background:#0d1a10; border-color:#2a5a30; border-top:3px solid #888780;">
+            <div class="chip chip-yellow">📐 Transformer original (Vaswani 2017)</div>
+            <h3 style="font-size:0.95rem; margin-bottom:10px;">Positional Encoding sinusoidal — fijo</h3>
+            <p style="font-size:0.85rem;">Los vectores posicionales se calculan con una <strong>fórmula matemática fija</strong> de seno y coseno. No se aprenden, no cambian, son siempre los mismos.</p>
+            <div class="math-block" style="font-size:0.8rem; margin-top:10px;">
+              <span class="label">Fórmula — Vaswani et al. 2017</span>
+              PE(pos, 2i)   = sin( pos / 10000^(2i/d) )
+              PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
+
+              pos = posición del token (0, 1, 2...)
+              i   = dimensión del vector (0 → d/2)
+            </div>
+            <div class="info-box info-note" style="margin-top:10px;">
+              <div class="info-box-title">✅ Ventaja</div>
+              <p style="font-size:0.82rem;">Puede generalizar a secuencias <strong>más largas</strong> que las vistas en entrenamiento, ya que la fórmula funciona para cualquier posición.</p>
+            </div>
+          </div>
+
+          <div class="card" style="background:#060f1e; border-color:#1a3a6b; border-top:3px solid var(--biobart-color);">
+            <div class="chip chip-green">🧬 BART y BioBART — Learned Positional Embeddings</div>
+            <h3 style="font-size:0.95rem; margin-bottom:10px;">Embeddings posicionales aprendidos — entrenables</h3>
+            <p style="font-size:0.85rem;">BART <strong>no usa la fórmula de seno/coseno</strong>. En su lugar, tiene una tabla de embeddings posicionales W_pos que se aprende durante el pre-entrenamiento, igual que los embeddings de palabras.</p>
+            <div class="math-block" style="font-size:0.8rem; margin-top:10px;">
+              <span class="label">BART — Learned Positional Embedding</span>
+              W_pos ∈ ℝ^(1026 × d_model)
+              (1024 posiciones + 2 tokens especiales)
+
+              z(pos) = TokenEmbedding(token) + W_pos[pos]
+
+              W_pos se actualiza con backpropagation
+              durante el pre-entrenamiento en 160GB de texto.
+            </div>
+            <div class="info-box info-success" style="margin-top:10px;">
+              <div class="info-box-title">✅ Ventaja para BART/BioBART</div>
+              <p style="font-size:0.82rem;">El modelo aprende <strong>exactamente qué patrón posicional es útil</strong> para el lenguaje natural y el dominio biomédico, en vez de asumir que las frecuencias sinusoidales son óptimas.</p>
+            </div>
+          </div>
         </div>
-        <div class="grid mt-12">
-          <div class="card" style="background:#0d1628;">
-            <div class="chip chip-blue">pos</div>
-            <p>Posición del token en la secuencia (0, 1, 2, ..., n-1).</p>
+
+        <!-- CÓMO FUNCIONAN LOS LEARNED EMBEDDINGS -->
+        <div class="card mt-16" style="background:#08101e; border-color:rgba(125,249,196,0.25);">
+          <div class="chip chip-green">🔍 ¿Cómo funcionan exactamente los learned embeddings en BART?</div>
+          <h3 style="margin-bottom:12px;">La tabla posicional como memoria de posición</h3>
+          <p style="font-size:0.88rem; margin-bottom:14px;">
+            Imagina una tabla con 1024 filas (una por posición posible) y 768 columnas (dimensiones del modelo).
+            Cada fila es un vector que el modelo asocia con "estar en esa posición". Al inicio del entrenamiento
+            son vectores aleatorios. Después de pre-entrenarse con millones de oraciones, cada fila aprende
+            un patrón que captura lo que lingüísticamente significa "ser el token en posición X".
+          </p>
+          <div class="flow-container">
+            <div class="flow-row">
+              <div class="flow-box enc" style="min-width:100px;">Token<br/><code style="font-size:0.75rem;">"fiebre"</code><br/><small>pos = 5</small></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box enc" style="min-width:130px;">E["fiebre"]<br/><small>vector semántico<br/>768 dims</small></div>
+              <div class="flow-arrow">+</div>
+              <div class="flow-box" style="border-color:rgba(125,249,196,0.4); min-width:130px; color:var(--accent2);">W_pos[5]<br/><small>vector posicional<br/>aprendido 768 dims</small></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box out" style="min-width:150px;">x₅ = "fiebre en pos 5"<br/><small>semántica + posición</small></div>
+            </div>
           </div>
-          <div class="card" style="background:#0d1628;">
-            <div class="chip chip-blue">i</div>
-            <p>Dimensión del embedding. Para d<sub>model</sub>=768, i va de 0 a 383.</p>
+          <div class="grid-2 mt-12">
+            <div class="info-box info-key">
+              <div class="info-box-title">🧠 ¿Qué aprende W_pos[0] vs W_pos[500]?</div>
+              <p style="font-size:0.83rem;">
+                <strong>W_pos[0–5]:</strong> Aprende que las primeras posiciones suelen ser sujetos, nombres de pacientes, fechas — inicio de nota clínica.<br/><br/>
+                <strong>W_pos[400–600]:</strong> Aprende que estas posiciones suelen contener resultados de laboratorio, diagnósticos secundarios.<br/><br/>
+                <strong>W_pos[900+]:</strong> Aprende que el final de una nota suele contener plan terapéutico y observaciones.
+              </p>
+            </div>
+            <div class="info-box info-warn">
+              <div class="info-box-title">⚠️ La limitación de este enfoque</div>
+              <p style="font-size:0.83rem;">
+                A diferencia del sinusoidal, los learned embeddings <strong>no generalizan más allá de 1024 tokens</strong>. Si una nota clínica excede esa longitud, BART simplemente no sabe qué vector posicional usar para la posición 1025 — no fue entrenado para eso.<br/><br/>
+                El sinusoidal puede extrapolarse matemáticamente; el learned no.
+              </p>
+            </div>
           </div>
-          <div class="card" style="background:#0d1628;">
-            <div class="chip chip-blue">Propiedad clave</div>
-            <p>PE(pos+k) puede expresarse como transformación lineal de PE(pos), permitiendo
-            inferir <strong>distancias relativas</strong> entre posiciones.</p>
-          </div>
+        </div>
+
+        <!-- TABLA RESUMEN -->
+        <div style="overflow-x:auto; margin-top:16px;">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th>Sinusoidal (Vaswani 2017)</th>
+                <th>Learned / BART + BioBART</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>¿Se aprende?</td>
+                <td style="color:var(--danger);">No — fórmula fija</td>
+                <td style="color:var(--accent2);">Sí — backpropagation</td>
+              </tr>
+              <tr>
+                <td>Generaliza a longitudes no vistas</td>
+                <td style="color:var(--accent2);">Sí</td>
+                <td style="color:var(--danger);">No (máx. 1024 en BART)</td>
+              </tr>
+              <tr>
+                <td>Optimalidad para el dominio</td>
+                <td style="color:var(--muted);">Genérica (matemática pura)</td>
+                <td style="color:var(--accent2);">Adaptada al lenguaje/dominio</td>
+              </tr>
+              <tr>
+                <td>Parámetros adicionales</td>
+                <td style="color:var(--accent2);">Ninguno</td>
+                <td style="color:var(--muted);">1024 × d_model (pequeño)</td>
+              </tr>
+              <tr>
+                <td>Usado por</td>
+                <td>Transformer original, T5</td>
+                <td style="color:var(--biobart-color);">GPT, BERT, <strong>BART, BioBART</strong></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -2166,7 +2265,7 @@ jupyter lab</pre>
         </div>
         <div class="glossary-item">
           <div class="glossary-term">Positional Encoding</div>
-          <div class="glossary-def">Vector sinusoidal sumado al embedding del token para codificar su posición. Necesario porque Self-Attention es invariante a la permutación.</div>
+          <div class="glossary-def">Vector sumado al embedding del token para codificar su posición. El Transformer original usa funciones seno/coseno (fijo). <strong>BART y BioBART usan learned positional embeddings</strong>: una tabla W_pos ∈ ℝ^(1024 × d_model) que se aprende por backpropagation durante el pre-entrenamiento.</div>
         </div>
         <div class="glossary-item">
           <div class="glossary-term">Layer Normalization</div>
