@@ -50,12 +50,9 @@
   </script>
   <style>
     html, body { margin: 0; padding: 0; background: #020408; font-family: 'Inter', sans-serif; }
-    .slide { display: none; animation: fadeIn 0.55s ease forwards; }
-    .slide.active { display: flex; }
+    .tab-section { display: none; }
+    .tab-section.active { display: block; animation: fadeIn 0.55s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Progress bar */
-    #progress-bar { transition: width 0.4s ease; }
 
     /* Neon text helpers */
     .text-neon-cyan  { color: #00f5ff; text-shadow: 0 0 8px #00f5ff88; }
@@ -118,10 +115,15 @@
     .delay-5 { animation-delay: 0.58s; }
     .delay-6 { animation-delay: 0.70s; }
 
-    /* Scrollable slide body */
-    .slide-body { overflow-y: auto; max-height: calc(100vh - 96px); }
-    .slide-body::-webkit-scrollbar { width: 4px; }
-    .slide-body::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+    /* Section content wrapper */
+    .slide-body { }
+
+    /* Active tab button */
+    .tab-btn.active-tab {
+      color: #00f5ff;
+      border-bottom: 2px solid #00f5ff;
+      background: rgba(0,245,255,.08);
+    }
 
     /* Nav button */
     .nav-btn {
@@ -140,32 +142,61 @@
 </head>
 <body class="min-h-screen flex flex-col" style="background:#020408; color:#e2e8f0;">
 
-  <!-- ══════════════════════  TOP BAR  ══════════════════════ -->
-  <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3"
-          style="background:rgba(2,4,8,.92); border-bottom:1px solid #0d1f38; backdrop-filter:blur(8px);">
-    <div class="flex items-center gap-3">
-      <span class="text-xs font-semibold tracking-widest uppercase text-neon-cyan opacity-80">BioBART</span>
-      <span class="text-gray-600 text-xs">|</span>
-      <span class="text-xs text-gray-400" id="slide-label">Diapositiva 1 / 6</span>
+  <!-- ══════════════════════  STICKY TOP NAV (TABS)  ══════════════════════ -->
+  <header class="fixed top-0 left-0 right-0 z-50"
+          style="background:rgba(2,4,8,.96); border-bottom:1px solid #0d1f38; backdrop-filter:blur(10px);">
+
+    <!-- Brand row -->
+    <div class="flex items-center justify-between px-4 sm:px-6 py-2" style="border-bottom:1px solid #091524;">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">🧬</span>
+        <span class="text-xs font-black tracking-widest uppercase text-neon-cyan">BioBART</span>
+        <span class="text-gray-700 text-xs hidden sm:inline">|</span>
+        <span class="text-xs text-gray-500 hidden sm:inline">Procesamiento de Datos Secuenciales</span>
+      </div>
+      <span class="text-xs text-gray-600 hidden md:inline">Sustentación de Modelo</span>
     </div>
-    <!-- Dot nav -->
-    <div class="flex gap-2" id="dot-nav">
-      <!-- dots injected by JS -->
-    </div>
-    <div class="text-xs text-gray-500 hidden sm:block">Procesamiento de Datos Secuenciales</div>
+
+    <!-- Tabs row -->
+    <nav class="flex overflow-x-auto gap-0 px-2" style="scrollbar-width:none;" id="tab-nav">
+      <button onclick="showTab('slide-1',this)" data-tab="slide-1"
+              class="tab-btn active-tab flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
+        ⚡ Linaje Evolutivo
+      </button>
+      <button onclick="showTab('slide-2',this)" data-tab="slide-2"
+              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
+        🏗️ Encoder-Decoder
+      </button>
+      <button onclick="showTab('slide-3',this)" data-tab="slide-3"
+              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
+        🔑 Atención Q,K,V
+      </button>
+      <button onclick="showTab('slide-4',this)" data-tab="slide-4"
+              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
+        🔬 Innovaciones
+      </button>
+      <button onclick="showTab('slide-5',this)" data-tab="slide-5"
+              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
+        📐 Dimensiones
+      </button>
+      <button onclick="showTab('slide-6',this)" data-tab="slide-6"
+              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
+        ⚠️ Limitaciones
+      </button>
+      <button onclick="showTab('slide-7',this)" data-tab="slide-7"
+              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-neon-green hover:bg-white/5 whitespace-nowrap"
+              style="color:#39ff1488;">
+        ⚡ Generación Paso a Paso
+      </button>
+    </nav>
   </header>
 
-  <!-- ══════════════════════  PROGRESS BAR  ══════════════════════ -->
-  <div class="fixed top-[52px] left-0 right-0 h-[2px] z-40" style="background:#091524;">
-    <div id="progress-bar" class="h-full" style="background:linear-gradient(90deg,#00f5ff,#bf5fff); width:16.67%;"></div>
-  </div>
-
   <!-- ══════════════════════  SLIDES CONTAINER  ══════════════════════ -->
-  <main class="flex-1 pt-[60px] pb-[72px] min-h-screen">
+  <main class="flex-1 pt-[84px] pb-12 min-h-screen">
 
     <!-- ━━━━━━━━━  SLIDE 1 — LINAJE EVOLUTIVO  ━━━━━━━━━ -->
-    <section id="slide-1" class="slide active flex-col items-center justify-center min-h-[calc(100vh-132px)] px-4 py-8">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8">
+    <section id="slide-1" class="tab-section active">
+      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
 
         <div class="text-center anim-item delay-1">
           <p class="text-xs font-semibold tracking-widest uppercase text-neon-cyan mb-2">Sección 1</p>
@@ -258,8 +289,8 @@
 
 
     <!-- ━━━━━━━━━  SLIDE 2 — ARQUITECTURA ENCODER-DECODER  ━━━━━━━━━ -->
-    <section id="slide-2" class="slide flex-col items-center justify-center min-h-[calc(100vh-132px)] px-4 py-8">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8">
+    <section id="slide-2" class="tab-section">
+      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
 
         <div class="text-center anim-item delay-1">
           <p class="text-xs font-semibold tracking-widest uppercase text-neon-cyan mb-2">Sección 2</p>
@@ -399,8 +430,8 @@
 
 
     <!-- ━━━━━━━━━  SLIDE 3 — MECANISMO DE ATENCIÓN  ━━━━━━━━━ -->
-    <section id="slide-3" class="slide flex-col items-center justify-center min-h-[calc(100vh-132px)] px-4 py-8">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8">
+    <section id="slide-3" class="tab-section">
+      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
 
         <div class="text-center anim-item delay-1">
           <p class="text-xs font-semibold tracking-widest uppercase text-neon-gold mb-2">Sección 3 — El Corazón</p>
@@ -507,8 +538,8 @@
 
 
     <!-- ━━━━━━━━━  SLIDE 4 — INNOVACIONES BIOBART  ━━━━━━━━━ -->
-    <section id="slide-4" class="slide flex-col items-center justify-center min-h-[calc(100vh-132px)] px-4 py-8">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8">
+    <section id="slide-4" class="tab-section">
+      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
 
         <div class="text-center anim-item delay-1">
           <p class="text-xs font-semibold tracking-widest uppercase text-neon-green mb-2">Sección 4</p>
@@ -609,8 +640,8 @@
 
 
     <!-- ━━━━━━━━━  SLIDE 5 — PIPELINE DIMENSIONAL  ━━━━━━━━━ -->
-    <section id="slide-5" class="slide flex-col items-center justify-center min-h-[calc(100vh-132px)] px-4 py-8">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8">
+    <section id="slide-5" class="tab-section">
+      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
 
         <div class="text-center anim-item delay-1">
           <p class="text-xs font-semibold tracking-widest uppercase text-neon-violet mb-2">Sección 5 — CRÍTICO</p>
@@ -754,8 +785,8 @@
 
 
     <!-- ━━━━━━━━━  SLIDE 6 — LIMITACIONES  ━━━━━━━━━ -->
-    <section id="slide-6" class="slide flex-col items-center justify-center min-h-[calc(100vh-132px)] px-4 py-8">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8">
+    <section id="slide-6" class="tab-section">
+      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
 
         <div class="text-center anim-item delay-1">
           <p class="text-xs font-semibold tracking-widest uppercase text-neon-pink mb-2">Sección 6</p>
@@ -875,147 +906,345 @@
       </div>
     </section>
 
+    <!-- ━━━━━━━━━  SLIDE 7 — GENERACIÓN DE TEXTO: EJEMPLO PRÁCTICO  ━━━━━━━━━ -->
+    <section id="slide-7" class="tab-section">
+      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col gap-8 px-4 py-8">
+
+        <div class="text-center anim-item delay-1">
+          <p class="text-xs font-semibold tracking-widest uppercase text-neon-green mb-2">Sección 7 — NUEVO</p>
+          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Generación de Texto</h1>
+          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Inferencia Autoregresiva de BioBART — Ejemplo Clínico Paso a Paso</p>
+        </div>
+
+        <!-- Overview intro -->
+        <div class="w-full rounded-2xl border border-neon-green p-5 anim-item delay-2"
+             style="background:rgba(57,255,20,.05);">
+          <div class="flex items-start gap-4">
+            <span class="text-4xl flex-shrink-0">🎯</span>
+            <div>
+              <div class="text-neon-green font-black text-lg mb-2">¿Qué es la Inferencia Autoregresiva?</div>
+              <p class="text-gray-300 text-sm leading-relaxed">
+                BioBART genera texto <strong class="text-white">un token a la vez</strong>. En cada paso t, el decoder recibe los tokens ya generados y consulta mediante <span class="text-neon-cyan font-semibold">Cross-Attention</span> la representación oculta Z producida por el encoder. El token más probable se selecciona y se agrega a la secuencia, convirtiéndose en la entrada del paso t+1 — hasta generar el token <code class="text-neon-gold bg-black/40 px-1 rounded">&lt;EOS&gt;</code>.
+              </p>
+              <div class="flex flex-wrap gap-2 mt-3">
+                <span class="text-xs px-2 py-1 rounded-full border border-neon-cyan text-neon-cyan">Causal (izq → der)</span>
+                <span class="text-xs px-2 py-1 rounded-full border border-neon-violet text-neon-violet">Masked Self-Attention</span>
+                <span class="text-xs px-2 py-1 rounded-full border border-neon-gold text-neon-gold">Cross-Attention al Encoder</span>
+                <span class="text-xs px-2 py-1 rounded-full border border-neon-green text-neon-green">Softmax → Greedy/Beam</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 0: Input corrupted -->
+        <div class="w-full anim-item delay-2">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm text-black flex-shrink-0"
+                  style="background:#ff2d78;">0</span>
+            <h2 class="text-white font-bold text-lg">Entrada Corrompida (Text Infilling)</h2>
+          </div>
+          <div class="rounded-2xl border-2 border-neon-pink p-5" style="background:rgba(255,45,120,.06);">
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Texto con corrupción — lo que recibe el Encoder</div>
+            <div class="font-mono text-base text-gray-200 leading-relaxed">
+              "El paciente <span class="px-2 py-0.5 rounded font-bold text-black token-pulse" style="background:#ffd700;">[MASK]</span>
+              fiebre alta y <span class="px-2 py-0.5 rounded font-bold text-black token-pulse" style="background:#ffd700;">[MASK]</span>
+              desde hace tres días, antecedente de <span class="px-2 py-0.5 rounded font-bold text-black token-pulse" style="background:#ffd700;">[MASK]</span>."
+            </div>
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div class="rounded-lg p-3" style="background:rgba(0,245,255,.07); border:1px solid #00f5ff33;">
+                <div class="text-neon-cyan font-bold mb-1">Tokenización BPE</div>
+                <div class="font-mono text-gray-400">[0, 123, <span class="text-neon-pink">50264</span>, 2341, 567, 14, <span class="text-neon-pink">50264</span>, 890, 2]</div>
+                <div class="text-gray-600 mt-1">50264 = ID de [MASK]</div>
+              </div>
+              <div class="rounded-lg p-3" style="background:rgba(191,95,255,.07); border:1px solid #bf5fff33;">
+                <div class="text-neon-violet font-bold mb-1">Shape del tensor</div>
+                <div class="font-mono text-gray-400">input_ids: [1, 9]<br/>dtype: int64</div>
+              </div>
+              <div class="rounded-lg p-3" style="background:rgba(255,215,0,.07); border:1px solid #ffd70033;">
+                <div class="text-neon-gold font-bold mb-1">Tarea de corrupción</div>
+                <div class="text-gray-400">Text Infilling: spans contiguos reemplazados por un único [MASK]</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 1: Encoder processing -->
+        <div class="w-full anim-item delay-3">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm text-black flex-shrink-0"
+                  style="background:#00f5ff;">1</span>
+            <h2 class="text-white font-bold text-lg">Encoder: Representación Bidireccional</h2>
+          </div>
+          <div class="rounded-2xl border-2 border-neon-cyan p-5" style="background:rgba(0,245,255,.05);">
+            <p class="text-gray-300 text-sm mb-4">El encoder procesa la secuencia completa (incluyendo los [MASK]) con <strong class="text-white">Self-Attention bidireccional</strong>. Cada token atiende a todos los demás simultáneamente:</p>
+
+            <!-- Attention visualization -->
+            <div class="rounded-xl p-4 mb-4" style="background:#020408; border:1px solid #0d1f38;">
+              <div class="text-xs text-gray-500 uppercase mb-3">Pesos de atención — token [MASK]₁ atendiendo a contexto:</div>
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-mono text-gray-400 w-28 flex-shrink-0">"paciente"</span>
+                  <div class="flex-1 rounded-full h-3" style="background:rgba(0,245,255,.15);">
+                    <div class="h-full rounded-full" style="width:85%; background:linear-gradient(90deg,#00f5ff,#00f5ff88);"></div>
+                  </div>
+                  <span class="text-neon-cyan text-xs font-mono w-10 text-right">0.85</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-mono text-gray-400 w-28 flex-shrink-0">"fiebre"</span>
+                  <div class="flex-1 rounded-full h-3" style="background:rgba(0,245,255,.15);">
+                    <div class="h-full rounded-full" style="width:72%; background:linear-gradient(90deg,#00f5ff,#00f5ff88);"></div>
+                  </div>
+                  <span class="text-neon-cyan text-xs font-mono w-10 text-right">0.72</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-mono text-gray-400 w-28 flex-shrink-0">"alta"</span>
+                  <div class="flex-1 rounded-full h-3" style="background:rgba(0,245,255,.15);">
+                    <div class="h-full rounded-full" style="width:61%; background:linear-gradient(90deg,#00f5ff,#00f5ff88);"></div>
+                  </div>
+                  <span class="text-neon-cyan text-xs font-mono w-10 text-right">0.61</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-mono text-gray-400 w-28 flex-shrink-0">"antecedente"</span>
+                  <div class="flex-1 rounded-full h-3" style="background:rgba(0,245,255,.15);">
+                    <div class="h-full rounded-full" style="width:43%; background:linear-gradient(90deg,#00f5ff,#00f5ff88);"></div>
+                  </div>
+                  <span class="text-neon-cyan text-xs font-mono w-10 text-right">0.43</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-lg p-3 text-center font-mono text-sm"
+                 style="background:rgba(0,245,255,.1); border:1px solid #00f5ff44;">
+              Salida del Encoder: Z ∈ ℝ<sup class="text-xs">[1 × 9 × 768]</sup>
+              <div class="text-xs text-gray-500 mt-1">Context vector: 1 batch · 9 tokens · 768 dimensiones</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2-N: Decoder autoregressive generation -->
+        <div class="w-full anim-item delay-4">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm text-black flex-shrink-0"
+                  style="background:#bf5fff;">2</span>
+            <h2 class="text-white font-bold text-lg">Decoder: Generación Token a Token</h2>
+          </div>
+          <div class="rounded-2xl border-2 border-neon-violet p-5" style="background:rgba(191,95,255,.05);">
+            <p class="text-gray-300 text-sm mb-5">El decoder comienza con <code class="text-neon-gold bg-black/40 px-1 rounded text-xs">&lt;BOS&gt;</code> y genera tokens sucesivos. En cada paso ejecuta dos capas de atención:</p>
+
+            <!-- Attention type explanation -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              <div class="rounded-xl p-4" style="background:rgba(191,95,255,.08); border:1px solid #bf5fff44;">
+                <div class="text-neon-violet font-bold text-sm mb-2">① Masked Self-Attention</div>
+                <p class="text-gray-400 text-xs">El token en posición t solo puede ver tokens en posiciones 0…t-1. La máscara causal impide ver el futuro, garantizando la causalidad autoregresiva.</p>
+                <div class="mt-2 font-mono text-xs" style="color:#bf5fff88;">mask[i,j] = -∞ si j &gt; i</div>
+              </div>
+              <div class="rounded-xl p-4" style="background:rgba(255,215,0,.08); border:1px solid #ffd70044;">
+                <div class="text-neon-gold font-bold text-sm mb-2">② Cross-Attention</div>
+                <p class="text-gray-400 text-xs">La Query Q viene del decoder. Las Keys K y Values V vienen de Z (salida del encoder). El decoder "consulta" todo el contexto de entrada en cada paso.</p>
+                <div class="mt-2 font-mono text-xs" style="color:#ffd70088;">Q←decoder · K,V←Z_enc</div>
+              </div>
+            </div>
+
+            <!-- Step-by-step table -->
+            <div class="overflow-x-auto rounded-xl" style="border:1px solid #1e3a5f;">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr style="background:#091524;">
+                    <th class="px-3 py-2.5 text-left text-neon-cyan font-bold tracking-wider">Paso t</th>
+                    <th class="px-3 py-2.5 text-left text-neon-cyan font-bold tracking-wider">Token Generado</th>
+                    <th class="px-3 py-2.5 text-left text-neon-cyan font-bold tracking-wider">Cross-Attention hacia Z</th>
+                    <th class="px-3 py-2.5 text-left text-neon-cyan font-bold tracking-wider hidden sm:table-cell">Top Proba</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="border-top:1px solid #0d1f38;">
+                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 0</td>
+                    <td class="px-3 py-2.5"><code class="text-neon-gold bg-black/40 px-1.5 py-0.5 rounded">&lt;BOS&gt;</code></td>
+                    <td class="px-3 py-2.5 text-gray-500 italic">Señal de inicio de secuencia</td>
+                    <td class="px-3 py-2.5 hidden sm:table-cell text-gray-600">—</td>
+                  </tr>
+                  <tr style="border-top:1px solid #0d1f38; background:rgba(57,255,20,.03);">
+                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 1</td>
+                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"presenta"</span></td>
+                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">"paciente"</span> + <span class="text-neon-cyan">[MASK]₁</span></td>
+                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.68</span></td>
+                  </tr>
+                  <tr style="border-top:1px solid #0d1f38;">
+                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 2</td>
+                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"tos"</span></td>
+                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">"fiebre"</span> + <span class="text-neon-cyan">"alta"</span></td>
+                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.54</span></td>
+                  </tr>
+                  <tr style="border-top:1px solid #0d1f38; background:rgba(57,255,20,.03);">
+                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 3</td>
+                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"seca"</span></td>
+                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">"tos"</span> (paso anterior) + <span class="text-neon-cyan">"fiebre"</span></td>
+                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.71</span></td>
+                  </tr>
+                  <tr style="border-top:1px solid #0d1f38;">
+                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 4</td>
+                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"disnea"</span></td>
+                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">[MASK]₂</span> + <span class="text-neon-cyan">"tres días"</span></td>
+                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.61</span></td>
+                  </tr>
+                  <tr style="border-top:1px solid #0d1f38; background:rgba(57,255,20,.03);">
+                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 5</td>
+                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"asma"</span></td>
+                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">"antecedente"</span> + <span class="text-neon-cyan">[MASK]₃</span></td>
+                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.76</span></td>
+                  </tr>
+                  <tr style="border-top:1px solid #0d1f38;">
+                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = N</td>
+                    <td class="px-3 py-2.5"><code class="text-neon-pink bg-black/40 px-1.5 py-0.5 rounded">&lt;EOS&gt;</code></td>
+                    <td class="px-3 py-2.5 text-gray-500 italic">Señal de fin — detiene la generación</td>
+                    <td class="px-3 py-2.5 hidden sm:table-cell text-gray-600">—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Softmax & Token Selection -->
+        <div class="w-full anim-item delay-5">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm text-black flex-shrink-0"
+                  style="background:#ffd700;">3</span>
+            <h2 class="text-white font-bold text-lg">Linear + Softmax → Selección del Token</h2>
+          </div>
+          <div class="rounded-2xl border-2 border-neon-gold p-5" style="background:rgba(255,215,0,.05); box-shadow:0 0 25px rgba(255,215,0,.08);">
+
+            <div class="text-gray-300 text-sm mb-4">En cada paso t, el hidden state del decoder <span class="font-mono text-neon-violet">[1×768]</span> se proyecta al vocabulario completo mediante una capa lineal y luego normalizada con softmax:</div>
+
+            <!-- Formula -->
+            <div class="rounded-xl p-4 text-center mb-5" style="background:rgba(255,215,0,.06); border:1px solid #ffd70044;">
+              <div class="text-gray-500 text-xs mb-2">Proyección al vocabulario</div>
+              <div class="formula text-xl font-bold text-neon-gold">
+                P(w<sub class="text-sm">t</sub> | w<sub class="text-sm">&lt;t</sub>, Z) = softmax(W<sub class="text-neon-cyan text-sm">out</sub> · h<sub class="text-neon-violet text-sm">t</sub>)
+              </div>
+              <div class="text-xs text-gray-500 mt-2 flex flex-wrap justify-center gap-4">
+                <span><span class="text-neon-violet font-bold">h<sub>t</sub></span> ∈ ℝ<sup>768</sup> — hidden state del decoder</span>
+                <span><span class="text-neon-cyan font-bold">W<sub>out</sub></span> ∈ ℝ<sup>V×768</sup> — V ≈ 50,265 tokens</span>
+              </div>
+            </div>
+
+            <!-- Token probabilities visualization for step t=2 -->
+            <div class="text-xs text-gray-500 uppercase tracking-wider mb-3">Distribución en t=2 — candidatos para "síntoma del paciente"</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="rounded-xl p-3 text-center" style="background:rgba(57,255,20,.15); border:2px solid #39ff14;">
+                <div class="text-neon-green font-black text-lg">"tos"</div>
+                <div class="text-neon-green text-sm font-bold mt-1">54%</div>
+                <div class="text-gray-500 text-xs mt-1">← seleccionado</div>
+              </div>
+              <div class="rounded-xl p-3 text-center" style="background:rgba(0,245,255,.08); border:1px solid #00f5ff44;">
+                <div class="text-neon-cyan font-bold">"disnea"</div>
+                <div class="text-neon-cyan text-sm font-bold mt-1">22%</div>
+                <div class="text-gray-500 text-xs mt-1">&nbsp;</div>
+              </div>
+              <div class="rounded-xl p-3 text-center" style="background:rgba(191,95,255,.08); border:1px solid #bf5fff44;">
+                <div class="text-neon-violet font-bold">"dolor"</div>
+                <div class="text-neon-violet text-sm font-bold mt-1">13%</div>
+                <div class="text-gray-500 text-xs mt-1">&nbsp;</div>
+              </div>
+              <div class="rounded-xl p-3 text-center" style="background:rgba(255,215,0,.08); border:1px solid #ffd70044;">
+                <div class="text-neon-gold font-bold">otros…</div>
+                <div class="text-neon-gold text-sm font-bold mt-1">11%</div>
+                <div class="text-gray-500 text-xs mt-1">&nbsp;</div>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-3 text-center italic">Estrategia Greedy Search: siempre se elige el token de mayor probabilidad en cada paso.</p>
+          </div>
+        </div>
+
+        <!-- FINAL OUTPUT -->
+        <div class="w-full rounded-2xl border-2 border-neon-green p-6 anim-item delay-6"
+             style="background:rgba(57,255,20,.06); box-shadow:0 0 30px rgba(57,255,20,.12);">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-3xl">✅</span>
+            <div>
+              <div class="text-neon-green font-black text-xl">Texto Reconstruido — Salida Final de BioBART</div>
+              <div class="text-gray-500 text-xs">Secuencia completa generada token a token</div>
+            </div>
+          </div>
+          <div class="rounded-xl p-4 font-mono text-sm text-gray-200 leading-relaxed"
+               style="background:#020408; border:1px solid rgba(57,255,20,.2);">
+            "El paciente <span class="text-neon-green font-bold underline">presenta tos seca</span>
+            fiebre alta y <span class="text-neon-green font-bold underline">disnea</span>
+            desde hace tres días, antecedente de <span class="text-neon-green font-bold underline">asma</span>."
+          </div>
+          <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div class="rounded-lg p-3 text-center" style="background:rgba(57,255,20,.08); border:1px solid #39ff1433;">
+              <div class="text-neon-green font-bold mb-1">Tokens generados</div>
+              <div class="text-gray-400">5 tokens reconstruidos para los 3 spans enmascarados</div>
+            </div>
+            <div class="rounded-lg p-3 text-center" style="background:rgba(57,255,20,.08); border:1px solid #39ff1433;">
+              <div class="text-neon-green font-bold mb-1">Pasos del decoder</div>
+              <div class="text-gray-400">6 pasos + 1 token &lt;EOS&gt; = 7 llamadas al forward pass</div>
+            </div>
+            <div class="rounded-lg p-3 text-center" style="background:rgba(57,255,20,.08); border:1px solid #39ff1433;">
+              <div class="text-neon-green font-bold mb-1">Clave del éxito</div>
+              <div class="text-gray-400">BPE biomédico reconoce "asma" y "disnea" como unidades del vocabulario médico</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary tensor flow -->
+        <div class="w-full rounded-xl p-5 anim-item delay-6" style="background:#091524; border:1px solid #122845;">
+          <div class="text-neon-cyan font-bold text-sm mb-3 text-center">Resumen del Flujo de Tensores — Generación Completa</div>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-2 flex-wrap text-xs font-mono text-center">
+            <div class="px-3 py-2 rounded-lg border border-neon-pink" style="background:rgba(255,45,120,.06);">
+              <div class="text-neon-pink font-bold">Entrada</div>
+              <div class="text-gray-400">[1, S]  int64</div>
+            </div>
+            <div class="arrow-right hidden sm:block" style="color:#374151;"></div>
+            <div class="text-gray-600 sm:hidden">↓</div>
+            <div class="px-3 py-2 rounded-lg border border-neon-cyan" style="background:rgba(0,245,255,.06);">
+              <div class="text-neon-cyan font-bold">Encoder Z</div>
+              <div class="text-gray-400">[1, S, 768]  float32</div>
+            </div>
+            <div class="arrow-right hidden sm:block" style="color:#374151;"></div>
+            <div class="text-gray-600 sm:hidden">↓</div>
+            <div class="px-3 py-2 rounded-lg border border-neon-violet" style="background:rgba(191,95,255,.06);">
+              <div class="text-neon-violet font-bold">Decoder h_t</div>
+              <div class="text-gray-400">[1, t, 768]  float32</div>
+            </div>
+            <div class="arrow-right hidden sm:block" style="color:#374151;"></div>
+            <div class="text-gray-600 sm:hidden">↓</div>
+            <div class="px-3 py-2 rounded-lg border border-neon-gold" style="background:rgba(255,215,0,.06);">
+              <div class="text-neon-gold font-bold">Logits</div>
+              <div class="text-gray-400">[1, V≈50K]  float32</div>
+            </div>
+            <div class="arrow-right hidden sm:block" style="color:#374151;"></div>
+            <div class="text-gray-600 sm:hidden">↓</div>
+            <div class="px-3 py-2 rounded-lg border border-neon-green" style="background:rgba(57,255,20,.06);">
+              <div class="text-neon-green font-bold">Token</div>
+              <div class="text-gray-400">argmax → int</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
-  <!-- ══════════════════════  BOTTOM NAV  ══════════════════════ -->
-  <nav class="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4"
-       style="background:rgba(2,4,8,.95); border-top:1px solid #0d1f38; backdrop-filter:blur(8px);">
-
-    <button id="btn-prev"
-            class="nav-btn flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm border border-gray-700 text-gray-400 hover:border-neon-cyan hover:text-neon-cyan"
-            style="transition:all .2s ease;"
-            disabled>
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-      </svg>
-      Anterior
-    </button>
-
-    <div class="text-xs text-gray-500 text-center hidden sm:flex flex-col items-center">
-      <span id="slide-title-center" class="font-semibold text-gray-300 text-sm"></span>
-    </div>
-
-    <button id="btn-next"
-            class="nav-btn flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-black"
-            style="background:linear-gradient(90deg,#00f5ff,#bf5fff); transition:all .2s ease;">
-      Siguiente
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-      </svg>
-    </button>
-
-  </nav>
-
-
-  <!-- ══════════════════════  JAVASCRIPT  ══════════════════════ -->
+  <!-- ══════════════════════  JAVASCRIPT — SIMPLE TAB LOGIC  ══════════════════════ -->
   <script>
-    const slides = [
-      { id: 'slide-1', title: 'El Linaje Evolutivo' },
-      { id: 'slide-2', title: 'Arquitectura Encoder-Decoder' },
-      { id: 'slide-3', title: 'Mecanismo de Atención (Q, K, V)' },
-      { id: 'slide-4', title: 'Innovaciones de BioBART' },
-      { id: 'slide-5', title: 'Pipeline Dimensional' },
-      { id: 'slide-6', title: 'Limitaciones' },
-    ];
-
-    let current = 0;
-
-    // Create dot nav
-    const dotNav = document.getElementById('dot-nav');
-    slides.forEach((s, i) => {
-      const dot = document.createElement('button');
-      dot.id = `dot-${i}`;
-      dot.className = 'w-2 h-2 rounded-full transition-all duration-300';
-      dot.style.background = i === 0 ? '#00f5ff' : '#1e3a5f';
-      dot.addEventListener('click', () => goTo(i));
-      dotNav.appendChild(dot);
-    });
-
-    function updateUI() {
-      const total = slides.length;
-
-      // Show/hide slides
-      slides.forEach((s, i) => {
-        const el = document.getElementById(s.id);
-        if (i === current) {
-          el.classList.add('active');
-          // Restart animations
-          el.querySelectorAll('.anim-item').forEach(a => {
-            a.style.animation = 'none';
-            a.offsetHeight; // reflow
-            a.style.animation = '';
-          });
-        } else {
-          el.classList.remove('active');
-        }
+    function showTab(tabId, btn) {
+      // Hide all sections
+      document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+      // Remove active style from all tab buttons
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active-tab');
+        b.style.color = '';
       });
-
-      // Progress bar
-      const pct = ((current + 1) / total) * 100;
-      document.getElementById('progress-bar').style.width = pct + '%';
-
-      // Label
-      document.getElementById('slide-label').textContent = `Diapositiva ${current + 1} / ${total}`;
-
-      // Center title
-      const titleEl = document.getElementById('slide-title-center');
-      if (titleEl) titleEl.textContent = slides[current].title;
-
-      // Dots
-      slides.forEach((_, i) => {
-        const dot = document.getElementById(`dot-${i}`);
-        dot.style.background = i === current ? '#00f5ff' : '#1e3a5f';
-        dot.style.width = i === current ? '20px' : '8px';
-        dot.style.borderRadius = '4px';
-      });
-
-      // Buttons
-      document.getElementById('btn-prev').disabled = current === 0;
-      const btnNext = document.getElementById('btn-next');
-      if (current === total - 1) {
-        btnNext.innerHTML = '<span aria-hidden="true">🎉</span> Fin de la presentación';
-        btnNext.setAttribute('aria-label', 'Fin de la presentación');
-        btnNext.style.background = 'linear-gradient(90deg,#39ff14,#00f5ff)';
-        btnNext.disabled = true;
-      } else {
-        btnNext.innerHTML = `Siguiente <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
-        btnNext.style.background = 'linear-gradient(90deg,#00f5ff,#bf5fff)';
-        btnNext.disabled = false;
-      }
-
-      // Reset scroll
-      const body = document.getElementById(slides[current].id).querySelector('.slide-body');
-      if (body) body.scrollTop = 0;
+      // Show target section
+      document.getElementById(tabId).classList.add('active');
+      // Mark button active
+      btn.classList.add('active-tab');
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
-
-    function goTo(index) {
-      if (index < 0 || index >= slides.length) return;
-      current = index;
-      updateUI();
-    }
-
-    document.getElementById('btn-prev').addEventListener('click', () => goTo(current - 1));
-    document.getElementById('btn-next').addEventListener('click', () => goTo(current + 1));
-
-    // Keyboard navigation (arrow keys only; spacebar reserved for native page scroll)
-    document.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight') goTo(current + 1);
-      if (e.key === 'ArrowLeft') goTo(current - 1);
-    });
-
-    // Touch/swipe support
-    let touchStartX = 0;
-    document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
-    document.addEventListener('touchend', e => {
-      const diff = touchStartX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 50) {
-        if (diff > 0) goTo(current + 1);
-        else goTo(current - 1);
-      }
-    });
-
-    // Init
-    updateUI();
   </script>
 
 </body>
