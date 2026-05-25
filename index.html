@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -53,6 +53,7 @@
     .tab-section { display: none; }
     .tab-section.active { display: block; animation: fadeIn 0.55s ease forwards; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Neon text helpers */
     .text-neon-cyan  { color: #00f5ff; text-shadow: 0 0 8px #00f5ff88; }
@@ -114,9 +115,6 @@
     .delay-4 { animation-delay: 0.46s; }
     .delay-5 { animation-delay: 0.58s; }
     .delay-6 { animation-delay: 0.70s; }
-
-    /* Section content wrapper */
-    .slide-body { }
 
     /* Active tab button */
     .tab-btn.active-tab {
@@ -181,17 +179,17 @@
       </button>
       <button onclick="showTab('slide-6',this)" data-tab="slide-6"
               class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
-        ⚠️ Limitaciones
+        ⚡ Generación Paso a Paso
       </button>
       <button onclick="showTab('slide-7',this)" data-tab="slide-7"
               class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-green-neon hover:bg-white/5 whitespace-nowrap">
-        ⚡ Generación Paso a Paso
+        ⚠️ Limitaciones
       </button>
     </nav>
   </header>
 
   <!-- ══════════════════════  SLIDES CONTAINER  ══════════════════════ -->
-  <main class="flex-1 pt-[84px] pb-12 min-h-screen">
+  <main class="flex flex-col flex-1 pt-[84px] pb-12 min-h-screen">
 
     <!-- ━━━━━━━━━  SLIDE 1 — LINAJE EVOLUTIVO  ━━━━━━━━━ -->
     <section id="slide-1" class="tab-section active">
@@ -253,7 +251,7 @@
             <div class="px-8 py-5 rounded-2xl border-2 text-center"
                  style="background:linear-gradient(135deg,rgba(0,245,255,.08),rgba(191,95,255,.08)); border-color:#6b7280; min-width:220px;">
               <div class="text-2xl mb-1">🔀</div>
-              <div class="font-black text-xl" style="background:linear-gradient(90deg,#00f5ff,#bf5fff); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">BART</div>
+              <div class="font-black text-xl" style="background:linear-gradient(90deg,#00f5ff,#bf5fff); background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">BART</div>
               <div class="text-gray-400 text-xs mt-1">Encoder + Decoder</div>
               <div class="text-gray-500 text-xs mt-1">Secuencia a secuencia (seq2seq)</div>
               <div class="flex justify-center gap-2 mt-2">
@@ -782,135 +780,12 @@
       </div>
     </section>
 
-
-    <!-- ━━━━━━━━━  SLIDE 6 — LIMITACIONES  ━━━━━━━━━ -->
-    <section id="slide-6" class="tab-section">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
-
-        <div class="text-center anim-item delay-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-neon-pink mb-2">Sección 6</p>
-          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Limitaciones</h1>
-          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Consideraciones críticas para uso en entornos clínicos</p>
-        </div>
-
-        <!-- Limitation cards -->
-        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-5 anim-item delay-2">
-
-          <!-- Cost -->
-          <div class="rounded-2xl p-6 border-2 border-neon-pink flex flex-col gap-4" style="background:rgba(255,45,120,.06);">
-            <div class="text-5xl text-center">💸</div>
-            <div class="text-center">
-              <div class="text-neon-pink font-black text-lg">Costo Computacional</div>
-            </div>
-            <div class="space-y-2 text-sm text-gray-400">
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
-                <span>~140M parámetros entrenables</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
-                <span>Fine-tuning requiere GPUs de alta memoria</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
-                <span>Inferencia costosa vs. modelos más pequeños</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
-                <span>Pre-entrenamiento: semanas en clúster</span>
-              </div>
-            </div>
-            <div class="rounded-lg p-2 text-center text-xs" style="background:rgba(255,45,120,.12);">
-              <span class="text-neon-pink font-bold">Impacto:</span>
-              <span class="text-gray-400"> Barrera de acceso en entornos con recursos limitados</span>
-            </div>
-          </div>
-
-          <!-- Context limit -->
-          <div class="rounded-2xl p-6 border-2 border-neon-gold flex flex-col gap-4" style="background:rgba(255,215,0,.06);">
-            <div class="text-5xl text-center">📏</div>
-            <div class="text-center">
-              <div class="text-neon-gold font-black text-lg">Límite de Contexto</div>
-            </div>
-            <div class="space-y-2 text-sm text-gray-400">
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
-                <span>Encoder: máx. <strong class="text-white">1024 tokens</strong></span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
-                <span>Decoder: máx. <strong class="text-white">1024 tokens</strong> generados</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
-                <span>Historiales clínicos largos quedan truncados</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
-                <span>Complejidad cuadrática: O(n²) en atención</span>
-              </div>
-            </div>
-            <div class="rounded-lg p-2 text-center text-xs" style="background:rgba(255,215,0,.12);">
-              <span class="text-neon-gold font-bold">Impacto:</span>
-              <span class="text-gray-400"> Inapropiado para notas clínicas extensas sin chunking</span>
-            </div>
-          </div>
-
-          <!-- Hallucinations -->
-          <div class="rounded-2xl p-6 border-2 border-neon-violet flex flex-col gap-4" style="background:rgba(191,95,255,.06);">
-            <div class="text-5xl text-center">⚠️</div>
-            <div class="text-center">
-              <div class="text-neon-violet font-black text-lg">Alucinaciones Clínicas</div>
-            </div>
-            <div class="space-y-2 text-sm text-gray-400">
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
-                <span>Puede generar dosificaciones <strong class="text-white">incorrectas</strong></span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
-                <span>Síntomas o diagnósticos plausibles pero falsos</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
-                <span>Sin mecanismo de verificación factual nativo</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
-                <span>El modelo no "sabe" lo que no sabe</span>
-              </div>
-            </div>
-            <div class="rounded-lg p-2 text-center text-xs" style="background:rgba(191,95,255,.12);">
-              <span class="text-neon-violet font-bold">⚠ Crítico:</span>
-              <span class="text-gray-400"> Requiere supervisión humana en aplicaciones clínicas reales</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Summary -->
-        <div class="w-full rounded-xl p-5 anim-item delay-3" style="background:#091524; border:1px solid #122845;">
-          <div class="text-center text-neon-green font-bold mb-3">Conclusión del Equipo</div>
-          <div class="text-gray-300 text-sm text-center max-w-2xl mx-auto">
-            BioBART representa un avance significativo en NLP biomédico al especializar BART con datos y técnicas de dominio. Sin embargo, su uso en entornos clínicos reales requiere <strong class="text-white">validación rigurosa</strong>, <strong class="text-white">supervisión experta</strong> y sistemas de <strong class="text-white">verificación factual</strong> complementarios.
-          </div>
-          <div class="mt-4 flex flex-wrap justify-center gap-3">
-            <span class="text-xs px-3 py-1 rounded-full border border-neon-green text-neon-green">🧬 Dominio especializado</span>
-            <span class="text-xs px-3 py-1 rounded-full border border-neon-cyan text-neon-cyan">🔬 Base: PubMed</span>
-            <span class="text-xs px-3 py-1 rounded-full border border-neon-violet text-neon-violet">🏗 Arquitectura: Encoder-Decoder</span>
-            <span class="text-xs px-3 py-1 rounded-full border border-neon-gold text-neon-gold">⚡ Potencial: Alto</span>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ━━━━━━━━━  SLIDE 7 — GENERACIÓN DE TEXTO: EJEMPLO PRÁCTICO  ━━━━━━━━━ -->
-    <section id="slide-7" class="tab-section">
+    <!-- ━━━━━━━━━  SLIDE 6 — GENERACIÓN DE TEXTO: EJEMPLO PRÁCTICO  ━━━━━━━━━ -->
+    <section id="slide-6" class="tab-section" style="order:5;">
       <div class="slide-body w-full max-w-5xl mx-auto flex flex-col gap-8 px-4 py-8">
 
         <div class="text-center anim-item delay-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-neon-green mb-2">Sección 7 — NUEVO</p>
+          <p class="text-xs font-semibold tracking-widest uppercase text-neon-green mb-2">Sección 6</p>
           <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Generación de Texto</h1>
           <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Inferencia Autoregresiva de BioBART — Ejemplo Clínico Paso a Paso</p>
         </div>
@@ -1225,6 +1100,130 @@
       </div>
     </section>
 
+    <!-- ━━━━━━━━━  SLIDE 7 — LIMITACIONES  ━━━━━━━━━ -->
+    <section id="slide-7" class="tab-section" style="order:7;">
+      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
+
+        <div class="text-center anim-item delay-1">
+          <p class="text-xs font-semibold tracking-widest uppercase text-neon-pink mb-2">Sección 7</p>
+          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Limitaciones</h1>
+          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Consideraciones críticas para uso en entornos clínicos</p>
+        </div>
+
+        <!-- Limitation cards -->
+        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-5 anim-item delay-2">
+
+          <!-- Cost -->
+          <div class="rounded-2xl p-6 border-2 border-neon-pink flex flex-col gap-4" style="background:rgba(255,45,120,.06);">
+            <div class="text-5xl text-center">💸</div>
+            <div class="text-center">
+              <div class="text-neon-pink font-black text-lg">Costo Computacional</div>
+            </div>
+            <div class="space-y-2 text-sm text-gray-400">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
+                <span>~140M parámetros entrenables</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
+                <span>Fine-tuning requiere GPUs de alta memoria</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
+                <span>Inferencia costosa vs. modelos más pequeños</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
+                <span>Pre-entrenamiento: semanas en clúster</span>
+              </div>
+            </div>
+            <div class="rounded-lg p-2 text-center text-xs" style="background:rgba(255,45,120,.12);">
+              <span class="text-neon-pink font-bold">Impacto:</span>
+              <span class="text-gray-400"> Barrera de acceso en entornos con recursos limitados</span>
+            </div>
+          </div>
+
+          <!-- Context limit -->
+          <div class="rounded-2xl p-6 border-2 border-neon-gold flex flex-col gap-4" style="background:rgba(255,215,0,.06);">
+            <div class="text-5xl text-center">📏</div>
+            <div class="text-center">
+              <div class="text-neon-gold font-black text-lg">Límite de Contexto</div>
+            </div>
+            <div class="space-y-2 text-sm text-gray-400">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
+                <span>Encoder: máx. <strong class="text-white">1024 tokens</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
+                <span>Decoder: máx. <strong class="text-white">1024 tokens</strong> generados</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
+                <span>Historiales clínicos largos quedan truncados</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
+                <span>Complejidad cuadrática: O(n²) en atención</span>
+              </div>
+            </div>
+            <div class="rounded-lg p-2 text-center text-xs" style="background:rgba(255,215,0,.12);">
+              <span class="text-neon-gold font-bold">Impacto:</span>
+              <span class="text-gray-400"> Inapropiado para notas clínicas extensas sin chunking</span>
+            </div>
+          </div>
+
+          <!-- Hallucinations -->
+          <div class="rounded-2xl p-6 border-2 border-neon-violet flex flex-col gap-4" style="background:rgba(191,95,255,.06);">
+            <div class="text-5xl text-center">⚠️</div>
+            <div class="text-center">
+              <div class="text-neon-violet font-black text-lg">Alucinaciones Clínicas</div>
+            </div>
+            <div class="space-y-2 text-sm text-gray-400">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
+                <span>Puede generar dosificaciones <strong class="text-white">incorrectas</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
+                <span>Síntomas o diagnósticos plausibles pero falsos</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
+                <span>Sin mecanismo de verificación factual nativo</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
+                <span>El modelo no "sabe" lo que no sabe</span>
+              </div>
+            </div>
+            <div class="rounded-lg p-2 text-center text-xs" style="background:rgba(191,95,255,.12);">
+              <span class="text-neon-violet font-bold">⚠ Crítico:</span>
+              <span class="text-gray-400"> Requiere supervisión humana en aplicaciones clínicas reales</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Summary -->
+        <div class="w-full rounded-xl p-5 anim-item delay-3" style="background:#091524; border:1px solid #122845;">
+          <div class="text-center text-neon-green font-bold mb-3">Conclusión del Equipo</div>
+          <div class="text-gray-300 text-sm text-center max-w-2xl mx-auto">
+            BioBART representa un avance significativo en NLP biomédico al especializar BART con datos y técnicas de dominio. Sin embargo, su uso en entornos clínicos reales requiere <strong class="text-white">validación rigurosa</strong>, <strong class="text-white">supervisión experta</strong> y sistemas de <strong class="text-white">verificación factual</strong> complementarios.
+          </div>
+          <div class="mt-4 flex flex-wrap justify-center gap-3">
+            <span class="text-xs px-3 py-1 rounded-full border border-neon-green text-neon-green">🧬 Dominio especializado</span>
+            <span class="text-xs px-3 py-1 rounded-full border border-neon-cyan text-neon-cyan">🔬 Base: PubMed</span>
+            <span class="text-xs px-3 py-1 rounded-full border border-neon-violet text-neon-violet">🏗 Arquitectura: Encoder-Decoder</span>
+            <span class="text-xs px-3 py-1 rounded-full border border-neon-gold text-neon-gold">⚡ Potencial: Alto</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    
+
   </main>
 
   <!-- ══════════════════════  JAVASCRIPT — SIMPLE TAB LOGIC  ══════════════════════ -->
@@ -1242,7 +1241,7 @@
       // Mark button active
       btn.classList.add('active-tab');
       // Scroll to top
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.scrollTo(0, 0);
     }
   </script>
 
