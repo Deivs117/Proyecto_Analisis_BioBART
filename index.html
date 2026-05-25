@@ -973,7 +973,8 @@
       document.getElementById('btn-prev').disabled = current === 0;
       const btnNext = document.getElementById('btn-next');
       if (current === total - 1) {
-        btnNext.textContent = '🎉 Fin';
+        btnNext.innerHTML = '<span aria-hidden="true">🎉</span> Fin de la presentación';
+        btnNext.setAttribute('aria-label', 'Fin de la presentación');
         btnNext.style.background = 'linear-gradient(90deg,#39ff14,#00f5ff)';
         btnNext.disabled = true;
       } else {
@@ -996,9 +997,9 @@
     document.getElementById('btn-prev').addEventListener('click', () => goTo(current - 1));
     document.getElementById('btn-next').addEventListener('click', () => goTo(current + 1));
 
-    // Keyboard navigation
+    // Keyboard navigation (arrow keys only; spacebar reserved for native page scroll)
     document.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight' || e.key === ' ') goTo(current + 1);
+      if (e.key === 'ArrowRight') goTo(current + 1);
       if (e.key === 'ArrowLeft') goTo(current - 1);
     });
 
