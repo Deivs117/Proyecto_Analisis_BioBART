@@ -4,8 +4,6 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BioBART — Sustentación PLN</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     :root {
       --bg:      #04080f;
@@ -22,8 +20,8 @@
       --text:    #cbd5e1;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
-    code, .mono { font-family: 'JetBrains Mono', monospace; }
+    html, body { background: var(--bg); color: var(--text); font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; min-height: 100vh; line-height: 1.65; font-size: 15px; }
+    code, .mono { font-family: 'Courier New', 'Consolas', monospace; }
 
     /* ── NAV ── */
     header {
@@ -40,7 +38,7 @@
       flex-shrink:0; padding:10px 16px; font-size:11px; font-weight:700;
       text-transform:uppercase; letter-spacing:.08em; color:var(--muted);
       background:none; border:none; border-bottom:2px solid transparent;
-      cursor:pointer; transition:all .2s; white-space:nowrap; font-family:'Syne',sans-serif;
+      cursor:pointer; transition:all .2s; white-space:nowrap; font-family:'Inter','Segoe UI',system-ui,sans-serif;
     }
     .tab-btn:hover { color:var(--white); }
     .tab-btn.active { color:var(--cyan); border-bottom-color:var(--cyan); background:rgba(0,229,255,.05); }
@@ -157,8 +155,6 @@
   </div>
   <nav>
     <button class="tab-btn active" onclick="show('s1',this)">⚡ Linaje</button>
-    <button class="tab-btn" onclick="show('s2',this)">🔵 BERT</button>
-    <button class="tab-btn" onclick="show('s3',this)">🟣 GPT</button>
     <button class="tab-btn" onclick="show('s4',this)">🔤 Tokenización</button>
     <button class="tab-btn" onclick="show('s5',this)">🏗️ Arquitectura</button>
     <button class="tab-btn" onclick="show('s6',this)">🔑 Q, K, V</button>
@@ -237,221 +233,140 @@
       <div class="mt-8"><span class="badge badge-green">PubMed</span> <span class="badge badge-green">BPE Médico</span> <span class="badge badge-green">Radiología</span></div>
     </div>
 
-  </div>
-</div>
-</section>
 
-<!-- ══════════════════ S2 — BERT ══════════════════ -->
-<section id="s2" class="section">
-<div class="container">
-  <div class="sec-label" style="color:var(--cyan)">Sección 2 — Google AI, 2019</div>
-  <h1>BERT</h1>
-  <p class="subtitle">Bidirectional Encoder Representations from Transformers — la revolución de la comprensión bidireccional.</p>
+    <hr class="divider" style="margin-top:40px;"/>
 
-  <div class="mt-24">
-    <div class="grid-2">
-      <div class="card card-cyan">
-        <h3 style="color:var(--cyan)">① Masked Language Model (MLM)</h3>
-        <p style="font-size:.85rem; margin-top:8px;">Se enmascara aleatoriamente el <strong style="color:var(--white)">15% de los tokens</strong> y el modelo predice los tokens enmascarados usando contexto bidireccional completo — ve tanto lo que viene antes como después.</p>
-        <div class="noise-before mt-16">
-          <div class="noise-label">Texto original</div>
-          <span class="mono" style="font-size:.8rem; color:var(--text);">"El paciente presenta <span style="color:var(--green)">fiebre</span> alta"</span>
+    <!-- ── BERT EXPANDIDO ── -->
+    <div style="max-width:860px; width:100%; margin:0 auto;">
+      <div class="sec-label" style="color:var(--cyan); text-align:center; margin-bottom:8px;">Google AI, 2019</div>
+      <h2 style="text-align:center; margin-bottom:6px; color:var(--cyan); font-size:1.8rem;">🔵 BERT — Comprensión Bidireccional</h2>
+      <p style="font-size:.85rem; color:var(--muted); text-align:center; margin-bottom:24px;">Bidirectional Encoder Representations from Transformers</p>
+
+      <div class="grid-2">
+        <div class="card card-cyan">
+          <h3 style="color:var(--cyan)">① Masked Language Model (MLM)</h3>
+          <p style="font-size:.85rem; margin-top:8px;">Se enmascara aleatoriamente el <strong style="color:var(--white)">15% de los tokens</strong> y el modelo predice los tokens enmascarados usando contexto bidireccional completo — ve tanto lo que viene antes como después.</p>
+          <div class="noise-before mt-16">
+            <div class="noise-label">Texto original</div>
+            <span class="mono" style="font-size:.8rem; color:var(--text);">"El paciente presenta <span style="color:var(--green)">fiebre</span> alta"</span>
+          </div>
+          <div class="noise-after">
+            <div class="noise-label">Entrada al modelo (MLM)</div>
+            <span class="mono" style="font-size:.8rem;">"El paciente presenta <span class="token-box" style="color:var(--gold); border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.1);">[MASK]</span> alta"</span>
+          </div>
+          <p style="font-size:.78rem; color:var(--muted); margin-top:8px;">BERT ve "El paciente presenta" <strong>Y</strong> "alta" simultáneamente para predecir "fiebre" — imposible con GPT que solo vería lo de la izquierda.</p>
         </div>
-        <div class="noise-after">
-          <div class="noise-label">Entrada al modelo (MLM)</div>
-          <span class="mono" style="font-size:.8rem;">"El paciente presenta <span class="token-box" style="color:var(--gold); border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.1);">[MASK]</span> alta"</span>
+        <div class="card card-violet">
+          <h3 style="color:var(--violet)">② Next Sentence Prediction (NSP)</h3>
+          <p style="font-size:.85rem; margin-top:8px;">El modelo predice si la segunda oración sigue naturalmente a la primera. Aprende relaciones entre oraciones — clave para QA y entailment.</p>
+          <div class="noise-before mt-16">
+            <div class="noise-label">IsNext ✓</div>
+            <span class="mono" style="font-size:.78rem; color:var(--text);">A: "El fármaco inhibe la enzima."<br/>B: "Esto reduce la inflamación."</span>
+          </div>
+          <div class="noise-after">
+            <div class="noise-label">NotNext ✗</div>
+            <span class="mono" style="font-size:.78rem;">"El fármaco inhibe la enzima."<br/>"El cielo es azul."</span>
+          </div>
         </div>
-        <p style="font-size:.78rem; color:var(--muted); margin-top:8px;">BERT ve "El paciente presenta" <strong>Y</strong> "alta" simultáneamente para predecir "fiebre" — imposible con GPT que solo vería lo de la izquierda.</p>
-      </div>
-
-      <div class="card card-violet">
-        <h3 style="color:var(--violet)">② Next Sentence Prediction (NSP)</h3>
-        <p style="font-size:.85rem; margin-top:8px;">El modelo recibe dos oraciones y predice si la segunda sigue naturalmente a la primera. Aprende relaciones entre oraciones — clave para QA y entailment.</p>
-        <div class="noise-before mt-16">
-          <div class="noise-label">Ejemplo IsNext ✓</div>
-          <span class="mono" style="font-size:.78rem; color:var(--text);">A: "El fármaco inhibe la enzima."<br/>B: "Esto reduce la inflamación."</span>
-        </div>
-        <div class="noise-after">
-          <div class="noise-label">Ejemplo NotNext ✗</div>
-          <span class="mono" style="font-size:.78rem;">"El fármaco inhibe la enzima."<br/>"El cielo es azul."</span>
-        </div>
-      </div>
-    </div>
-
-    <hr class="divider"/>
-
-    <h2>Las 3 novedades de BERT frente a lo anterior</h2>
-    <div class="grid-3 mt-16">
-      <div class="card card-cyan">
-        <div style="font-size:1.6rem; margin-bottom:8px;">↔️</div>
-        <h3 style="color:var(--cyan)">Bidireccionalidad profunda real</h3>
-        <p style="font-size:.82rem; margin-top:6px;">GPT y ELMo eran "pseudo-bidireccionales". BERT es el primer modelo en pre-entrenarse con atención bidireccional en <strong style="color:var(--white)">todas las capas simultáneamente</strong>. Cada token atiende a todos los demás desde la capa 1.</p>
-      </div>
-      <div class="card card-cyan">
-        <div style="font-size:1.6rem; margin-bottom:8px;">🧠</div>
-        <h3 style="color:var(--cyan)">Representaciones contextuales ricas</h3>
-        <p style="font-size:.82rem; margin-top:6px;">Al ver el contexto completo, BERT aprende que <em>"banco"</em> en <em>"orilla del banco"</em> y en <em>"depósito en el banco"</em> son vectores distintos. GPT no puede lograr esto mirando solo a la izquierda.</p>
-      </div>
-      <div class="card card-cyan">
-        <div style="font-size:1.6rem; margin-bottom:8px;">⚡</div>
-        <h3 style="color:var(--cyan)">Fine-tuning extremadamente sencillo</h3>
-        <p style="font-size:.82rem; margin-top:6px;">Para la mayoría de tareas basta agregar <strong style="color:var(--white)">una sola capa de clasificación</strong> sobre el token [CLS]. BERT logró SOTA en 11 tareas con la misma arquitectura sin rediseñar nada.</p>
-      </div>
-    </div>
-
-    <hr class="divider"/>
-
-    <div class="card" style="border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.04);">
-      <div style="display:flex; gap:12px; align-items:flex-start;">
-        <span style="font-size:1.5rem; flex-shrink:0;">⚠️</span>
-        <div>
-          <h3 style="color:var(--pink)">Limitación estructural que BART resuelve</h3>
-          <p style="font-size:.85rem; margin-top:6px;">Las predicciones de BERT son <strong style="color:var(--white)">condicionalmente independientes</strong> — predice cada [MASK] de forma aislada. Esto lo hace incapaz de generación autoregresiva: no puede escribir una secuencia coherente token a token porque no modela la dependencia entre los tokens generados. <strong style="color:var(--white)">BioBERT y PubMedBERT tienen exactamente esta limitación</strong> — por eso se necesita BioBART.</p>
-        </div>
-      </div>
-    </div>
-
-    <hr class="divider"/>
-    <h2>Especificaciones técnicas</h2>
-    <div class="mt-16" style="overflow-x:auto;">
-      <table class="tbl">
-        <thead><tr><th>Parámetro</th><th>BERT-base</th><th>BERT-large</th></tr></thead>
-        <tbody>
-          <tr><td>Capas (encoder)</td><td>12</td><td>24</td></tr>
-          <tr><td>Dimensión oculta (d_model)</td><td>768</td><td>1024</td></tr>
-          <tr><td>Cabezas de atención</td><td>12</td><td>16</td></tr>
-          <tr><td>Parámetros totales</td><td>110 M</td><td>340 M</td></tr>
-          <tr><td>Activación FFN</td><td colspan="2">GELU</td></tr>
-          <tr><td>Vocabulario</td><td colspan="2">~30,000 tokens (WordPiece)</td></tr>
-          <tr><td>Positional Encoding</td><td colspan="2">Learned embeddings</td></tr>
-          <tr><td>Datos de pre-entrenamiento</td><td colspan="2">BooksCorpus + Wikipedia (16 GB)</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- ══════════════════ S3 — GPT ══════════════════ -->
-<section id="s3" class="section">
-<div class="container">
-  <div class="sec-label" style="color:var(--violet)">Sección 3 — OpenAI, 2018</div>
-  <h1>GPT</h1>
-  <p class="subtitle">Improving Language Understanding by Generative Pre-Training — el primer modelo en demostrar que pre-entrenar un Transformer decoder a gran escala transfiere conocimiento lingüístico masivo.</p>
-
-  <div class="mt-24">
-    <div class="grid-2">
-      <div class="card card-violet">
-        <h3 style="color:var(--violet)">① Pre-entrenamiento no supervisado (L₁)</h3>
-        <p style="font-size:.85rem; margin-top:8px;">GPT se entrena con un corpus de +7,000 libros (BooksCorpus) aprendiendo a <strong style="color:var(--white)">predecir el token siguiente</strong> dado el contexto previo. Sin etiquetas humanas, sin supervisión.</p>
-        <div class="code-block mt-16">
-          <span class="label">Objetivo L₁ — maximizar log-verosimilitud</span>
-          <span class="hl-gold">L₁(U)</span> = Σᵢ log P(<span class="hl-cyan">uᵢ</span> | <span class="hl-violet">uᵢ₋ₖ,...,uᵢ₋₁</span> ; Θ)
-
-k = ventana de contexto
-Θ = parámetros (actualizados por SGD)
-        </div>
-        <div class="noise-before mt-16">
-          <div class="noise-label">Predicción autoregresiva — izquierda a derecha</div>
-          <span class="mono" style="font-size:.8rem; color:var(--text);">"El gato estaba en el" → predice: <span style="color:var(--green);">"tejado"</span></span>
-        </div>
-      </div>
-
-      <div class="card card-violet">
-        <h3 style="color:var(--violet)">② Fine-tuning supervisado (L₃)</h3>
-        <p style="font-size:.85rem; margin-top:8px;">Se agrega únicamente <strong style="color:var(--white)">una capa lineal + softmax</strong> al final del modelo. Los pesos pre-entrenados se ajustan ligeramente. El modelo base casi no cambia.</p>
-        <div class="code-block mt-16">
-          <span class="label">Objetivo combinado L₃</span>
-          <span class="hl-gold">L₃(C)</span> = <span class="hl-cyan">L₂(C)</span> + λ · <span class="hl-violet">L₁(C)</span>
-
-L₂ = pérdida supervisada de la tarea
-L₁ = objetivo auxiliar de lenguaje
-λ  = 0.5 (peso del auxiliar)
-        </div>
-        <p style="font-size:.78rem; color:var(--muted); margin-top:8px;">Sin pre-entrenamiento, el rendimiento cae <strong style="color:var(--pink);">14.8%</strong> en promedio — prueba de que el conocimiento de la fase 1 es fundamental.</p>
-      </div>
-    </div>
-
-    <hr class="divider"/>
-    <h2>Arquitectura interna — Transformer decoder (12 capas)</h2>
-    <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">GPT usa un <strong style="color:var(--white)">Transformer solo-decoder</strong>. La clave es la <strong style="color:var(--violet)">máscara causal</strong>: cada token solo puede ver los tokens anteriores, nunca los futuros.</p>
-
-    <div class="card card-violet">
-      <div class="code-block">
-        <span class="label">Pipeline interno — por cada capa (×12)</span>
-        Input → Token Embedding + <span class="hl-violet">Learned Positional Embedding</span>
-              ↓
-        <span class="hl-cyan">Masked Multi-Head Self-Attention</span>  (12 cabezas, 768 dims)
-              ↓ solo ve tokens anteriores — máscara causal triangular
-        Add & Norm  (conexión residual)
-              ↓
-        <span class="hl-gold">Feed Forward Network</span>  (3072 dims internos, activación GELU)
-              ↓
-        Add & Norm
-              ↓
-        [siguiente capa]  ×12
-              ↓
-        Linear + Softmax → distribución sobre vocabulario (40,000 tokens BPE)
       </div>
 
       <div class="grid-3 mt-16">
-        <div><span class="badge badge-violet">12 capas</span> <span style="font-size:.8rem; color:var(--muted);">capas del decoder</span></div>
-        <div><span class="badge badge-violet">768 dims</span> <span style="font-size:.8rem; color:var(--muted);">d_model</span></div>
-        <div><span class="badge badge-violet">12 cabezas</span> <span style="font-size:.8rem; color:var(--muted);">multi-head attention</span></div>
-        <div><span class="badge badge-violet">~117M params</span> <span style="font-size:.8rem; color:var(--muted);">total</span></div>
-        <div><span class="badge badge-violet">BPE 40K</span> <span style="font-size:.8rem; color:var(--muted);">vocabulario</span></div>
-        <div><span class="badge badge-violet">GELU</span> <span style="font-size:.8rem; color:var(--muted);">activación FFN</span></div>
+        <div class="card card-cyan">
+          <div style="font-size:1.4rem; margin-bottom:6px;">↔️</div>
+          <h3 style="color:var(--cyan)">Novedad 1 — Bidireccionalidad real</h3>
+          <p style="font-size:.8rem; margin-top:6px;">BERT es el primer modelo pre-entrenado con atención bidireccional en <strong style="color:var(--white)">todas las capas simultáneamente</strong>. Cada token atiende a todos los demás desde la capa 1.</p>
+        </div>
+        <div class="card card-cyan">
+          <div style="font-size:1.4rem; margin-bottom:6px;">🧠</div>
+          <h3 style="color:var(--cyan)">Novedad 2 — Representaciones contextuales</h3>
+          <p style="font-size:.8rem; margin-top:6px;">BERT aprende que <em>"banco"</em> en <em>"orilla del banco"</em> y en <em>"depósito en el banco"</em> son vectores distintos. GPT no puede lograrlo mirando solo a la izquierda.</p>
+        </div>
+        <div class="card card-cyan">
+          <div style="font-size:1.4rem; margin-bottom:6px;">⚡</div>
+          <h3 style="color:var(--cyan)">Novedad 3 — Fine-tuning sencillo</h3>
+          <p style="font-size:.8rem; margin-top:6px;">Basta agregar <strong style="color:var(--white)">una sola capa lineal</strong> sobre el token [CLS]. BERT logró SOTA en 11 tareas con la misma arquitectura sin rediseñar nada.</p>
+        </div>
       </div>
-    </div>
 
-    <hr class="divider"/>
-    <h2>Las 3 novedades de GPT frente a lo anterior</h2>
-    <div class="grid-3 mt-16">
-      <div class="card card-violet">
-        <div style="font-size:1.6rem; margin-bottom:8px;">📈</div>
-        <h3 style="color:var(--violet)">Pre-entrenamiento a gran escala con Transformers</h3>
-        <p style="font-size:.82rem; margin-top:6px;">Antes de GPT, el pre-entrenamiento se hacía con LSTMs (alcance corto). GPT fue el primer modelo en demostrar que un Transformer decoder pre-entrenado transfiere conocimiento lingüístico de largo alcance de forma masiva.</p>
-      </div>
-      <div class="card card-violet">
-        <div style="font-size:1.6rem; margin-bottom:8px;">🎯</div>
-        <h3 style="color:var(--violet)">Un modelo genérico supera a modelos especializados</h3>
-        <p style="font-size:.82rem; margin-top:6px;">GPT superó el estado del arte en 9 de 12 benchmarks usando el mismo modelo para tareas distintas: QA, entailment, similitud, clasificación. Antes se necesitaba una arquitectura distinta para cada tarea.</p>
-      </div>
-      <div class="card card-violet">
-        <div style="font-size:1.6rem; margin-bottom:8px;">🌟</div>
-        <h3 style="color:var(--violet)">Comportamiento zero-shot emergente</h3>
-        <p style="font-size:.82rem; margin-top:6px;">Sin ningún entrenamiento supervisado, GPT muestra capacidad de resolver tareas lingüísticas básicas — sugiriendo que el modelo internalizó estructura del lenguaje solo con predecir la siguiente palabra a escala.</p>
-      </div>
-    </div>
-
-    <hr class="divider"/>
-    <div class="card" style="border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.04);">
-      <div style="display:flex; gap:12px; align-items:flex-start;">
-        <span style="font-size:1.5rem; flex-shrink:0;">⚠️</span>
-        <div>
-          <h3 style="color:var(--pink)">Limitación estructural que BART resuelve</h3>
-          <p style="font-size:.85rem; margin-top:6px;">GPT solo ve contexto <strong style="color:var(--white)">hacia la izquierda</strong>. Para tareas seq2seq como resumen de reportes clínicos, necesita leer una entrada completa — pero no puede "releer" el input bidireccionalmente. BART resuelve esto con su encoder bidireccional que procesa toda la entrada antes de que el decoder genere.</p>
+      <div class="card mt-16" style="border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.04);">
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <span style="font-size:1.3rem; flex-shrink:0;">⚠️</span>
+          <p style="font-size:.83rem;"><strong style="color:var(--pink);">Limitación → BART la resuelve:</strong> Las predicciones de BERT son <strong style="color:var(--white)">condicionalmente independientes</strong> — predice cada [MASK] de forma aislada. No puede generar secuencias coherentes. BioBERT y PubMedBERT tienen exactamente esta limitación — por eso se necesita BioBART.</p>
         </div>
       </div>
     </div>
 
-    <hr class="divider"/>
-    <h2>Resultados GPT en benchmarks (Radford et al., 2018)</h2>
-    <div class="mt-16" style="overflow-x:auto;">
-      <table class="tbl">
-        <thead><tr><th>Tarea</th><th>SOTA anterior</th><th>GPT</th><th>Mejora</th></tr></thead>
-        <tbody>
-          <tr><td>Story Cloze (razonamiento)</td><td>77.6%</td><td style="color:var(--green);">86.5%</td><td style="color:var(--green);">+8.9%</td></tr>
-          <tr><td>RACE (QA)</td><td>53.3%</td><td style="color:var(--green);">59.0%</td><td style="color:var(--green);">+5.7%</td></tr>
-          <tr><td>MultiNLI (entailment)</td><td>72.2%</td><td style="color:var(--green);">82.1%</td><td style="color:var(--green);">+9.9%</td></tr>
-          <tr><td>GLUE (general)</td><td>68.9</td><td style="color:var(--green);">72.8</td><td style="color:var(--green);">+3.9</td></tr>
-        </tbody>
-      </table>
+    <hr class="divider" style="margin-top:40px;"/>
+
+    <!-- ── GPT EXPANDIDO ── -->
+    <div style="max-width:860px; width:100%; margin:0 auto; margin-bottom:40px;">
+      <div class="sec-label" style="color:var(--violet); text-align:center; margin-bottom:8px;">OpenAI, 2018</div>
+      <h2 style="text-align:center; margin-bottom:6px; color:var(--violet); font-size:1.8rem;">🟣 GPT — Generación Autoregresiva</h2>
+      <p style="font-size:.85rem; color:var(--muted); text-align:center; margin-bottom:24px;">Improving Language Understanding by Generative Pre-Training</p>
+
+      <div class="grid-2">
+        <div class="card card-violet">
+          <h3 style="color:var(--violet)">① Pre-entrenamiento no supervisado (L₁)</h3>
+          <p style="font-size:.85rem; margin-top:8px;">GPT aprende a <strong style="color:var(--white)">predecir el token siguiente</strong> con +7,000 libros (BooksCorpus). Sin etiquetas humanas.</p>
+          <div class="code-block mt-16">
+            <span class="label">Objetivo L₁</span>
+            <span class="hl-gold">L₁(U)</span> = Σᵢ log P(<span class="hl-cyan">uᵢ</span> | <span class="hl-violet">uᵢ₋ₖ,...,uᵢ₋₁</span> ; Θ)
+          </div>
+          <div class="noise-before mt-16">
+            <div class="noise-label">Predicción — izquierda a derecha</div>
+            <span class="mono" style="font-size:.8rem;">"El gato estaba en el" → <span style="color:var(--green);">"tejado"</span></span>
+          </div>
+        </div>
+        <div class="card card-violet">
+          <h3 style="color:var(--violet)">② Fine-tuning supervisado (L₃)</h3>
+          <p style="font-size:.85rem; margin-top:8px;">Se agrega <strong style="color:var(--white)">una sola capa lineal + softmax</strong>. Sin pre-entrenamiento, el rendimiento cae <strong style="color:var(--pink);">14.8%</strong>.</p>
+          <div class="code-block mt-16">
+            <span class="label">Objetivo combinado L₃</span>
+            <span class="hl-gold">L₃(C)</span> = <span class="hl-cyan">L₂(C)</span> + λ · <span class="hl-violet">L₁(C)</span>   (λ = 0.5)
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-violet mt-16">
+        <h3 style="color:var(--violet);">Arquitectura — Transformer decoder solo</h3>
+        <div class="code-block mt-16">
+          <span class="label">Por capa (×12) — 768 dims · 12 cabezas · ~117M params · BPE 40K tokens</span>
+          Input → TokenEmb + <span class="hl-violet">Learned Positional Emb</span>
+                ↓ <span class="hl-cyan">Masked Multi-Head Self-Attention</span>  (solo ve tokens anteriores)
+                ↓ Add &amp; Norm → <span class="hl-gold">Feed Forward (GELU)</span> → Add &amp; Norm
+          Linear + Softmax → token más probable
+        </div>
+      </div>
+
+      <div class="grid-3 mt-16">
+        <div class="card card-violet">
+          <div style="font-size:1.4rem; margin-bottom:6px;">📈</div>
+          <h3 style="color:var(--violet)">Novedad 1 — Pre-entrenamiento masivo</h3>
+          <p style="font-size:.8rem; margin-top:6px;">Primer Transformer decoder pre-entrenado a gran escala. Antes solo LSTMs de alcance corto.</p>
+        </div>
+        <div class="card card-violet">
+          <div style="font-size:1.4rem; margin-bottom:6px;">🎯</div>
+          <h3 style="color:var(--violet)">Novedad 2 — Modelo genérico</h3>
+          <p style="font-size:.8rem; margin-top:6px;">9 de 12 benchmarks superados con el mismo modelo. Story Cloze +8.9%, RACE +5.7%, GLUE 68.9→72.8.</p>
+        </div>
+        <div class="card card-violet">
+          <div style="font-size:1.4rem; margin-bottom:6px;">🌟</div>
+          <h3 style="color:var(--violet)">Novedad 3 — Zero-shot emergente</h3>
+          <p style="font-size:.8rem; margin-top:6px;">Sin entrenamiento supervisado, resuelve tareas lingüísticas básicas. El lenguaje emerge de predecir el siguiente token a escala.</p>
+        </div>
+      </div>
+
+      <div class="card mt-16" style="border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.04);">
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <span style="font-size:1.3rem; flex-shrink:0;">⚠️</span>
+          <p style="font-size:.83rem;"><strong style="color:var(--pink);">Limitación → BART la resuelve:</strong> GPT solo ve contexto <strong style="color:var(--white)">hacia la izquierda</strong>. Para resumir un reporte clínico completo necesita leer toda la entrada bidireccionalmente — imposible sin encoder. BART agrega exactamente ese encoder bidireccional.</p>
+        </div>
+      </div>
     </div>
+
   </div>
 </div>
 </section>
-
 <!-- ══════════════════ S4 — TOKENIZACIÓN ══════════════════ -->
 <section id="s4" class="section">
 <div class="container">
@@ -584,6 +499,97 @@ inputs_resumen = tokenizer(
         </tbody>
       </table>
     </div>
+
+    <hr class="divider"/>
+
+    <!-- ── LEARNED POSITIONAL ENCODING ── -->
+    <h2>Learned Positional Encoding — ¿Cómo funciona?</h2>
+    <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">La Self-Attention es <strong style="color:var(--white)">invariante a la permutación</strong>: sin información posicional, el modelo trata "el médico trató al paciente" y "el paciente trató al médico" como idénticas. El Positional Encoding inyecta el orden al sumar un vector de posición al embedding de cada token.</p>
+
+    <div class="grid-2">
+      <div class="card" style="border-color:rgba(100,116,139,.3);">
+        <h3 style="color:var(--muted);">Transformer original — Sinusoidal (fijo)</h3>
+        <p style="font-size:.82rem; margin-top:8px;">Calculado con una <strong style="color:var(--white)">fórmula matemática fija</strong> de seno y coseno. No se aprende, no cambia con el entrenamiento.</p>
+        <div class="code-block mt-16">
+          <span class="label">Fórmula — Vaswani et al. 2017</span>
+PE(pos, 2i)   = sin( pos / 10000^(2i/d) )
+PE(pos, 2i+1) = cos( pos / 10000^(2i/d) )
+
+pos = posición del token (0, 1, 2...)
+i   = dimensión del vector
+        </div>
+        <p style="font-size:.78rem; color:var(--muted); margin-top:10px;"><strong style="color:var(--white);">✓ Ventaja:</strong> Puede generalizar a secuencias más largas que las vistas en entrenamiento — la fórmula funciona para cualquier posición.</p>
+        <p style="font-size:.78rem; color:var(--muted); margin-top:6px;"><strong style="color:var(--pink);">✗ Limitación:</strong> Genérico — no aprende qué patrón posicional es óptimo para el lenguaje biomédico.</p>
+      </div>
+
+      <div class="card card-violet" style="border-width:2px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+          <span style="background:var(--violet); color:#04080f; font-size:.7rem; font-weight:800; padding:3px 10px; border-radius:12px;">BART / BioBART</span>
+          <h3 style="color:var(--violet); margin:0;">Learned Embeddings</h3>
+        </div>
+        <p style="font-size:.82rem; margin-bottom:12px;">Una <strong style="color:var(--white)">tabla de embeddings entrenables</strong> W_pos — una fila por posición posible. Se aprende durante el pre-entrenamiento igual que los embeddings de palabras.</p>
+        <div class="code-block">
+          <span class="label">BART — Learned Positional Embedding</span>
+W_pos ∈ ℝ^(1026 × d_model)
+(1024 posiciones + 2 tokens especiales)
+
+z(pos) = TokenEmbedding(token) + W_pos[pos]
+
+W_pos se actualiza con backpropagation
+durante el pre-entrenamiento (160 GB texto)
+        </div>
+        <p style="font-size:.78rem; color:var(--muted); margin-top:10px;"><strong style="color:var(--green);">✓ Ventaja:</strong> El modelo aprende exactamente qué patrón posicional es óptimo para el lenguaje biomédico.</p>
+        <p style="font-size:.78rem; color:var(--muted); margin-top:6px;"><strong style="color:var(--pink);">✗ Limitación:</strong> No generaliza más allá de 1024 tokens — la tabla no tiene fila para posición 1025.</p>
+      </div>
+    </div>
+
+    <div class="card card-violet mt-16">
+      <h3 style="color:var(--violet);">¿Cómo funciona la tabla internamente?</h3>
+      <p style="font-size:.85rem; margin-top:10px; margin-bottom:16px;">Imagina una <strong style="color:var(--white)">libreta con 1024 páginas</strong> — una por posición. Al inicio del entrenamiento cada página tiene valores aleatorios. Después de pre-entrenarse con millones de oraciones biomédicas, cada fila aprende un patrón que captura lo que lingüísticamente significa "estar en esa posición":</p>
+
+      <div class="grid-3">
+        <div class="card" style="background:rgba(192,132,252,.06); border-color:rgba(192,132,252,.2); text-align:center;">
+          <div style="font-size:1.2rem; margin-bottom:6px;">📍</div>
+          <div style="font-size:.78rem; font-weight:700; color:var(--violet); margin-bottom:4px;">W_pos[0–5]</div>
+          <p style="font-size:.78rem; color:var(--muted);">Aprende que las primeras posiciones suelen ser sujetos, fechas, nombres de pacientes — inicio de reporte clínico.</p>
+        </div>
+        <div class="card" style="background:rgba(192,132,252,.06); border-color:rgba(192,132,252,.2); text-align:center;">
+          <div style="font-size:1.2rem; margin-bottom:6px;">🔬</div>
+          <div style="font-size:.78rem; font-weight:700; color:var(--violet); margin-bottom:4px;">W_pos[50–300]</div>
+          <p style="font-size:.78rem; color:var(--muted);">Aprende que estas posiciones suelen contener hallazgos radiológicos, resultados de laboratorio, diagnósticos.</p>
+        </div>
+        <div class="card" style="background:rgba(192,132,252,.06); border-color:rgba(192,132,252,.2); text-align:center;">
+          <div style="font-size:1.2rem; margin-bottom:6px;">💊</div>
+          <div style="font-size:.78rem; font-weight:700; color:var(--violet); margin-bottom:4px;">W_pos[400+]</div>
+          <p style="font-size:.78rem; color:var(--muted);">Aprende que el final de una nota suele contener plan terapéutico, tratamiento prescrito, observaciones.</p>
+        </div>
+      </div>
+
+      <div class="code-block mt-16">
+        <span class="label">Ejemplo — Token "cardiomegaly" en posición 47 del reporte</span>
+z(47) = E["cardiomegaly"]  +  W_pos[47]
+        ↑ qué significa          ↑ dónde está
+        [768 dims semánticos]    [768 dims posicionales aprendidos]
+              ↓
+        Vector final que entra al encoder
+        (semántica biomédica + conciencia posicional)
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <div class="mt-16" style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr><th>Característica</th><th>Sinusoidal (Transformer original)</th><th>Learned W_pos (BART / BioBART)</th></tr></thead>
+        <tbody>
+          <tr><td>¿Se aprende?</td><td style="color:var(--pink);">No — fórmula fija</td><td style="color:var(--green);">Sí — backpropagation</td></tr>
+          <tr><td>Generaliza más allá de max_len</td><td style="color:var(--green);">Sí</td><td style="color:var(--pink);">No (máx. 1024 en BART)</td></tr>
+          <tr><td>Optimalidad para el dominio</td><td style="color:var(--muted);">Genérica (matemática pura)</td><td style="color:var(--green);">Adaptada al lenguaje biomédico</td></tr>
+          <tr><td>Parámetros adicionales</td><td style="color:var(--green);">Ninguno</td><td style="color:var(--muted);">1024 × d_model (pequeño)</td></tr>
+          <tr><td>Usado por</td><td>Transformer original, T5</td><td style="color:var(--violet);">GPT, BERT, <strong>BART, BioBART</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>
 </section>
@@ -969,24 +975,80 @@ x_corrupted = texto con ruido (entrada al encoder)
 
   <div class="mt-24">
 
+    <!-- INTRO AUTORREGRESIVA -->
+    <div class="card card-green" style="margin-bottom:24px;">
+      <div style="display:flex; align-items:flex-start; gap:16px;">
+        <span style="font-size:2rem; flex-shrink:0;">🎯</span>
+        <div>
+          <h2 style="color:var(--green); margin-bottom:10px;">¿Qué es la Inferencia Autoregresiva?</h2>
+          <p style="font-size:.88rem; line-height:1.8;">BioBART genera texto <strong style="color:var(--white)">un token a la vez</strong>. En cada paso t, el decoder recibe los tokens ya generados y consulta mediante <strong style="color:var(--cyan)">Cross-Attention</strong> la representación oculta H_enc producida por el encoder. El token más probable se selecciona y se agrega a la secuencia — hasta generar el token <code class="mono" style="color:var(--gold);">&lt;EOS&gt;</code>.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;">
+            <span class="badge badge-cyan">Causal (izq → der)</span>
+            <span class="badge badge-violet">Masked Self-Attention</span>
+            <span class="badge badge-gold">Cross-Attention al Encoder</span>
+            <span class="badge badge-green">Softmax → token seleccionado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLUJO GENERAL -->
+    <div class="card" style="margin-bottom:24px; border-color:rgba(100,116,139,.3);">
+      <h3>Flujo de tensores — inferencia completa</h3>
+      <div class="code-block mt-16">
+        <span class="label">Pipeline — del texto al token generado</span>
+Texto de entrada (reporte radiológico)
+        ↓ tokenizador BPE + .join().split()
+input_ids: <span class="hl-cyan">[1, S]</span>  int64
+        ↓ encoder (Self-Attention bidireccional, 6 capas)
+H_enc: <span class="hl-gold">[1, S, 768]</span>  float32   ← matrices K y V para el decoder
+        ↓ decoder (Masked Self-Attn + Cross-Attn, 6 capas)
+h_t: <span class="hl-violet">[1, t, 768]</span>  float32   ← hidden state en paso t
+        ↓ Linear (d_model → vocabulario)
+logits: <span class="hl-pink">[1, V≈50K]</span>  float32
+        ↓ Beam Search (Tarea 1) / Nucleus Sampling (Tarea 2)
+token_t: <span class="hl-green">int</span>   ← se agrega al output, repite hasta &lt;EOS&gt;
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
     <!-- TAREA 1 -->
     <div class="card card-cyan">
-      <h2 style="color:var(--cyan);">Tarea 1 — Summarization con Beam Search</h2>
-      <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">El modelo recibe el reporte completo, el encoder lo procesa bidireccionalmente y el decoder genera el resumen con 4 hipótesis en paralelo.</p>
+      <h2 style="color:var(--cyan);">Tarea 1 — Summarization de Reporte Radiológico con Beam Search</h2>
+      <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">El encoder lee el reporte completo con Self-Attention bidireccional y produce H_enc. El decoder genera el resumen consultando H_enc via Cross-Attention en cada paso con 4 hipótesis en paralelo.</p>
 
       <div class="noise-before">
-        <div class="noise-label">Entrada — Reporte radiológico (72-year-old male)</div>
-        <p class="mono" style="font-size:.78rem; color:var(--text); line-height:1.7;">"Chest X-ray findings: The patient is a 72-year-old male with progressive dyspnea and hypoxemia. Bilateral ground-glass opacities are identified in the lower lung fields, with consolidation in the right lower lobe. Mild cardiomegaly is noted with a cardiothoracic ratio of 0.58. Blunting of the right costophrenic angle suggests small pleural effusion. No pneumothorax identified. Endotracheal tube tip is 4 cm above the carina, in appropriate position. Left-sided PICC line with tip projecting over the lower SVC..."</p>
+        <div class="noise-label">Entrada — Reporte radiológico (72-year-old male, ~130 tokens)</div>
+        <p class="mono" style="font-size:.78rem; color:var(--text); line-height:1.7;">"Chest X-ray findings: The patient is a 72-year-old male with progressive dyspnea and hypoxemia. Bilateral ground-glass opacities are identified in the lower lung fields, with consolidation in the right lower lobe. Mild cardiomegaly is noted with a cardiothoracic ratio of 0.58. Blunting of the right costophrenic angle suggests small pleural effusion. No pneumothorax identified. Endotracheal tube tip is 4 cm above the carina, in appropriate position. Left-sided PICC line with tip projecting over the lower SVC. Pulmonary vascularity appears increased, consistent with pulmonary edema."</p>
       </div>
 
-      <div class="noise-after mt-16">
-        <div class="noise-label">Salida generada por BioBART — Beam Search (num_beams=4)</div>
+      <div style="margin:16px 0; padding:14px; background:#020609; border-radius:10px; border:1px solid var(--border);">
+        <div class="noise-label" style="margin-bottom:12px;">Decoder generando token a token — Beam Search mantiene 4 borradores en paralelo</div>
+        <div style="overflow-x:auto;">
+          <table class="tbl" style="font-size:.75rem;">
+            <thead><tr><th>Paso</th><th>Token generado</th><th>Cross-Attention consulta en H_enc</th><th>Prob.</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="color:var(--muted);">t=0</td><td><code class="mono" style="color:var(--gold);">&lt;BOS&gt;</code></td><td style="color:var(--muted); font-style:italic;">Inicio de secuencia</td><td>—</td></tr>
+              <tr><td class="mono" style="color:var(--muted);">t=1</td><td style="color:var(--green); font-weight:700;">"leftsided"</td><td>→ "Left-sided PICC line" (score alto)</td><td style="color:var(--green);">0.71</td></tr>
+              <tr><td class="mono" style="color:var(--muted);">t=2-3</td><td style="color:var(--green); font-weight:700;">"picc line"</td><td>→ "PICC line" + "tip projecting over SVC"</td><td style="color:var(--green);">0.88</td></tr>
+              <tr><td class="mono" style="color:var(--muted);">t=...</td><td style="color:var(--green); font-weight:700;">"no pneumothorax"</td><td>→ "No pneumothorax identified"</td><td style="color:var(--green);">0.85</td></tr>
+              <tr><td class="mono" style="color:var(--muted);">t=...</td><td style="color:var(--green); font-weight:700;">"cardiomegaly"</td><td>→ "cardiomegaly" + "ratio 0.58"</td><td style="color:var(--green);">0.76</td></tr>
+              <tr><td class="mono" style="color:var(--muted);">t=...</td><td style="color:var(--green); font-weight:700;">"pulmonary edema"</td><td>→ "vascularity increased" + "consistent with"</td><td style="color:var(--green);">0.69</td></tr>
+              <tr><td class="mono" style="color:var(--muted);">t=52</td><td><code class="mono" style="color:var(--pink);">&lt;EOS&gt;</code></td><td style="color:var(--muted); font-style:italic;">early_stopping=True — todos los beams terminaron</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="noise-after">
+        <div class="noise-label">Salida generada — Beam Search (num_beams=4) — 52 tokens de 120 posibles</div>
         <p class="mono" style="font-size:.82rem; color:var(--green);">"leftsided picc line with the tip projecting over the lower svc no pneumothorax cardiomegaly and pulmonary edema no acute pulmonary abnormalities are identified the endotracheal tube is in good position"</p>
-        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">52 tokens generados de 120 posibles. El modelo emitió EOS antes del límite — consideró el resumen completo.</p>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">El modelo emitió EOS antes del límite — consideró el resumen completo. <code class="mono" style="color:var(--gold);">tokenizer.decode(skip_special_tokens=True)</code> elimina BOS, EOS y PAD del texto final.</p>
       </div>
 
       <div class="mt-16">
-        <h3>Hiperparámetros de generación — Tarea 1</h3>
+        <h3>Hiperparámetros — Tarea 1</h3>
         <div class="mt-8" style="overflow-x:auto;">
           <table class="tbl">
             <thead><tr><th>Parámetro</th><th>Valor</th><th>Frase clave</th></tr></thead>
@@ -996,7 +1058,7 @@ x_corrupted = texto con ruido (entrada al encoder)
               <tr><td><code class="mono" style="color:var(--cyan);">max_new_tokens</code></td><td>120</td><td>Máximo 120 tokens de resumen</td></tr>
               <tr><td><code class="mono" style="color:var(--cyan);">min_length</code></td><td>40</td><td>Prohibido terminar antes de tiempo</td></tr>
               <tr><td><code class="mono" style="color:var(--cyan);">no_repeat_ngram_size</code></td><td>3</td><td>No repetir la misma frase dos veces</td></tr>
-              <tr><td><code class="mono" style="color:var(--cyan);">length_penalty</code></td><td>1.5</td><td>Premia resúmenes más completos</td></tr>
+              <tr><td><code class="mono" style="color:var(--cyan);">length_penalty</code></td><td>1.5</td><td>Premia resúmenes más completos en Beam Search</td></tr>
               <tr><td><code class="mono" style="color:var(--cyan);">early_stopping</code></td><td>True</td><td>Para cuando todos los beams terminaron</td></tr>
             </tbody>
           </table>
@@ -1008,22 +1070,62 @@ x_corrupted = texto con ruido (entrada al encoder)
 
     <!-- TAREA 2 -->
     <div class="card card-violet">
-      <h2 style="color:var(--violet);">Tarea 2 — QA Médico con Nucleus Sampling</h2>
-      <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">El modelo recibe un prompt estructurado <code class="mono" style="color:var(--gold);">question: ... context: ...</code> que le indica qué tarea realizar. El decoder usa muestreo probabilístico para mayor fluidez.</p>
+      <h2 style="color:var(--violet);">Tarea 2 — QA Médico Radiológico con Nucleus Sampling</h2>
+      <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">El modelo recibe un prompt <code class="mono" style="color:var(--gold);">question: ... context: ...</code> — el prefijo le indica qué tarea realizar. A diferencia de la Tarea 1, el decoder usa muestreo probabilístico para respuestas más naturales.</p>
 
       <div class="noise-before">
-        <div class="noise-label">Entrada — Prompt QA (58-year-old female)</div>
-        <p class="mono" style="font-size:.78rem; color:var(--text);">"question: What are the main radiological findings and their clinical significance? context: Chest X-ray: 58-year-old female with worsening shortness of breath. Bilateral perihilar opacities with air bronchograms in both lower lobes. Increased interstitial markings consistent with pulmonary edema. Moderate right pleural effusion. Cardiomegaly with cardiothoracic ratio 0.62..."</p>
+        <div class="noise-label">Entrada — Prompt QA (58-year-old female, ~131 tokens)</div>
+        <p class="mono" style="font-size:.78rem; color:var(--text);">"question: What are the main radiological findings and their clinical significance?  context: Chest X-ray: 58-year-old female with worsening shortness of breath. Bilateral perihilar opacities with air bronchograms in both lower lobes. Increased interstitial markings consistent with pulmonary edema. Moderate right pleural effusion with blunting of costophrenic angle. Cardiomegaly with cardiothoracic ratio 0.62. No pneumothorax. Endotracheal tube tip 3.5 cm above carina. Mild left lower lobe atelectasis noted."</p>
+        <p style="font-size:.73rem; color:var(--muted); margin-top:6px;">Contexto en inglés — el modelo fue entrenado en ese idioma. El prefijo <code class="mono">"question: ... context: ..."</code> es el patrón aprendido durante el fine-tuning en datasets de QA biomédico.</p>
       </div>
 
-      <div class="noise-after mt-16">
-        <div class="noise-label">Respuesta generada — Nucleus Sampling (top_p=0.92)</div>
+      <div style="margin:16px 0; padding:14px; background:#020609; border-radius:10px; border:1px solid var(--border);">
+        <div class="noise-label" style="margin-bottom:12px;">Nucleus Sampling en acción — top_p=0.92, temperature=0.7</div>
+        <div class="grid-2" style="gap:12px;">
+          <div>
+            <div style="font-size:.72rem; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:.08em;">Distribución softmax en t=1</div>
+            <div class="attn-bar">
+              <span class="attn-label">"worsening"</span>
+              <div class="attn-track"><div class="attn-fill" style="width:62%; background:linear-gradient(90deg,var(--green),rgba(52,211,153,.4));"></div></div>
+              <span class="attn-score" style="color:var(--green);">0.62 ✓</span>
+            </div>
+            <div class="attn-bar">
+              <span class="attn-label">"bilateral"</span>
+              <div class="attn-track"><div class="attn-fill" style="width:21%; background:linear-gradient(90deg,var(--cyan),rgba(0,229,255,.4));"></div></div>
+              <span class="attn-score" style="color:var(--cyan);">0.21 ✓</span>
+            </div>
+            <div class="attn-bar">
+              <span class="attn-label">"pulmonary"</span>
+              <div class="attn-track"><div class="attn-fill" style="width:9%; background:linear-gradient(90deg,var(--violet),rgba(192,132,252,.4));"></div></div>
+              <span class="attn-score" style="color:var(--violet);">0.09 ✓</span>
+            </div>
+            <div class="attn-bar">
+              <span class="attn-label">otros ~50K</span>
+              <div class="attn-track"><div class="attn-fill" style="width:8%; background:linear-gradient(90deg,var(--muted),rgba(100,116,139,.3));"></div></div>
+              <span class="attn-score" style="color:var(--muted);">0.08 ✗</span>
+            </div>
+            <p style="font-size:.72rem; color:var(--muted); margin-top:6px;">Los primeros 3 tokens suman ≥0.92 → nucleus. Se muestrea solo de ellos.</p>
+          </div>
+          <div class="code-block" style="align-self:center;">
+            <span class="label">Pipeline Nucleus Sampling</span>
+logits → softmax → P[50K tokens]
+   ↓ temperature=0.7 (concentra dist.)
+   ↓ top_k=50 (descarta raros)
+   ↓ top_p=0.92 (nucleus adaptativo)
+   ↓ sample() → token_t
+   ↓ repetition_penalty=1.3
+          </div>
+        </div>
+      </div>
+
+      <div class="noise-after">
+        <div class="noise-label">Respuesta generada — Nucleus Sampling (top_p=0.92) — 20 tokens</div>
         <p class="mono" style="font-size:.82rem; color:var(--violet);">"worsening pulmonary edema with bilateral pleural effusions and left lower lobe atelectasis"</p>
-        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">20 tokens generados. El modelo identificó los hallazgos clínicamente más relevantes para la pregunta formulada.</p>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">El modelo identificó los hallazgos clínicamente más relevantes. Emitió EOS temprano — completó su patrón aprendido de "impresión radiológica concisa".</p>
       </div>
 
       <div class="mt-16">
-        <h3>Hiperparámetros de generación — Tarea 2</h3>
+        <h3>Hiperparámetros — Tarea 2</h3>
         <div class="mt-8" style="overflow-x:auto;">
           <table class="tbl">
             <thead><tr><th>Parámetro</th><th>Valor</th><th>Frase clave</th></tr></thead>
@@ -1047,24 +1149,44 @@ x_corrupted = texto con ruido (entrada al encoder)
     <div class="grid-2 mt-16">
       <div class="card" style="border-color:rgba(100,116,139,.3);">
         <h3 style="color:var(--muted);">Greedy Search</h3>
-        <p style="font-size:.8rem; margin-top:6px; color:var(--muted);">Siempre elige el token más probable — argmax local.</p>
+        <p style="font-size:.8rem; margin-top:6px; color:var(--muted);">Siempre elige el token más probable — argmax local en cada paso.</p>
         <div class="noise-before mt-16">
           <span class="mono" style="font-size:.78rem; color:var(--text);">"no pneumothorax is identified on this portable chest xray leftsided picc line with the tip projecting over the lower svc with bilateral pulmonary edema"</span>
         </div>
-        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">Menciona neumotórax, PICC y edema. Estructura menos organizada — encadena hallazgos con "with". <strong style="color:var(--pink);">Omite cardiomegalia y tubo endotraqueal.</strong></p>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">Menciona neumotórax, PICC y edema. Estructura menos organizada. <strong style="color:var(--pink);">Omite cardiomegalia y tubo endotraqueal.</strong></p>
       </div>
       <div class="card card-green">
         <h3 style="color:var(--green);">Beam Search (num_beams=4)</h3>
-        <p style="font-size:.8rem; margin-top:6px;">Mantiene 4 hipótesis en paralelo — maximiza probabilidad conjunta.</p>
+        <p style="font-size:.8rem; margin-top:6px;">Mantiene 4 hipótesis en paralelo — maximiza probabilidad conjunta al final.</p>
         <div class="noise-after mt-16">
           <span class="mono" style="font-size:.78rem; color:var(--green);">"leftsided picc line with the tip projecting over the lower svc no pneumothorax cardiomegaly and pulmonary edema no acute pulmonary abnormalities are identified the endotracheal tube is in good position"</span>
         </div>
-        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;"><strong style="color:var(--green);">Agrega cardiomegalia y posición del tubo endotraqueal</strong> que Greedy omitió. Sigue el formato estándar de una impresión radiológica.</p>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;"><strong style="color:var(--green);">Agrega cardiomegalia y tubo endotraqueal</strong> que Greedy omitió. Sigue el formato estándar de impresión radiológica.</p>
       </div>
     </div>
     <div class="card mt-16" style="background:var(--bg3); border-color:var(--border);">
-      <p style="font-size:.85rem;"><strong style="color:var(--white);">Conclusión:</strong> Beam Search produjo un resumen más completo porque al explorar 4 hipótesis en paralelo encontró una secuencia con mayor probabilidad conjunta — una que incluía más hallazgos relevantes. Greedy quedó atrapado en la secuencia localmente más probable. Esto ilustra directamente por qué Beam Search es la estrategia preferida para resúmenes clínicos donde la completitud factual es crítica.</p>
+      <p style="font-size:.85rem;"><strong style="color:var(--white);">Conclusión:</strong> Beam Search produjo un resumen más completo porque al explorar 4 hipótesis en paralelo encontró una secuencia con mayor probabilidad conjunta — una que incluía más hallazgos relevantes del reporte. Greedy quedó atrapado en la secuencia localmente más probable. Esto ilustra directamente por qué Beam Search es la estrategia preferida para resúmenes clínicos donde la completitud factual es crítica.</p>
     </div>
+
+    <hr class="divider"/>
+    <h2>Resumen comparativo de hiperparámetros</h2>
+    <div class="mt-16" style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr><th>Hiperparámetro</th><th>Tarea 1 (Resumen)</th><th>Tarea 2 (QA)</th><th>Efecto</th></tr></thead>
+        <tbody>
+          <tr><td><code class="mono">max_new_tokens</code></td><td style="color:var(--cyan);">120</td><td style="color:var(--violet);">150</td><td>Longitud máxima del output generado</td></tr>
+          <tr><td><code class="mono">num_beams</code></td><td style="color:var(--cyan);">4</td><td style="color:var(--muted);">—</td><td>Beam Search: explora 4 hipótesis en paralelo</td></tr>
+          <tr><td><code class="mono">do_sample</code></td><td style="color:var(--cyan);">False</td><td style="color:var(--violet);">True</td><td>Beam Search vs. muestreo probabilístico</td></tr>
+          <tr><td><code class="mono">temperature</code></td><td style="color:var(--muted);">—</td><td style="color:var(--violet);">0.7</td><td>Distribución más concentrada: respuestas más seguras</td></tr>
+          <tr><td><code class="mono">top_k</code></td><td style="color:var(--muted);">—</td><td style="color:var(--violet);">50</td><td>Descarta tokens con probabilidad muy baja</td></tr>
+          <tr><td><code class="mono">top_p</code></td><td style="color:var(--muted);">—</td><td style="color:var(--violet);">0.92</td><td>Nucleus: mínimo conjunto que acumula 92% de probabilidad</td></tr>
+          <tr><td><code class="mono">no_repeat_ngram_size</code></td><td style="color:var(--cyan);">3</td><td style="color:var(--violet);">3</td><td>Prohíbe repetir la misma secuencia de 3 palabras</td></tr>
+          <tr><td><code class="mono">length_penalty</code></td><td style="color:var(--cyan);">1.5</td><td style="color:var(--muted);">—</td><td>Premia resúmenes más completos en Beam Search</td></tr>
+          <tr><td><code class="mono">repetition_penalty</code></td><td style="color:var(--muted);">—</td><td style="color:var(--violet);">1.3</td><td>Reduce probabilidad de tokens ya generados</td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>
 </section>
