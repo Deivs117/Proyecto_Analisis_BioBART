@@ -1,1249 +1,1171 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BioBART — Presentación Interactiva</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            space: {
-              950: '#020408',
-              900: '#050c14',
-              800: '#091524',
-              700: '#0d1f38',
-              600: '#122845',
-            },
-            cyan: { neon: '#00f5ff' },
-            violet: { neon: '#bf5fff' },
-            gold: { neon: '#ffd700' },
-            green: { neon: '#39ff14' },
-            pink: { neon: '#ff2d78' },
-          },
-          boxShadow: {
-            neon_cyan: '0 0 12px #00f5ff, 0 0 30px #00f5ff44',
-            neon_violet: '0 0 12px #bf5fff, 0 0 30px #bf5fff44',
-            neon_gold: '0 0 12px #ffd700, 0 0 30px #ffd70044',
-            neon_green: '0 0 12px #39ff14, 0 0 30px #39ff1444',
-            neon_pink: '0 0 12px #ff2d78, 0 0 30px #ff2d7844',
-          },
-          animation: {
-            'fade-in': 'fadeIn 0.6s ease forwards',
-            'slide-up': 'slideUp 0.5s ease forwards',
-            'pulse-glow': 'pulseGlow 2.5s ease-in-out infinite',
-          },
-          keyframes: {
-            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-            slideUp: { '0%': { opacity: '0', transform: 'translateY(24px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
-            pulseGlow: { '0%,100%': { opacity: '0.7' }, '50%': { opacity: '1' } },
-          },
-        }
-      }
-    }
-  </script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BioBART — Sustentación PLN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <style>
-    html, body { margin: 0; padding: 0; background: #020408; font-family: 'Inter', sans-serif; }
-    .tab-section { display: none; }
-    .tab-section.active { display: block; animation: fadeIn 0.55s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Neon text helpers */
-    .text-neon-cyan  { color: #00f5ff; text-shadow: 0 0 8px #00f5ff88; }
-    .text-neon-violet{ color: #bf5fff; text-shadow: 0 0 8px #bf5fff88; }
-    .text-neon-gold  { color: #ffd700; text-shadow: 0 0 8px #ffd70088; }
-    .text-neon-green { color: #39ff14; text-shadow: 0 0 8px #39ff1488; }
-    .text-neon-pink  { color: #ff2d78; text-shadow: 0 0 8px #ff2d7888; }
-
-    /* Neon border helpers */
-    .border-neon-cyan  { border-color: #00f5ff; box-shadow: 0 0 10px #00f5ff44; }
-    .border-neon-violet{ border-color: #bf5fff; box-shadow: 0 0 10px #bf5fff44; }
-    .border-neon-gold  { border-color: #ffd700; box-shadow: 0 0 10px #ffd70044; }
-    .border-neon-green { border-color: #39ff14; box-shadow: 0 0 10px #39ff1444; }
-    .border-neon-pink  { border-color: #ff2d78; box-shadow: 0 0 10px #ff2d7844; }
-
-    /* Glow bg */
-    .bg-neon-cyan-subtle  { background: rgba(0,245,255,.07); }
-    .bg-neon-violet-subtle{ background: rgba(191,95,255,.07); }
-    .bg-neon-gold-subtle  { background: rgba(255,215,0,.07); }
-    .bg-neon-green-subtle { background: rgba(57,255,20,.07); }
-    .bg-neon-pink-subtle  { background: rgba(255,45,120,.07); }
-
-    /* Arrow */
-    .arrow-right {
-      width: 0; height: 0;
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent;
-      border-left: 18px solid currentColor;
+    :root {
+      --bg:      #04080f;
+      --bg2:     #080f1c;
+      --bg3:     #0c1628;
+      --border:  #1a2d4a;
+      --cyan:    #00e5ff;
+      --violet:  #c084fc;
+      --gold:    #fbbf24;
+      --green:   #34d399;
+      --pink:    #f472b6;
+      --white:   #f0f6ff;
+      --muted:   #64748b;
+      --text:    #cbd5e1;
     }
-    .arrow-down {
-      width: 0; height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 18px solid currentColor;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+    code, .mono { font-family: 'JetBrains Mono', monospace; }
 
-    /* Formula */
-    .formula {
-      font-family: 'Georgia', serif;
-      font-style: italic;
+    /* ── NAV ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(4,8,15,.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
     }
-
-    /* Connector line */
-    .connector { position: relative; }
-    .connector::after {
-      content: '';
-      position: absolute;
-      right: -20px; top: 50%;
-      transform: translateY(-50%);
-      width: 20px; height: 2px;
-      background: currentColor;
+    .brand { display:flex; align-items:center; gap:10px; padding:8px 20px; border-bottom:1px solid var(--bg3); }
+    .brand-title { font-size:11px; font-weight:800; letter-spacing:.15em; text-transform:uppercase; color:var(--cyan); }
+    .brand-sub { font-size:11px; color:var(--muted); }
+    nav { display:flex; overflow-x:auto; scrollbar-width:none; }
+    nav::-webkit-scrollbar { display:none; }
+    .tab-btn {
+      flex-shrink:0; padding:10px 16px; font-size:11px; font-weight:700;
+      text-transform:uppercase; letter-spacing:.08em; color:var(--muted);
+      background:none; border:none; border-bottom:2px solid transparent;
+      cursor:pointer; transition:all .2s; white-space:nowrap; font-family:'Syne',sans-serif;
     }
+    .tab-btn:hover { color:var(--white); }
+    .tab-btn.active { color:var(--cyan); border-bottom-color:var(--cyan); background:rgba(0,229,255,.05); }
 
-    /* Slide-in animation for items */
-    .anim-item { opacity: 0; animation: slideUp 0.5s ease forwards; }
-    .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.22s; }
-    .delay-3 { animation-delay: 0.34s; }
-    .delay-4 { animation-delay: 0.46s; }
-    .delay-5 { animation-delay: 0.58s; }
-    .delay-6 { animation-delay: 0.70s; }
+    /* ── LAYOUT ── */
+    main { padding-top:84px; min-height:100vh; }
+    .section { display:none; }
+    .section.active { display:block; animation: fadeUp .5s ease forwards; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .container { max-width:1000px; margin:0 auto; padding:40px 20px 60px; }
 
-    /* Active tab button */
-    .tab-btn.active-tab {
-      color: #00f5ff;
-      border-bottom: 2px solid #00f5ff;
-      background: rgba(0,245,255,.08);
+    /* ── TYPOGRAPHY ── */
+    .sec-label { font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; margin-bottom:10px; }
+    h1 { font-size:clamp(2rem,5vw,3.5rem); font-weight:800; color:var(--white); line-height:1.1; }
+    h2 { font-size:1.4rem; font-weight:700; color:var(--white); margin-bottom:12px; }
+    h3 { font-size:1rem; font-weight:700; color:var(--white); margin-bottom:8px; }
+    p { font-size:.9rem; line-height:1.7; color:var(--text); }
+    .subtitle { font-size:1rem; color:var(--muted); margin-top:10px; max-width:560px; }
+
+    /* ── CARDS ── */
+    .card {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:14px; padding:24px;
     }
+    .card-cyan   { border-color:rgba(0,229,255,.3);  background:rgba(0,229,255,.04); }
+    .card-violet { border-color:rgba(192,132,252,.3); background:rgba(192,132,252,.04); }
+    .card-gold   { border-color:rgba(251,191,36,.3);  background:rgba(251,191,36,.04); }
+    .card-green  { border-color:rgba(52,211,153,.3);  background:rgba(52,211,153,.04); }
+    .card-pink   { border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.04); }
 
-    /* Nav button */
-    .nav-btn {
-      transition: all 0.2s ease;
-    }
-    .nav-btn:hover { transform: scale(1.06); }
-    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+    /* ── GRID ── */
+    .grid-2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+    .grid-3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
 
-    /* QKV animated token highlight */
-    @keyframes tokenHighlight {
-      0%,100% { background: rgba(255,215,0,.08); }
-      50%      { background: rgba(255,215,0,.22); }
+    /* ── BADGES ── */
+    .badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.05em; padding:3px 10px; border-radius:20px; border:1px solid; margin:2px; }
+    .badge-cyan   { color:var(--cyan);   border-color:rgba(0,229,255,.4);   background:rgba(0,229,255,.08); }
+    .badge-violet { color:var(--violet); border-color:rgba(192,132,252,.4); background:rgba(192,132,252,.08); }
+    .badge-gold   { color:var(--gold);   border-color:rgba(251,191,36,.4);  background:rgba(251,191,36,.08); }
+    .badge-green  { color:var(--green);  border-color:rgba(52,211,153,.4);  background:rgba(52,211,153,.08); }
+    .badge-pink   { color:var(--pink);   border-color:rgba(244,114,182,.4); background:rgba(244,114,182,.08); }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background:#020609; border:1px solid var(--border); border-radius:10px;
+      padding:16px; font-family:'JetBrains Mono',monospace; font-size:.78rem;
+      line-height:1.8; color:#94a3b8; overflow-x:auto; margin:12px 0;
     }
-    .token-pulse { animation: tokenHighlight 2s ease-in-out infinite; }
+    .code-block .label { font-size:.7rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; display:block; margin-bottom:8px; border-bottom:1px solid var(--border); padding-bottom:6px; }
+    .hl-cyan   { color:var(--cyan); }
+    .hl-gold   { color:var(--gold); }
+    .hl-violet { color:var(--violet); }
+    .hl-green  { color:var(--green); }
+    .hl-pink   { color:var(--pink); }
+
+    /* ── FLOW ARROWS ── */
+    .arr-down { width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:14px solid; margin:0 auto; }
+    .arr-right { width:0; height:0; border-top:8px solid transparent; border-bottom:8px solid transparent; border-left:14px solid; }
+
+    /* ── DIVIDER ── */
+    .divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+
+    /* ── TABLE ── */
+    .tbl { width:100%; border-collapse:collapse; font-size:.82rem; }
+    .tbl th { text-align:left; padding:10px 14px; background:var(--bg3); color:var(--cyan); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; border-bottom:1px solid var(--border); }
+    .tbl td { padding:10px 14px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:top; }
+    .tbl tr:last-child td { border-bottom:none; }
+    .tbl tr:hover td { background:rgba(255,255,255,.02); }
+
+    /* ── STEP ── */
+    .step { display:flex; gap:16px; align-items:flex-start; margin-bottom:20px; }
+    .step-num { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem; flex-shrink:0; }
+    .step-body { flex:1; }
+
+    /* ── TOKEN DEMO ── */
+    .token-box { display:inline-block; padding:4px 10px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:.78rem; margin:2px; border:1px solid; }
+
+    /* ── PULSE ── */
+    @keyframes pulse { 0%,100%{opacity:.6} 50%{opacity:1} }
+    .pulse { animation:pulse 2s ease-in-out infinite; }
+
+    /* ── ATTENTION VIZ ── */
+    .attn-bar { display:flex; align-items:center; gap:10px; margin:6px 0; }
+    .attn-label { font-family:'JetBrains Mono',monospace; font-size:.75rem; color:var(--muted); min-width:100px; }
+    .attn-track { flex:1; height:8px; background:rgba(255,255,255,.05); border-radius:4px; overflow:hidden; }
+    .attn-fill { height:100%; border-radius:4px; }
+    .attn-score { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--muted); min-width:36px; text-align:right; }
+
+    /* ── NOISE CARD ── */
+    .noise-before { background:rgba(244,114,182,.06); border:1px solid rgba(244,114,182,.2); border-radius:8px; padding:10px 14px; margin:8px 0; }
+    .noise-after  { background:rgba(0,229,255,.06); border:1px solid rgba(0,229,255,.2); border-radius:8px; padding:10px 14px; margin:8px 0; }
+    .noise-label  { font-size:.68rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-bottom:6px; }
+
+    /* ── GAP UTILS ── */
+    .mt-8  { margin-top:8px; }
+    .mt-16 { margin-top:16px; }
+    .mt-24 { margin-top:24px; }
+    .mb-16 { margin-bottom:16px; }
+    .gap-8 { gap:8px; }
+    .flex  { display:flex; }
+    .flex-col { flex-direction:column; }
+    .items-center { align-items:center; }
+    .flex-wrap { flex-wrap:wrap; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col" style="background:#020408; color:#e2e8f0;">
+<body>
 
-  <!-- ══════════════════════  STICKY TOP NAV (TABS)  ══════════════════════ -->
-  <header class="fixed top-0 left-0 right-0 z-50"
-          style="background:rgba(2,4,8,.96); border-bottom:1px solid #0d1f38; backdrop-filter:blur(10px);">
+<header>
+  <div class="brand">
+    <span>🧬</span>
+    <span class="brand-title">BioBART</span>
+    <span style="color:var(--border)">|</span>
+    <span class="brand-sub">Procesamiento de Datos Secuenciales — Trabajo Final PLN</span>
+  </div>
+  <nav>
+    <button class="tab-btn active" onclick="show('s1',this)">⚡ Linaje</button>
+    <button class="tab-btn" onclick="show('s2',this)">🔵 BERT</button>
+    <button class="tab-btn" onclick="show('s3',this)">🟣 GPT</button>
+    <button class="tab-btn" onclick="show('s4',this)">🔤 Tokenización</button>
+    <button class="tab-btn" onclick="show('s5',this)">🏗️ Arquitectura</button>
+    <button class="tab-btn" onclick="show('s6',this)">🔑 Q, K, V</button>
+    <button class="tab-btn" onclick="show('s7',this)">🔬 Pre-entrenamiento BART</button>
+    <button class="tab-btn" onclick="show('s8',this)">⚡ Generación</button>
+    <button class="tab-btn" onclick="show('s9',this)">⚠️ Limitaciones</button>
+  </nav>
+</header>
 
-    <!-- Brand row -->
-    <div class="flex items-center justify-between px-4 sm:px-6 py-2" style="border-bottom:1px solid #091524;">
-      <div class="flex items-center gap-2">
-        <span class="text-lg">🧬</span>
-        <span class="text-xs font-black tracking-widest uppercase text-neon-cyan">BioBART</span>
-        <span class="text-gray-700 text-xs hidden sm:inline">|</span>
-        <span class="text-xs text-gray-500 hidden sm:inline">Procesamiento de Datos Secuenciales</span>
-      </div>
-      <span class="text-xs text-gray-600 hidden md:inline">Sustentación de Modelo</span>
+<main>
+
+<!-- ══════════════════ S1 — LINAJE ══════════════════ -->
+<section id="s1" class="section active">
+<div class="container">
+  <div class="sec-label" style="color:var(--cyan)">Sección 1 — Evolución</div>
+  <h1>El Linaje Evolutivo</h1>
+  <p class="subtitle">De las RNN al especialista biomédico — por qué cada modelo existía y qué limitación resolvió el siguiente.</p>
+
+  <div style="display:flex; flex-direction:column; align-items:center; gap:0; margin-top:36px;">
+
+    <!-- RNN -->
+    <div class="card" style="max-width:460px; width:100%; text-align:center; border-color:rgba(100,116,139,.4);">
+      <div style="font-size:2rem; margin-bottom:8px;">🔄</div>
+      <h3 style="color:var(--muted)">RNN / LSTM (pre-2017)</h3>
+      <p style="font-size:.82rem; margin-top:6px;">Procesaba texto palabra por palabra, de izquierda a derecha. Olvidaba contexto lejano, no se podía paralelizar. El tiempo de entrenamiento era prohibitivo para textos largos.</p>
+      <div class="mt-8"><span class="badge" style="color:#ef4444; border-color:rgba(239,68,68,.4); background:rgba(239,68,68,.08);">❌ Memoria corta</span> <span class="badge" style="color:#ef4444; border-color:rgba(239,68,68,.4); background:rgba(239,68,68,.08);">❌ No paralelizable</span></div>
     </div>
 
-    <!-- Tabs row -->
-    <nav class="flex overflow-x-auto gap-0 px-2" style="scrollbar-width:none;" id="tab-nav">
-      <button onclick="showTab('slide-1',this)" data-tab="slide-1"
-              class="tab-btn active-tab flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
-        ⚡ Linaje Evolutivo
-      </button>
-      <button onclick="showTab('slide-2',this)" data-tab="slide-2"
-              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
-        🏗️ Encoder-Decoder
-      </button>
-      <button onclick="showTab('slide-3',this)" data-tab="slide-3"
-              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
-        🔑 Atención Q,K,V
-      </button>
-      <button onclick="showTab('slide-4',this)" data-tab="slide-4"
-              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
-        🔬 Innovaciones
-      </button>
-      <button onclick="showTab('slide-5',this)" data-tab="slide-5"
-              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
-        📐 Dimensiones
-      </button>
-      <button onclick="showTab('slide-6',this)" data-tab="slide-6"
-              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-cyan-neon hover:bg-white/5 whitespace-nowrap">
-        ⚡ Generación Paso a Paso
-      </button>
-      <button onclick="showTab('slide-7',this)" data-tab="slide-7"
-              class="tab-btn flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all duration-200 border-b-2 border-transparent hover:text-green-neon hover:bg-white/5 whitespace-nowrap">
-        ⚠️ Limitaciones
-      </button>
-    </nav>
-  </header>
+    <div style="margin:8px 0;"><div class="arr-down" style="border-top-color:var(--border);"></div></div>
 
-  <!-- ══════════════════════  SLIDES CONTAINER  ══════════════════════ -->
-  <main class="flex flex-col flex-1 pt-[84px] pb-12 min-h-screen">
+    <!-- Transformer -->
+    <div class="card card-gold" style="max-width:460px; width:100%; text-align:center;">
+      <div style="font-size:2rem; margin-bottom:8px;">⚡</div>
+      <h3 style="color:var(--gold)">Transformer — "Attention is All You Need" (Vaswani et al., 2017)</h3>
+      <p style="font-size:.82rem; margin-top:6px;">Reemplazó la recurrencia por <strong style="color:var(--white)">Self-Attention</strong>: todos los tokens se relacionan simultáneamente. Paralización total en GPU. Base de GPT, BERT y BART.</p>
+      <div class="mt-8"><span class="badge badge-gold">✓ Paralelo</span> <span class="badge badge-gold">✓ Largo alcance</span> <span class="badge badge-gold">✓ Escalable</span></div>
+    </div>
 
-    <!-- ━━━━━━━━━  SLIDE 1 — LINAJE EVOLUTIVO  ━━━━━━━━━ -->
-    <section id="slide-1" class="tab-section active">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
+    <div style="margin:8px 0;"><div class="arr-down" style="border-top-color:var(--border);"></div></div>
 
-        <div class="text-center anim-item delay-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-neon-cyan mb-2">Sección 1</p>
-          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">El Linaje Evolutivo</h1>
-          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">De los Transformers genéricos al especialista biomédico</p>
+    <!-- BERT + GPT -->
+    <div class="grid-2" style="max-width:620px; width:100%;">
+      <div class="card card-cyan" style="text-align:center;">
+        <div style="font-size:1.8rem; margin-bottom:8px;">🔵</div>
+        <h3 style="color:var(--cyan)">BERT (Google, 2019)</h3>
+        <p style="font-size:.8rem; margin-top:6px;">Solo Encoder. Bidireccional. Comprende texto pero <strong style="color:var(--pink)">no puede generarlo</strong>.</p>
+        <div class="mt-8"><span class="badge badge-cyan">Comprensión</span> <span class="badge" style="color:var(--pink); border-color:rgba(244,114,182,.4); background:rgba(244,114,182,.08);">Sin decoder</span></div>
+      </div>
+      <div class="card card-violet" style="text-align:center;">
+        <div style="font-size:1.8rem; margin-bottom:8px;">🟣</div>
+        <h3 style="color:var(--violet)">GPT (OpenAI, 2018)</h3>
+        <p style="font-size:.8rem; margin-top:6px;">Solo Decoder. Genera texto pero <strong style="color:var(--pink)">solo ve contexto izquierdo</strong>.</p>
+        <div class="mt-8"><span class="badge badge-violet">Generación</span> <span class="badge" style="color:var(--pink); border-color:rgba(244,114,182,.4); background:rgba(244,114,182,.08);">Unidireccional</span></div>
+      </div>
+    </div>
+
+    <div style="margin:8px 0;"><div class="arr-down" style="border-top-color:var(--border);"></div></div>
+
+    <!-- BART -->
+    <div class="card" style="max-width:460px; width:100%; text-align:center; border-color:rgba(0,229,255,.25); background:linear-gradient(135deg,rgba(0,229,255,.04),rgba(192,132,252,.04));">
+      <div style="font-size:2rem; margin-bottom:8px;">🔀</div>
+      <h3 style="background:linear-gradient(90deg,var(--cyan),var(--violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">BART (Facebook AI, 2019)</h3>
+      <p style="font-size:.82rem; margin-top:6px;">Encoder bidireccional (como BERT) + Decoder autoregresivo (como GPT). Pre-entrenado con <strong style="color:var(--white)">denoising</strong> sobre 160 GB de texto.</p>
+      <div class="mt-8"><span class="badge badge-cyan">Comprende</span> <span class="badge badge-violet">Genera</span> <span class="badge badge-gold">Denoising</span></div>
+    </div>
+
+    <div style="margin:8px 0;"><div class="arr-down" style="border-top-color:var(--border);"></div></div>
+
+    <!-- BioBART -->
+    <div class="card card-green" style="max-width:460px; width:100%; text-align:center; position:relative; box-shadow:0 0 30px rgba(52,211,153,.12);">
+      <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--green); color:#04080f; font-size:.7rem; font-weight:800; padding:3px 12px; border-radius:20px; letter-spacing:.08em;">OBJETIVO</div>
+      <div style="font-size:2rem; margin-bottom:8px; margin-top:8px;">🧬</div>
+      <h3 style="color:var(--green); font-size:1.6rem;">BioBART</h3>
+      <p style="font-size:.82rem; margin-top:6px;">BART re-entrenado sobre abstracts de PubMed (~4.5M artículos). Tokenizador BPE biomédico. Pre-entrenamiento con <strong style="color:var(--white)">Text Infilling + Sentence Permutation</strong>.</p>
+      <p style="font-size:.8rem; margin-top:8px; color:var(--muted);">Modelo usado en el notebook: <code class="mono" style="color:var(--green);">hamzamalik11/Biobart_radiology_summarization</code></p>
+      <div class="mt-8"><span class="badge badge-green">PubMed</span> <span class="badge badge-green">BPE Médico</span> <span class="badge badge-green">Radiología</span></div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ S2 — BERT ══════════════════ -->
+<section id="s2" class="section">
+<div class="container">
+  <div class="sec-label" style="color:var(--cyan)">Sección 2 — Google AI, 2019</div>
+  <h1>BERT</h1>
+  <p class="subtitle">Bidirectional Encoder Representations from Transformers — la revolución de la comprensión bidireccional.</p>
+
+  <div class="mt-24">
+    <div class="grid-2">
+      <div class="card card-cyan">
+        <h3 style="color:var(--cyan)">① Masked Language Model (MLM)</h3>
+        <p style="font-size:.85rem; margin-top:8px;">Se enmascara aleatoriamente el <strong style="color:var(--white)">15% de los tokens</strong> y el modelo predice los tokens enmascarados usando contexto bidireccional completo — ve tanto lo que viene antes como después.</p>
+        <div class="noise-before mt-16">
+          <div class="noise-label">Texto original</div>
+          <span class="mono" style="font-size:.8rem; color:var(--text);">"El paciente presenta <span style="color:var(--green)">fiebre</span> alta"</span>
         </div>
+        <div class="noise-after">
+          <div class="noise-label">Entrada al modelo (MLM)</div>
+          <span class="mono" style="font-size:.8rem;">"El paciente presenta <span class="token-box" style="color:var(--gold); border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.1);">[MASK]</span> alta"</span>
+        </div>
+        <p style="font-size:.78rem; color:var(--muted); margin-top:8px;">BERT ve "El paciente presenta" <strong>Y</strong> "alta" simultáneamente para predecir "fiebre" — imposible con GPT que solo vería lo de la izquierda.</p>
+      </div>
 
-        <!-- Timeline horizontal -->
-        <div class="w-full flex flex-col items-center gap-4 mt-4 anim-item delay-2">
-
-          <!-- Row 1: Transformer -->
-          <div class="flex flex-col items-center">
-            <div class="px-6 py-4 rounded-2xl border border-neon-gold text-center"
-                 style="background:rgba(255,215,0,.07); min-width:200px;">
-              <div class="text-2xl mb-1">⚡</div>
-              <div class="text-neon-gold font-black text-lg">Transformer</div>
-              <div class="text-gray-400 text-xs mt-1">"Attention is All You Need" (2017)</div>
-              <div class="text-gray-500 text-xs mt-1">Arquitectura base universal</div>
-            </div>
-            <div class="arrow-down mt-2" style="color:#ffd700;"></div>
-          </div>
-
-          <!-- Row 2: BERT + GPT split -->
-          <div class="flex flex-col sm:flex-row items-center gap-4 anim-item delay-3">
-            <!-- BERT -->
-            <div class="flex flex-col items-center">
-              <div class="px-6 py-4 rounded-2xl border border-neon-cyan text-center"
-                   style="background:rgba(0,245,255,.07); min-width:180px;">
-                <div class="text-2xl mb-1">🔵</div>
-                <div class="text-neon-cyan font-black text-lg">BERT</div>
-                <div class="text-gray-400 text-xs mt-1">Solo Encoder</div>
-                <div class="text-gray-500 text-xs mt-1">Comprensión bidireccional</div>
-              </div>
-            </div>
-
-            <div class="text-gray-600 font-bold text-xl hidden sm:block">+</div>
-
-            <!-- GPT -->
-            <div class="flex flex-col items-center">
-              <div class="px-6 py-4 rounded-2xl border border-neon-violet text-center"
-                   style="background:rgba(191,95,255,.07); min-width:180px;">
-                <div class="text-2xl mb-1">🟣</div>
-                <div class="text-neon-violet font-black text-lg">GPT</div>
-                <div class="text-gray-400 text-xs mt-1">Solo Decoder</div>
-                <div class="text-gray-500 text-xs mt-1">Generación autoregresiva</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Arrow down to BART -->
-          <div class="arrow-down" style="color:#6b7280;"></div>
-
-          <!-- Row 3: BART -->
-          <div class="anim-item delay-4 flex flex-col items-center">
-            <div class="px-8 py-5 rounded-2xl border-2 text-center"
-                 style="background:linear-gradient(135deg,rgba(0,245,255,.08),rgba(191,95,255,.08)); border-color:#6b7280; min-width:220px;">
-              <div class="text-2xl mb-1">🔀</div>
-              <div class="font-black text-xl" style="background:linear-gradient(90deg,#00f5ff,#bf5fff); background-clip:text; -webkit-background-clip:text; -webkit-text-fill-color:transparent;">BART</div>
-              <div class="text-gray-400 text-xs mt-1">Encoder + Decoder</div>
-              <div class="text-gray-500 text-xs mt-1">Secuencia a secuencia (seq2seq)</div>
-              <div class="flex justify-center gap-2 mt-2">
-                <span class="text-xs px-2 py-0.5 rounded-full border border-neon-cyan text-neon-cyan">Encoder</span>
-                <span class="text-xs px-2 py-0.5 rounded-full border border-neon-violet text-neon-violet">Decoder</span>
-              </div>
-            </div>
-            <div class="arrow-down mt-2" style="color:#6b7280;"></div>
-          </div>
-
-          <!-- Row 4: BioBART -->
-          <div class="anim-item delay-5 flex flex-col items-center">
-            <div class="px-8 py-5 rounded-2xl border-2 border-neon-green text-center relative"
-                 style="background:rgba(57,255,20,.07); min-width:240px; box-shadow:0 0 30px rgba(57,255,20,.15);">
-              <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs font-bold"
-                   style="background:#39ff14; color:#020408;">OBJETIVO FINAL</div>
-              <div class="text-2xl mb-1 mt-2">🧬</div>
-              <div class="text-neon-green font-black text-2xl">BioBART</div>
-              <div class="text-gray-300 text-xs mt-1">BART especializado en Biomedicina</div>
-              <div class="text-gray-500 text-xs mt-1">Entrenado en PubMed abstracts</div>
-              <div class="flex flex-wrap justify-center gap-1 mt-2">
-                <span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(57,255,20,.15); color:#39ff14;">Vocabulario BPE Médico</span>
-                <span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(57,255,20,.15); color:#39ff14;">Text Infilling</span>
-                <span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(57,255,20,.15); color:#39ff14;">Sent. Permutation</span>
-              </div>
-            </div>
-          </div>
-
+      <div class="card card-violet">
+        <h3 style="color:var(--violet)">② Next Sentence Prediction (NSP)</h3>
+        <p style="font-size:.85rem; margin-top:8px;">El modelo recibe dos oraciones y predice si la segunda sigue naturalmente a la primera. Aprende relaciones entre oraciones — clave para QA y entailment.</p>
+        <div class="noise-before mt-16">
+          <div class="noise-label">Ejemplo IsNext ✓</div>
+          <span class="mono" style="font-size:.78rem; color:var(--text);">A: "El fármaco inhibe la enzima."<br/>B: "Esto reduce la inflamación."</span>
+        </div>
+        <div class="noise-after">
+          <div class="noise-label">Ejemplo NotNext ✗</div>
+          <span class="mono" style="font-size:.78rem;">"El fármaco inhibe la enzima."<br/>"El cielo es azul."</span>
         </div>
       </div>
-    </section>
+    </div>
 
+    <hr class="divider"/>
 
-    <!-- ━━━━━━━━━  SLIDE 2 — ARQUITECTURA ENCODER-DECODER  ━━━━━━━━━ -->
-    <section id="slide-2" class="tab-section">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
+    <h2>Las 3 novedades de BERT frente a lo anterior</h2>
+    <div class="grid-3 mt-16">
+      <div class="card card-cyan">
+        <div style="font-size:1.6rem; margin-bottom:8px;">↔️</div>
+        <h3 style="color:var(--cyan)">Bidireccionalidad profunda real</h3>
+        <p style="font-size:.82rem; margin-top:6px;">GPT y ELMo eran "pseudo-bidireccionales". BERT es el primer modelo en pre-entrenarse con atención bidireccional en <strong style="color:var(--white)">todas las capas simultáneamente</strong>. Cada token atiende a todos los demás desde la capa 1.</p>
+      </div>
+      <div class="card card-cyan">
+        <div style="font-size:1.6rem; margin-bottom:8px;">🧠</div>
+        <h3 style="color:var(--cyan)">Representaciones contextuales ricas</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Al ver el contexto completo, BERT aprende que <em>"banco"</em> en <em>"orilla del banco"</em> y en <em>"depósito en el banco"</em> son vectores distintos. GPT no puede lograr esto mirando solo a la izquierda.</p>
+      </div>
+      <div class="card card-cyan">
+        <div style="font-size:1.6rem; margin-bottom:8px;">⚡</div>
+        <h3 style="color:var(--cyan)">Fine-tuning extremadamente sencillo</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Para la mayoría de tareas basta agregar <strong style="color:var(--white)">una sola capa de clasificación</strong> sobre el token [CLS]. BERT logró SOTA en 11 tareas con la misma arquitectura sin rediseñar nada.</p>
+      </div>
+    </div>
 
-        <div class="text-center anim-item delay-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-neon-cyan mb-2">Sección 2</p>
-          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Arquitectura Encoder-Decoder</h1>
-          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Texto con ruido → representación oculta → texto limpio</p>
-        </div>
+    <hr class="divider"/>
 
-        <!-- Main diagram -->
-        <div class="w-full flex flex-col items-center gap-3 anim-item delay-2">
-
-          <!-- Input text -->
-          <div class="px-5 py-3 rounded-xl border border-neon-pink text-center"
-               style="background:rgba(255,45,120,.07);">
-            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Entrada corrupta</div>
-            <div class="font-mono text-sm text-neon-pink">"El paciente tiene <span class="bg-yellow-400 text-black px-1 rounded">[MASK]</span> crónica grave"</div>
-          </div>
-
-          <div class="arrow-down" style="color:#6b7280;"></div>
-
-          <!-- Main row: Encoder | Hidden | Decoder -->
-          <div class="w-full flex flex-col lg:flex-row items-stretch gap-4">
-
-            <!-- ENCODER -->
-            <div class="flex-1 rounded-2xl border-2 border-neon-cyan p-5"
-                 style="background:rgba(0,245,255,.06); box-shadow:0 0 20px rgba(0,245,255,.1);">
-              <div class="text-neon-cyan font-black text-lg mb-3 flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full" style="background:#00f5ff; box-shadow:0 0 6px #00f5ff;"></span>
-                ENCODER
-              </div>
-              <div class="space-y-2 text-sm">
-                <div class="flex items-start gap-2">
-                  <span class="text-neon-cyan text-lg">①</span>
-                  <div>
-                    <div class="text-white font-semibold">Tokenización</div>
-                    <div class="text-gray-400 text-xs">BPE médico → IDs de tokens</div>
-                  </div>
-                </div>
-                <div class="flex items-start gap-2">
-                  <span class="text-neon-cyan text-lg">②</span>
-                  <div>
-                    <div class="text-white font-semibold">Embeddings</div>
-                    <div class="text-gray-400 text-xs">Token + Posicional [B, S, 768]</div>
-                  </div>
-                </div>
-                <div class="flex items-start gap-2">
-                  <span class="text-neon-cyan text-lg">③</span>
-                  <div>
-                    <div class="text-white font-semibold">Self-Attention Bidireccional</div>
-                    <div class="text-gray-400 text-xs">Cada token ve todos los demás</div>
-                  </div>
-                </div>
-                <div class="flex items-start gap-2">
-                  <span class="text-neon-cyan text-lg">④</span>
-                  <div>
-                    <div class="text-white font-semibold">Feed-Forward Layers</div>
-                    <div class="text-gray-400 text-xs">12 capas apiladas</div>
-                  </div>
-                </div>
-              </div>
-              <div class="mt-4 rounded-lg p-2 text-center text-xs font-mono"
-                   style="background:rgba(0,245,255,.1); border:1px solid #00f5ff44;">
-                Output: Z ∈ ℝ^[B × S × 768]
-              </div>
-            </div>
-
-            <!-- HIDDEN REPRESENTATION -->
-            <div class="flex flex-col items-center justify-center gap-2 lg:w-40">
-              <div class="hidden lg:flex arrow-right" style="color:#6b7280;"></div>
-              <div class="rounded-xl border-2 border-neon-gold p-4 text-center"
-                   style="background:rgba(255,215,0,.08); box-shadow:0 0 20px rgba(255,215,0,.12);">
-                <div class="text-neon-gold font-black text-sm">Representación</div>
-                <div class="text-neon-gold font-black text-sm">Oculta</div>
-                <div class="text-gray-500 text-xs mt-1">Context Vector</div>
-                <div class="font-mono text-xs mt-2 text-neon-gold">Z</div>
-                <div class="text-xs text-gray-500 mt-1">[B, S, d_model]</div>
-              </div>
-              <div class="hidden lg:flex arrow-right" style="color:#6b7280;"></div>
-            </div>
-
-            <!-- DECODER -->
-            <div class="flex-1 rounded-2xl border-2 border-neon-violet p-5"
-                 style="background:rgba(191,95,255,.06); box-shadow:0 0 20px rgba(191,95,255,.1);">
-              <div class="text-neon-violet font-black text-lg mb-3 flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full" style="background:#bf5fff; box-shadow:0 0 6px #bf5fff;"></span>
-                DECODER
-              </div>
-              <div class="space-y-2 text-sm">
-                <div class="flex items-start gap-2">
-                  <span class="text-neon-violet text-lg">①</span>
-                  <div>
-                    <div class="text-white font-semibold">Masked Self-Attention</div>
-                    <div class="text-gray-400 text-xs">Solo ve tokens anteriores</div>
-                  </div>
-                </div>
-                <div class="flex items-start gap-2">
-                  <span class="text-neon-violet text-lg">②</span>
-                  <div>
-                    <div class="text-white font-semibold">Cross-Attention</div>
-                    <div class="text-gray-400 text-xs">Consulta Z del Encoder</div>
-                  </div>
-                </div>
-                <div class="flex items-start gap-2">
-                  <span class="text-neon-violet text-lg">③</span>
-                  <div>
-                    <div class="text-white font-semibold">Generación Autoregresiva</div>
-                    <div class="text-gray-400 text-xs">Token por token ←→ greedy/beam</div>
-                  </div>
-                </div>
-                <div class="flex items-start gap-2">
-                  <span class="text-neon-violet text-lg">④</span>
-                  <div>
-                    <div class="text-white font-semibold">Linear + Softmax</div>
-                    <div class="text-gray-400 text-xs">Distribución sobre vocabulario</div>
-                  </div>
-                </div>
-              </div>
-              <div class="mt-4 rounded-lg p-2 text-center text-xs font-mono"
-                   style="background:rgba(191,95,255,.1); border:1px solid #bf5fff44;">
-                Output: [B × S × V_size]
-              </div>
-            </div>
-
-          </div>
-
-          <div class="arrow-down" style="color:#6b7280;"></div>
-
-          <!-- Output -->
-          <div class="px-5 py-3 rounded-xl border border-neon-green text-center"
-               style="background:rgba(57,255,20,.07);">
-            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Salida reconstruida</div>
-            <div class="font-mono text-sm text-neon-green">"El paciente tiene <span class="underline">hipertensión</span> crónica grave"</div>
-          </div>
-
+    <div class="card" style="border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.04);">
+      <div style="display:flex; gap:12px; align-items:flex-start;">
+        <span style="font-size:1.5rem; flex-shrink:0;">⚠️</span>
+        <div>
+          <h3 style="color:var(--pink)">Limitación estructural que BART resuelve</h3>
+          <p style="font-size:.85rem; margin-top:6px;">Las predicciones de BERT son <strong style="color:var(--white)">condicionalmente independientes</strong> — predice cada [MASK] de forma aislada. Esto lo hace incapaz de generación autoregresiva: no puede escribir una secuencia coherente token a token porque no modela la dependencia entre los tokens generados. <strong style="color:var(--white)">BioBERT y PubMedBERT tienen exactamente esta limitación</strong> — por eso se necesita BioBART.</p>
         </div>
       </div>
-    </section>
+    </div>
 
+    <hr class="divider"/>
+    <h2>Especificaciones técnicas</h2>
+    <div class="mt-16" style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr><th>Parámetro</th><th>BERT-base</th><th>BERT-large</th></tr></thead>
+        <tbody>
+          <tr><td>Capas (encoder)</td><td>12</td><td>24</td></tr>
+          <tr><td>Dimensión oculta (d_model)</td><td>768</td><td>1024</td></tr>
+          <tr><td>Cabezas de atención</td><td>12</td><td>16</td></tr>
+          <tr><td>Parámetros totales</td><td>110 M</td><td>340 M</td></tr>
+          <tr><td>Activación FFN</td><td colspan="2">GELU</td></tr>
+          <tr><td>Vocabulario</td><td colspan="2">~30,000 tokens (WordPiece)</td></tr>
+          <tr><td>Positional Encoding</td><td colspan="2">Learned embeddings</td></tr>
+          <tr><td>Datos de pre-entrenamiento</td><td colspan="2">BooksCorpus + Wikipedia (16 GB)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</section>
 
-    <!-- ━━━━━━━━━  SLIDE 3 — MECANISMO DE ATENCIÓN  ━━━━━━━━━ -->
-    <section id="slide-3" class="tab-section">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
+<!-- ══════════════════ S3 — GPT ══════════════════ -->
+<section id="s3" class="section">
+<div class="container">
+  <div class="sec-label" style="color:var(--violet)">Sección 3 — OpenAI, 2018</div>
+  <h1>GPT</h1>
+  <p class="subtitle">Improving Language Understanding by Generative Pre-Training — el primer modelo en demostrar que pre-entrenar un Transformer decoder a gran escala transfiere conocimiento lingüístico masivo.</p>
 
-        <div class="text-center anim-item delay-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-neon-gold mb-2">Sección 3 — El Corazón</p>
-          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Mecanismo de Atención</h1>
-          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Cómo el modelo decide qué palabras son relevantes entre sí</p>
+  <div class="mt-24">
+    <div class="grid-2">
+      <div class="card card-violet">
+        <h3 style="color:var(--violet)">① Pre-entrenamiento no supervisado (L₁)</h3>
+        <p style="font-size:.85rem; margin-top:8px;">GPT se entrena con un corpus de +7,000 libros (BooksCorpus) aprendiendo a <strong style="color:var(--white)">predecir el token siguiente</strong> dado el contexto previo. Sin etiquetas humanas, sin supervisión.</p>
+        <div class="code-block mt-16">
+          <span class="label">Objetivo L₁ — maximizar log-verosimilitud</span>
+          <span class="hl-gold">L₁(U)</span> = Σᵢ log P(<span class="hl-cyan">uᵢ</span> | <span class="hl-violet">uᵢ₋ₖ,...,uᵢ₋₁</span> ; Θ)
+
+k = ventana de contexto
+Θ = parámetros (actualizados por SGD)
         </div>
-
-        <!-- QKV Cards -->
-        <div class="w-full grid grid-cols-1 sm:grid-cols-3 gap-4 anim-item delay-2">
-
-          <!-- Q -->
-          <div class="rounded-2xl border-2 p-5 flex flex-col gap-3" style="border-color:#ffd700; background:rgba(255,215,0,.07);">
-            <div class="flex items-center gap-3">
-              <span class="w-10 h-10 rounded-full flex items-center justify-center font-black text-lg text-black" style="background:#ffd700;">Q</span>
-              <div>
-                <div class="text-neon-gold font-black text-lg">Query</div>
-                <div class="text-gray-400 text-xs">La pregunta</div>
-              </div>
-            </div>
-            <div class="text-gray-300 text-sm">
-              <span class="text-neon-gold font-semibold">¿Qué estoy buscando?</span>
-              <p class="text-gray-400 text-xs mt-2">Proviene del token <em>actual</em>. Representa lo que este token quiere saber de los demás.</p>
-            </div>
-            <div class="rounded-lg p-2 text-center text-xs font-mono" style="background:rgba(255,215,0,.1);">
-              Q = X · W<sub>Q</sub>
-            </div>
-            <div class="text-xs text-gray-500 italic text-center">Ej: "hipertensión" pregunta<br/>¿con qué está relacionada?</div>
-          </div>
-
-          <!-- K -->
-          <div class="rounded-2xl border-2 p-5 flex flex-col gap-3" style="border-color:#00f5ff; background:rgba(0,245,255,.07);">
-            <div class="flex items-center gap-3">
-              <span class="w-10 h-10 rounded-full flex items-center justify-center font-black text-lg text-black" style="background:#00f5ff;">K</span>
-              <div>
-                <div class="text-neon-cyan font-black text-lg">Key</div>
-                <div class="text-gray-400 text-xs">El índice</div>
-              </div>
-            </div>
-            <div class="text-gray-300 text-sm">
-              <span class="text-neon-cyan font-semibold">¿Qué información tengo?</span>
-              <p class="text-gray-400 text-xs mt-2">Proviene de <em>todos</em> los tokens. Actúa como etiquetas en una base de datos.</p>
-            </div>
-            <div class="rounded-lg p-2 text-center text-xs font-mono" style="background:rgba(0,245,255,.1);">
-              K = X · W<sub>K</sub>
-            </div>
-            <div class="text-xs text-gray-500 italic text-center">Ej: Cada token anuncia<br/>su "tema" o contenido</div>
-          </div>
-
-          <!-- V -->
-          <div class="rounded-2xl border-2 p-5 flex flex-col gap-3" style="border-color:#bf5fff; background:rgba(191,95,255,.07);">
-            <div class="flex items-center gap-3">
-              <span class="w-10 h-10 rounded-full flex items-center justify-center font-black text-lg text-black" style="background:#bf5fff;">V</span>
-              <div>
-                <div class="text-neon-violet font-black text-lg">Value</div>
-                <div class="text-gray-400 text-xs">El contenido</div>
-              </div>
-            </div>
-            <div class="text-gray-300 text-sm">
-              <span class="text-neon-violet font-semibold">¿Cuál es el contenido real?</span>
-              <p class="text-gray-400 text-xs mt-2">La información que realmente se transfiere si la atención es alta entre Q y K.</p>
-            </div>
-            <div class="rounded-lg p-2 text-center text-xs font-mono" style="background:rgba(191,95,255,.1);">
-              V = X · W<sub>V</sub>
-            </div>
-            <div class="text-xs text-gray-500 italic text-center">Ej: El significado semántico<br/>real del token</div>
-          </div>
-
+        <div class="noise-before mt-16">
+          <div class="noise-label">Predicción autoregresiva — izquierda a derecha</div>
+          <span class="mono" style="font-size:.8rem; color:var(--text);">"El gato estaba en el" → predice: <span style="color:var(--green);">"tejado"</span></span>
         </div>
-
-        <!-- Formula -->
-        <div class="w-full rounded-2xl border-2 border-neon-gold p-6 text-center anim-item delay-3"
-             style="background:rgba(255,215,0,.06); box-shadow:0 0 30px rgba(255,215,0,.1);">
-          <div class="text-gray-400 text-sm mb-3">Fórmula de Scaled Dot-Product Attention</div>
-          <div class="formula text-2xl sm:text-3xl font-bold text-neon-gold">
-            Attention(Q, K, V) = softmax
-            <span class="text-white">(</span>
-            <span class="text-neon-cyan">QK</span><sup class="text-neon-cyan text-base">T</sup>
-            <span class="text-white"> / </span>
-            <span class="text-neon-violet">√d</span><sub class="text-neon-violet text-base">k</sub>
-            <span class="text-white">)</span>
-            · <span class="text-neon-violet">V</span>
-          </div>
-          <div class="mt-4 flex flex-wrap justify-center gap-4 text-xs text-gray-400">
-            <span><span class="text-neon-cyan font-bold">QKᵀ</span> = similitud coseno entre tokens</span>
-            <span><span class="text-neon-violet font-bold">√d<sub>k</sub></span> = factor de escala (estabilidad de gradientes)</span>
-            <span><span class="text-neon-gold font-bold">softmax</span> = normalización → pesos de atención [0,1]</span>
-          </div>
-        </div>
-
-        <!-- Multi-Head note -->
-        <div class="w-full rounded-xl p-4 text-sm anim-item delay-4" style="background:#091524; border:1px solid #122845;">
-          <span class="text-neon-green font-bold">Multi-Head Attention: </span>
-          <span class="text-gray-300">Se aplican <strong class="text-white">h = 12 cabezas</strong> en paralelo, cada una con sus propias matrices W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub>. Los resultados se concatenan → el modelo captura diferentes tipos de relaciones simultáneamente.</span>
-          <div class="mt-2 flex gap-2 flex-wrap">
-            <span class="text-xs px-2 py-0.5 rounded-full border border-neon-green text-neon-green">Head 1: sintaxis</span>
-            <span class="text-xs px-2 py-0.5 rounded-full border border-neon-cyan text-neon-cyan">Head 2: correferencia</span>
-            <span class="text-xs px-2 py-0.5 rounded-full border border-neon-violet text-neon-violet">Head 3: semántica</span>
-            <span class="text-xs px-2 py-0.5 rounded-full border-gray-600 border text-gray-400">... Head 12</span>
-          </div>
-        </div>
-
       </div>
-    </section>
 
+      <div class="card card-violet">
+        <h3 style="color:var(--violet)">② Fine-tuning supervisado (L₃)</h3>
+        <p style="font-size:.85rem; margin-top:8px;">Se agrega únicamente <strong style="color:var(--white)">una capa lineal + softmax</strong> al final del modelo. Los pesos pre-entrenados se ajustan ligeramente. El modelo base casi no cambia.</p>
+        <div class="code-block mt-16">
+          <span class="label">Objetivo combinado L₃</span>
+          <span class="hl-gold">L₃(C)</span> = <span class="hl-cyan">L₂(C)</span> + λ · <span class="hl-violet">L₁(C)</span>
 
-    <!-- ━━━━━━━━━  SLIDE 4 — INNOVACIONES BIOBART  ━━━━━━━━━ -->
-    <section id="slide-4" class="tab-section">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
-
-        <div class="text-center anim-item delay-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-neon-green mb-2">Sección 4</p>
-          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Innovaciones de BioBART</h1>
-          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Tareas de pre-entrenamiento y dominio especializado</p>
+L₂ = pérdida supervisada de la tarea
+L₁ = objetivo auxiliar de lenguaje
+λ  = 0.5 (peso del auxiliar)
         </div>
-
-        <!-- Pre-training tasks -->
-        <div class="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 anim-item delay-2">
-
-          <!-- Text Infilling -->
-          <div class="rounded-2xl border-2 border-neon-cyan p-6" style="background:rgba(0,245,255,.05);">
-            <div class="flex items-center gap-3 mb-4">
-              <span class="text-3xl">🔲</span>
-              <div>
-                <div class="text-neon-cyan font-black text-xl">Text Infilling</div>
-                <div class="text-gray-400 text-xs">Tarea de corrupción principal</div>
-              </div>
-            </div>
-            <div class="text-gray-300 text-sm mb-4">Se enmascaran <strong class="text-white">spans contiguos</strong> de texto con un único token <code class="text-neon-cyan bg-space-700 px-1 py-0.5 rounded">[MASK]</code>. El modelo aprende a reconstruirlos.</div>
-
-            <!-- Before/After -->
-            <div class="flex flex-col gap-2">
-              <div class="rounded-lg p-3" style="background:rgba(255,45,120,.08); border:1px solid #ff2d7844;">
-                <div class="text-xs text-gray-500 uppercase mb-1">Original</div>
-                <div class="font-mono text-sm text-gray-200">"The patient has <span class="text-neon-pink">chronic heart failure</span> and comorbidities"</div>
-              </div>
-              <div class="text-center text-gray-500 text-xs">↓ corrupción ↓</div>
-              <div class="rounded-lg p-3" style="background:rgba(0,245,255,.08); border:1px solid #00f5ff44;">
-                <div class="text-xs text-gray-500 uppercase mb-1">Entrada al modelo</div>
-                <div class="font-mono text-sm text-gray-200">"The patient has <span class="text-neon-cyan token-pulse px-1 rounded">[MASK]</span> and comorbidities"</div>
-              </div>
-            </div>
-            <div class="mt-3 text-xs text-gray-500">Aprende semántica biomédica profunda al reconstruir términos médicos complejos.</div>
-          </div>
-
-          <!-- Sentence Permutation -->
-          <div class="rounded-2xl border-2 border-neon-violet p-6" style="background:rgba(191,95,255,.05);">
-            <div class="flex items-center gap-3 mb-4">
-              <span class="text-3xl">🔀</span>
-              <div>
-                <div class="text-neon-violet font-black text-xl">Sentence Permutation</div>
-                <div class="text-gray-400 text-xs">Tarea de coherencia estructural</div>
-              </div>
-            </div>
-            <div class="text-gray-300 text-sm mb-4">Las oraciones del documento se <strong class="text-white">mezclan aleatoriamente</strong>. El modelo aprende el orden lógico del discurso médico.</div>
-
-            <!-- Before/After -->
-            <div class="flex flex-col gap-2">
-              <div class="rounded-lg p-3" style="background:rgba(255,45,120,.08); border:1px solid #ff2d7844;">
-                <div class="text-xs text-gray-500 uppercase mb-1">Original (orden correcto)</div>
-                <div class="font-mono text-xs text-gray-200">
-                  <div class="text-neon-green">1. Antecedentes del paciente.</div>
-                  <div class="text-neon-cyan">2. Diagnóstico principal.</div>
-                  <div class="text-neon-violet">3. Tratamiento prescrito.</div>
-                </div>
-              </div>
-              <div class="text-center text-gray-500 text-xs">↓ permutación ↓</div>
-              <div class="rounded-lg p-3" style="background:rgba(191,95,255,.08); border:1px solid #bf5fff44;">
-                <div class="text-xs text-gray-500 uppercase mb-1">Entrada al modelo (desordenado)</div>
-                <div class="font-mono text-xs text-gray-200">
-                  <div class="text-neon-violet">3. Tratamiento prescrito.</div>
-                  <div class="text-neon-green">1. Antecedentes del paciente.</div>
-                  <div class="text-neon-cyan">2. Diagnóstico principal.</div>
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 text-xs text-gray-500">Refuerza la coherencia narrativa en reportes clínicos y artículos científicos.</div>
-          </div>
-
-        </div>
-
-        <!-- PubMed & BPE info -->
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 anim-item delay-3">
-
-          <div class="rounded-xl p-4 border border-neon-green" style="background:rgba(57,255,20,.06);">
-            <div class="text-2xl mb-2">📚</div>
-            <div class="text-neon-green font-bold">Corpus PubMed</div>
-            <div class="text-gray-400 text-xs mt-1">~4.5M abstracts de artículos biomédicos revisados por pares. Dominio altamente especializado.</div>
-          </div>
-
-          <div class="rounded-xl p-4 border border-neon-gold" style="background:rgba(255,215,0,.06);">
-            <div class="text-2xl mb-2">🔤</div>
-            <div class="text-neon-gold font-bold">Vocabulario BPE Médico</div>
-            <div class="text-gray-400 text-xs mt-1">Byte-Pair Encoding adaptado. Reconoce términos como <code class="text-neon-gold">"myocardial"</code>, <code class="text-neon-gold">"hypertension"</code> como unidades completas.</div>
-          </div>
-
-          <div class="rounded-xl p-4 border border-neon-cyan sm:col-span-2 lg:col-span-1" style="background:rgba(0,245,255,.06);">
-            <div class="text-2xl mb-2">🏆</div>
-            <div class="text-neon-cyan font-bold">Resultado</div>
-            <div class="text-gray-400 text-xs mt-1">SOTA en tareas como <strong class="text-white">diálogo médico</strong>, <strong class="text-white">resumen clínico</strong> y <strong class="text-white">simplificación de reportes</strong>.</div>
-          </div>
-
-        </div>
-
+        <p style="font-size:.78rem; color:var(--muted); margin-top:8px;">Sin pre-entrenamiento, el rendimiento cae <strong style="color:var(--pink);">14.8%</strong> en promedio — prueba de que el conocimiento de la fase 1 es fundamental.</p>
       </div>
-    </section>
+    </div>
 
+    <hr class="divider"/>
+    <h2>Arquitectura interna — Transformer decoder (12 capas)</h2>
+    <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">GPT usa un <strong style="color:var(--white)">Transformer solo-decoder</strong>. La clave es la <strong style="color:var(--violet)">máscara causal</strong>: cada token solo puede ver los tokens anteriores, nunca los futuros.</p>
 
-    <!-- ━━━━━━━━━  SLIDE 5 — PIPELINE DIMENSIONAL  ━━━━━━━━━ -->
-    <section id="slide-5" class="tab-section">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
-
-        <div class="text-center anim-item delay-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-neon-violet mb-2">Sección 5 — CRÍTICO</p>
-          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Entradas, Salidas y Dimensiones</h1>
-          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Transformación tensor a tensor a través del modelo</p>
-        </div>
-
-        <!-- Pipeline -->
-        <div class="w-full anim-item delay-2">
-
-          <!-- Step boxes -->
-          <div class="flex flex-col gap-3">
-
-            <!-- Step 1: Raw Text -->
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 text-black" style="background:#ffd700;">1</div>
-              <div class="flex-1 rounded-xl p-4 border border-neon-gold" style="background:rgba(255,215,0,.06);">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <div class="text-neon-gold font-bold">Raw Text</div>
-                    <div class="font-mono text-sm text-gray-300 mt-1">"The patient presented with acute myocardial infarction"</div>
-                  </div>
-                  <div class="text-xs text-gray-500 bg-black bg-opacity-30 rounded px-2 py-1 font-mono flex-shrink-0">
-                    tipo: string
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex justify-center"><div class="arrow-down" style="color:#374151;"></div></div>
-
-            <!-- Step 2: Token IDs -->
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 text-black" style="background:#00f5ff;">2</div>
-              <div class="flex-1 rounded-xl p-4 border border-neon-cyan" style="background:rgba(0,245,255,.06);">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <div class="text-neon-cyan font-bold">Token IDs</div>
-                    <div class="font-mono text-sm text-gray-300 mt-1">[0, 20, 1345, 2983, 14, 2234, 45012, 2]</div>
-                    <div class="text-gray-500 text-xs mt-1">Tokenizador BPE → índices enteros</div>
-                  </div>
-                  <div class="text-xs text-gray-500 bg-black bg-opacity-30 rounded px-2 py-1 font-mono flex-shrink-0">
-                    shape: [1, 8]<br/>dtype: int64
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex justify-center"><div class="arrow-down" style="color:#374151;"></div></div>
-
-            <!-- Step 3: Embeddings -->
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 text-black" style="background:#bf5fff;">3</div>
-              <div class="flex-1 rounded-xl p-4 border border-neon-violet" style="background:rgba(191,95,255,.06);">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <div class="text-neon-violet font-bold">Embeddings</div>
-                    <div class="text-gray-400 text-xs mt-1">Embedding de token + Embedding posicional → suma vectorial</div>
-                    <div class="flex gap-2 mt-2">
-                      <span class="text-xs px-2 py-0.5 rounded border border-neon-violet text-neon-violet">Batch</span>
-                      <span class="text-xs text-gray-400">×</span>
-                      <span class="text-xs px-2 py-0.5 rounded border border-neon-cyan text-neon-cyan">Seq_len</span>
-                      <span class="text-xs text-gray-400">×</span>
-                      <span class="text-xs px-2 py-0.5 rounded border border-neon-gold text-neon-gold">d_model</span>
-                    </div>
-                  </div>
-                  <div class="text-xs text-gray-500 bg-black bg-opacity-30 rounded px-2 py-1 font-mono flex-shrink-0">
-                    shape: [B, S, 768]<br/>dtype: float32
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex justify-center"><div class="arrow-down" style="color:#374151;"></div></div>
-
-            <!-- Step 4: Hidden States -->
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 text-black" style="background:#39ff14;">4</div>
-              <div class="flex-1 rounded-xl p-4 border border-neon-green" style="background:rgba(57,255,20,.06);">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <div class="text-neon-green font-bold">Capas Transformer (× 12)</div>
-                    <div class="text-gray-400 text-xs mt-1">Multi-Head Attention → Layer Norm → Feed-Forward → Layer Norm</div>
-                    <div class="text-gray-500 text-xs mt-1">Dimensión preservada a través de todo el Encoder/Decoder</div>
-                  </div>
-                  <div class="text-xs text-gray-500 bg-black bg-opacity-30 rounded px-2 py-1 font-mono flex-shrink-0">
-                    shape: [B, S, 768]<br/>× 12 capas
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex justify-center"><div class="arrow-down" style="color:#374151;"></div></div>
-
-            <!-- Step 5: Linear -->
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 text-black" style="background:#ff2d78;">5</div>
-              <div class="flex-1 rounded-xl p-4 border border-neon-pink" style="background:rgba(255,45,120,.06);">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <div class="text-neon-pink font-bold">Linear Layer</div>
-                    <div class="text-gray-400 text-xs mt-1">Proyección al espacio del vocabulario completo</div>
-                    <div class="font-mono text-xs text-gray-500 mt-1">d_model (768) → |Vocabulario| (~50,265)</div>
-                  </div>
-                  <div class="text-xs text-gray-500 bg-black bg-opacity-30 rounded px-2 py-1 font-mono flex-shrink-0">
-                    shape: [B, S, V]<br/>logits (raw)
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex justify-center"><div class="arrow-down" style="color:#374151;"></div></div>
-
-            <!-- Step 6: Softmax -->
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 text-black" style="background:#ffd700;">6</div>
-              <div class="flex-1 rounded-xl p-4 border-2 border-neon-gold" style="background:rgba(255,215,0,.08); box-shadow:0 0 15px rgba(255,215,0,.1);">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <div class="text-neon-gold font-bold">Softmax → Probabilidades</div>
-                    <div class="font-mono text-xs text-gray-300 mt-1">P(token|contexto) para cada posición</div>
-                    <div class="flex gap-1 mt-2 flex-wrap">
-                      <span class="text-xs px-2 py-0.5 rounded font-mono" style="background:rgba(57,255,20,.2); color:#39ff14;">"infarction" → 0.72</span>
-                      <span class="text-xs px-2 py-0.5 rounded font-mono" style="background:rgba(0,245,255,.15); color:#00f5ff;">"attack" → 0.15</span>
-                      <span class="text-xs px-2 py-0.5 rounded font-mono" style="background:rgba(191,95,255,.15); color:#bf5fff;">"event" → 0.08</span>
-                      <span class="text-xs text-gray-500 px-1">...</span>
-                    </div>
-                  </div>
-                  <div class="text-xs text-gray-500 bg-black bg-opacity-30 rounded px-2 py-1 font-mono flex-shrink-0">
-                    shape: [B, S, V]<br/>∑ = 1.0
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
+    <div class="card card-violet">
+      <div class="code-block">
+        <span class="label">Pipeline interno — por cada capa (×12)</span>
+        Input → Token Embedding + <span class="hl-violet">Learned Positional Embedding</span>
+              ↓
+        <span class="hl-cyan">Masked Multi-Head Self-Attention</span>  (12 cabezas, 768 dims)
+              ↓ solo ve tokens anteriores — máscara causal triangular
+        Add & Norm  (conexión residual)
+              ↓
+        <span class="hl-gold">Feed Forward Network</span>  (3072 dims internos, activación GELU)
+              ↓
+        Add & Norm
+              ↓
+        [siguiente capa]  ×12
+              ↓
+        Linear + Softmax → distribución sobre vocabulario (40,000 tokens BPE)
       </div>
-    </section>
 
-    <!-- ━━━━━━━━━  SLIDE 6 — GENERACIÓN DE TEXTO: EJEMPLO PRÁCTICO  ━━━━━━━━━ -->
-    <section id="slide-6" class="tab-section" style="order:5;">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col gap-8 px-4 py-8">
-
-        <div class="text-center anim-item delay-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-neon-green mb-2">Sección 6</p>
-          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Generación de Texto</h1>
-          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Inferencia Autoregresiva de BioBART — Ejemplo Clínico Paso a Paso</p>
-        </div>
-
-        <!-- Overview intro -->
-        <div class="w-full rounded-2xl border border-neon-green p-5 anim-item delay-2"
-             style="background:rgba(57,255,20,.05);">
-          <div class="flex items-start gap-4">
-            <span class="text-4xl flex-shrink-0">🎯</span>
-            <div>
-              <div class="text-neon-green font-black text-lg mb-2">¿Qué es la Inferencia Autoregresiva?</div>
-              <p class="text-gray-300 text-sm leading-relaxed">
-                BioBART genera texto <strong class="text-white">un token a la vez</strong>. En cada paso t, el decoder recibe los tokens ya generados y consulta mediante <span class="text-neon-cyan font-semibold">Cross-Attention</span> la representación oculta Z producida por el encoder. El token más probable se selecciona y se agrega a la secuencia, convirtiéndose en la entrada del paso t+1 — hasta generar el token <code class="text-neon-gold bg-black/40 px-1 rounded">&lt;EOS&gt;</code>.
-              </p>
-              <div class="flex flex-wrap gap-2 mt-3">
-                <span class="text-xs px-2 py-1 rounded-full border border-neon-cyan text-neon-cyan">Causal (izq → der)</span>
-                <span class="text-xs px-2 py-1 rounded-full border border-neon-violet text-neon-violet">Masked Self-Attention</span>
-                <span class="text-xs px-2 py-1 rounded-full border border-neon-gold text-neon-gold">Cross-Attention al Encoder</span>
-                <span class="text-xs px-2 py-1 rounded-full border border-neon-green text-neon-green">Softmax → Greedy/Beam</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 0: Input corrupted -->
-        <div class="w-full anim-item delay-2">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm text-black flex-shrink-0"
-                  style="background:#ff2d78;">0</span>
-            <h2 class="text-white font-bold text-lg">Entrada Corrompida (Text Infilling)</h2>
-          </div>
-          <div class="rounded-2xl border-2 border-neon-pink p-5" style="background:rgba(255,45,120,.06);">
-            <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Texto con corrupción — lo que recibe el Encoder</div>
-            <div class="font-mono text-base text-gray-200 leading-relaxed">
-              "El paciente <span class="px-2 py-0.5 rounded font-bold text-black token-pulse" style="background:#ffd700;">[MASK]</span>
-              fiebre alta y <span class="px-2 py-0.5 rounded font-bold text-black token-pulse" style="background:#ffd700;">[MASK]</span>
-              desde hace tres días, antecedente de <span class="px-2 py-0.5 rounded font-bold text-black token-pulse" style="background:#ffd700;">[MASK]</span>."
-            </div>
-            <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div class="rounded-lg p-3" style="background:rgba(0,245,255,.07); border:1px solid #00f5ff33;">
-                <div class="text-neon-cyan font-bold mb-1">Tokenización BPE</div>
-                <div class="font-mono text-gray-400">[0, 123, <span class="text-neon-pink">50264</span>, 2341, 567, 14, <span class="text-neon-pink">50264</span>, 890, 2]</div>
-                <div class="text-gray-600 mt-1">50264 = ID de [MASK]</div>
-              </div>
-              <div class="rounded-lg p-3" style="background:rgba(191,95,255,.07); border:1px solid #bf5fff33;">
-                <div class="text-neon-violet font-bold mb-1">Shape del tensor</div>
-                <div class="font-mono text-gray-400">input_ids: [1, 9]<br/>dtype: int64</div>
-              </div>
-              <div class="rounded-lg p-3" style="background:rgba(255,215,0,.07); border:1px solid #ffd70033;">
-                <div class="text-neon-gold font-bold mb-1">Tarea de corrupción</div>
-                <div class="text-gray-400">Text Infilling: spans contiguos reemplazados por un único [MASK]</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 1: Encoder processing -->
-        <div class="w-full anim-item delay-3">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm text-black flex-shrink-0"
-                  style="background:#00f5ff;">1</span>
-            <h2 class="text-white font-bold text-lg">Encoder: Representación Bidireccional</h2>
-          </div>
-          <div class="rounded-2xl border-2 border-neon-cyan p-5" style="background:rgba(0,245,255,.05);">
-            <p class="text-gray-300 text-sm mb-4">El encoder procesa la secuencia completa (incluyendo los [MASK]) con <strong class="text-white">Self-Attention bidireccional</strong>. Cada token atiende a todos los demás simultáneamente:</p>
-
-            <!-- Attention visualization -->
-            <div class="rounded-xl p-4 mb-4" style="background:#020408; border:1px solid #0d1f38;">
-              <div class="text-xs text-gray-500 uppercase mb-3">Pesos de atención — token [MASK]₁ atendiendo a contexto:</div>
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-3">
-                  <span class="text-xs font-mono text-gray-400 w-28 flex-shrink-0">"paciente"</span>
-                  <div class="flex-1 rounded-full h-3" style="background:rgba(0,245,255,.15);">
-                    <div class="h-full rounded-full" style="width:85%; background:linear-gradient(90deg,#00f5ff,#00f5ff88);"></div>
-                  </div>
-                  <span class="text-neon-cyan text-xs font-mono w-10 text-right">0.85</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-xs font-mono text-gray-400 w-28 flex-shrink-0">"fiebre"</span>
-                  <div class="flex-1 rounded-full h-3" style="background:rgba(0,245,255,.15);">
-                    <div class="h-full rounded-full" style="width:72%; background:linear-gradient(90deg,#00f5ff,#00f5ff88);"></div>
-                  </div>
-                  <span class="text-neon-cyan text-xs font-mono w-10 text-right">0.72</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-xs font-mono text-gray-400 w-28 flex-shrink-0">"alta"</span>
-                  <div class="flex-1 rounded-full h-3" style="background:rgba(0,245,255,.15);">
-                    <div class="h-full rounded-full" style="width:61%; background:linear-gradient(90deg,#00f5ff,#00f5ff88);"></div>
-                  </div>
-                  <span class="text-neon-cyan text-xs font-mono w-10 text-right">0.61</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span class="text-xs font-mono text-gray-400 w-28 flex-shrink-0">"antecedente"</span>
-                  <div class="flex-1 rounded-full h-3" style="background:rgba(0,245,255,.15);">
-                    <div class="h-full rounded-full" style="width:43%; background:linear-gradient(90deg,#00f5ff,#00f5ff88);"></div>
-                  </div>
-                  <span class="text-neon-cyan text-xs font-mono w-10 text-right">0.43</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="rounded-lg p-3 text-center font-mono text-sm"
-                 style="background:rgba(0,245,255,.1); border:1px solid #00f5ff44;">
-              Salida del Encoder: Z ∈ ℝ<sup class="text-xs">[1 × 9 × 768]</sup>
-              <div class="text-xs text-gray-500 mt-1">Context vector: 1 batch · 9 tokens · 768 dimensiones</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 2-N: Decoder autoregressive generation -->
-        <div class="w-full anim-item delay-4">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm text-black flex-shrink-0"
-                  style="background:#bf5fff;">2</span>
-            <h2 class="text-white font-bold text-lg">Decoder: Generación Token a Token</h2>
-          </div>
-          <div class="rounded-2xl border-2 border-neon-violet p-5" style="background:rgba(191,95,255,.05);">
-            <p class="text-gray-300 text-sm mb-5">El decoder comienza con <code class="text-neon-gold bg-black/40 px-1 rounded text-xs">&lt;BOS&gt;</code> y genera tokens sucesivos. En cada paso ejecuta dos capas de atención:</p>
-
-            <!-- Attention type explanation -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-              <div class="rounded-xl p-4" style="background:rgba(191,95,255,.08); border:1px solid #bf5fff44;">
-                <div class="text-neon-violet font-bold text-sm mb-2">① Masked Self-Attention</div>
-                <p class="text-gray-400 text-xs">El token en posición t solo puede ver tokens en posiciones 0…t-1. La máscara causal impide ver el futuro, garantizando la causalidad autoregresiva.</p>
-                <div class="mt-2 font-mono text-xs" style="color:#bf5fff88;">mask[i,j] = -∞ si j &gt; i</div>
-              </div>
-              <div class="rounded-xl p-4" style="background:rgba(255,215,0,.08); border:1px solid #ffd70044;">
-                <div class="text-neon-gold font-bold text-sm mb-2">② Cross-Attention</div>
-                <p class="text-gray-400 text-xs">La Query Q viene del decoder. Las Keys K y Values V vienen de Z (salida del encoder). El decoder "consulta" todo el contexto de entrada en cada paso.</p>
-                <div class="mt-2 font-mono text-xs" style="color:#ffd70088;">Q←decoder · K,V←Z_enc</div>
-              </div>
-            </div>
-
-            <!-- Step-by-step table -->
-            <div class="overflow-x-auto rounded-xl" style="border:1px solid #1e3a5f;">
-              <table class="w-full text-xs">
-                <thead>
-                  <tr style="background:#091524;">
-                    <th class="px-3 py-2.5 text-left text-neon-cyan font-bold tracking-wider">Paso t</th>
-                    <th class="px-3 py-2.5 text-left text-neon-cyan font-bold tracking-wider">Token Generado</th>
-                    <th class="px-3 py-2.5 text-left text-neon-cyan font-bold tracking-wider">Cross-Attention hacia Z</th>
-                    <th class="px-3 py-2.5 text-left text-neon-cyan font-bold tracking-wider hidden sm:table-cell">Top Proba</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="border-top:1px solid #0d1f38;">
-                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 0</td>
-                    <td class="px-3 py-2.5"><code class="text-neon-gold bg-black/40 px-1.5 py-0.5 rounded">&lt;BOS&gt;</code></td>
-                    <td class="px-3 py-2.5 text-gray-500 italic">Señal de inicio de secuencia</td>
-                    <td class="px-3 py-2.5 hidden sm:table-cell text-gray-600">—</td>
-                  </tr>
-                  <tr style="border-top:1px solid #0d1f38; background:rgba(57,255,20,.03);">
-                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 1</td>
-                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"presenta"</span></td>
-                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">"paciente"</span> + <span class="text-neon-cyan">[MASK]₁</span></td>
-                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.68</span></td>
-                  </tr>
-                  <tr style="border-top:1px solid #0d1f38;">
-                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 2</td>
-                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"tos"</span></td>
-                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">"fiebre"</span> + <span class="text-neon-cyan">"alta"</span></td>
-                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.54</span></td>
-                  </tr>
-                  <tr style="border-top:1px solid #0d1f38; background:rgba(57,255,20,.03);">
-                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 3</td>
-                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"seca"</span></td>
-                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">"tos"</span> (paso anterior) + <span class="text-neon-cyan">"fiebre"</span></td>
-                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.71</span></td>
-                  </tr>
-                  <tr style="border-top:1px solid #0d1f38;">
-                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 4</td>
-                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"disnea"</span></td>
-                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">[MASK]₂</span> + <span class="text-neon-cyan">"tres días"</span></td>
-                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.61</span></td>
-                  </tr>
-                  <tr style="border-top:1px solid #0d1f38; background:rgba(57,255,20,.03);">
-                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = 5</td>
-                    <td class="px-3 py-2.5"><span class="text-neon-green font-bold">"asma"</span></td>
-                    <td class="px-3 py-2.5 text-gray-400">→ <span class="text-neon-cyan">"antecedente"</span> + <span class="text-neon-cyan">[MASK]₃</span></td>
-                    <td class="px-3 py-2.5 hidden sm:table-cell"><span class="text-neon-green font-mono">0.76</span></td>
-                  </tr>
-                  <tr style="border-top:1px solid #0d1f38;">
-                    <td class="px-3 py-2.5 text-gray-500 font-mono">t = N</td>
-                    <td class="px-3 py-2.5"><code class="text-neon-pink bg-black/40 px-1.5 py-0.5 rounded">&lt;EOS&gt;</code></td>
-                    <td class="px-3 py-2.5 text-gray-500 italic">Señal de fin — detiene la generación</td>
-                    <td class="px-3 py-2.5 hidden sm:table-cell text-gray-600">—</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 3: Softmax & Token Selection -->
-        <div class="w-full anim-item delay-5">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm text-black flex-shrink-0"
-                  style="background:#ffd700;">3</span>
-            <h2 class="text-white font-bold text-lg">Linear + Softmax → Selección del Token</h2>
-          </div>
-          <div class="rounded-2xl border-2 border-neon-gold p-5" style="background:rgba(255,215,0,.05); box-shadow:0 0 25px rgba(255,215,0,.08);">
-
-            <div class="text-gray-300 text-sm mb-4">En cada paso t, el hidden state del decoder <span class="font-mono text-neon-violet">[1×768]</span> se proyecta al vocabulario completo mediante una capa lineal y luego normalizada con softmax:</div>
-
-            <!-- Formula -->
-            <div class="rounded-xl p-4 text-center mb-5" style="background:rgba(255,215,0,.06); border:1px solid #ffd70044;">
-              <div class="text-gray-500 text-xs mb-2">Proyección al vocabulario</div>
-              <div class="formula text-xl font-bold text-neon-gold">
-                P(w<sub class="text-sm">t</sub> | w<sub class="text-sm">&lt;t</sub>, Z) = softmax(W<sub class="text-neon-cyan text-sm">out</sub> · h<sub class="text-neon-violet text-sm">t</sub>)
-              </div>
-              <div class="text-xs text-gray-500 mt-2 flex flex-wrap justify-center gap-4">
-                <span><span class="text-neon-violet font-bold">h<sub>t</sub></span> ∈ ℝ<sup>768</sup> — hidden state del decoder</span>
-                <span><span class="text-neon-cyan font-bold">W<sub>out</sub></span> ∈ ℝ<sup>V×768</sup> — V ≈ 50,265 tokens</span>
-              </div>
-            </div>
-
-            <!-- Token probabilities visualization for step t=2 -->
-            <div class="text-xs text-gray-500 uppercase tracking-wider mb-3">Distribución en t=2 — candidatos para "síntoma del paciente"</div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div class="rounded-xl p-3 text-center" style="background:rgba(57,255,20,.15); border:2px solid #39ff14;">
-                <div class="text-neon-green font-black text-lg">"tos"</div>
-                <div class="text-neon-green text-sm font-bold mt-1">54%</div>
-                <div class="text-gray-500 text-xs mt-1">← seleccionado</div>
-              </div>
-              <div class="rounded-xl p-3 text-center" style="background:rgba(0,245,255,.08); border:1px solid #00f5ff44;">
-                <div class="text-neon-cyan font-bold">"disnea"</div>
-                <div class="text-neon-cyan text-sm font-bold mt-1">22%</div>
-                <div class="text-gray-500 text-xs mt-1">&nbsp;</div>
-              </div>
-              <div class="rounded-xl p-3 text-center" style="background:rgba(191,95,255,.08); border:1px solid #bf5fff44;">
-                <div class="text-neon-violet font-bold">"dolor"</div>
-                <div class="text-neon-violet text-sm font-bold mt-1">13%</div>
-                <div class="text-gray-500 text-xs mt-1">&nbsp;</div>
-              </div>
-              <div class="rounded-xl p-3 text-center" style="background:rgba(255,215,0,.08); border:1px solid #ffd70044;">
-                <div class="text-neon-gold font-bold">otros…</div>
-                <div class="text-neon-gold text-sm font-bold mt-1">11%</div>
-                <div class="text-gray-500 text-xs mt-1">&nbsp;</div>
-              </div>
-            </div>
-            <p class="text-xs text-gray-500 mt-3 text-center italic">Estrategia Greedy Search: siempre se elige el token de mayor probabilidad en cada paso.</p>
-          </div>
-        </div>
-
-        <!-- FINAL OUTPUT -->
-        <div class="w-full rounded-2xl border-2 border-neon-green p-6 anim-item delay-6"
-             style="background:rgba(57,255,20,.06); box-shadow:0 0 30px rgba(57,255,20,.12);">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="text-3xl">✅</span>
-            <div>
-              <div class="text-neon-green font-black text-xl">Texto Reconstruido — Salida Final de BioBART</div>
-              <div class="text-gray-500 text-xs">Secuencia completa generada token a token</div>
-            </div>
-          </div>
-          <div class="rounded-xl p-4 font-mono text-sm text-gray-200 leading-relaxed"
-               style="background:#020408; border:1px solid rgba(57,255,20,.2);">
-            "El paciente <span class="text-neon-green font-bold underline">presenta tos seca</span>
-            fiebre alta y <span class="text-neon-green font-bold underline">disnea</span>
-            desde hace tres días, antecedente de <span class="text-neon-green font-bold underline">asma</span>."
-          </div>
-          <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <div class="rounded-lg p-3 text-center" style="background:rgba(57,255,20,.08); border:1px solid #39ff1433;">
-              <div class="text-neon-green font-bold mb-1">Tokens generados</div>
-              <div class="text-gray-400">5 tokens reconstruidos para los 3 spans enmascarados</div>
-            </div>
-            <div class="rounded-lg p-3 text-center" style="background:rgba(57,255,20,.08); border:1px solid #39ff1433;">
-              <div class="text-neon-green font-bold mb-1">Pasos del decoder</div>
-              <div class="text-gray-400">6 pasos + 1 token &lt;EOS&gt; = 7 llamadas al forward pass</div>
-            </div>
-            <div class="rounded-lg p-3 text-center" style="background:rgba(57,255,20,.08); border:1px solid #39ff1433;">
-              <div class="text-neon-green font-bold mb-1">Clave del éxito</div>
-              <div class="text-gray-400">BPE biomédico reconoce "asma" y "disnea" como unidades del vocabulario médico</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Summary tensor flow -->
-        <div class="w-full rounded-xl p-5 anim-item delay-6" style="background:#091524; border:1px solid #122845;">
-          <div class="text-neon-cyan font-bold text-sm mb-3 text-center">Resumen del Flujo de Tensores — Generación Completa</div>
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-2 flex-wrap text-xs font-mono text-center">
-            <div class="px-3 py-2 rounded-lg border border-neon-pink" style="background:rgba(255,45,120,.06);">
-              <div class="text-neon-pink font-bold">Entrada</div>
-              <div class="text-gray-400">[1, S]  int64</div>
-            </div>
-            <div class="arrow-right hidden sm:block" style="color:#374151;"></div>
-            <div class="text-gray-600 sm:hidden">↓</div>
-            <div class="px-3 py-2 rounded-lg border border-neon-cyan" style="background:rgba(0,245,255,.06);">
-              <div class="text-neon-cyan font-bold">Encoder Z</div>
-              <div class="text-gray-400">[1, S, 768]  float32</div>
-            </div>
-            <div class="arrow-right hidden sm:block" style="color:#374151;"></div>
-            <div class="text-gray-600 sm:hidden">↓</div>
-            <div class="px-3 py-2 rounded-lg border border-neon-violet" style="background:rgba(191,95,255,.06);">
-              <div class="text-neon-violet font-bold">Decoder h_t</div>
-              <div class="text-gray-400">[1, t, 768]  float32</div>
-            </div>
-            <div class="arrow-right hidden sm:block" style="color:#374151;"></div>
-            <div class="text-gray-600 sm:hidden">↓</div>
-            <div class="px-3 py-2 rounded-lg border border-neon-gold" style="background:rgba(255,215,0,.06);">
-              <div class="text-neon-gold font-bold">Logits</div>
-              <div class="text-gray-400">[1, V≈50K]  float32</div>
-            </div>
-            <div class="arrow-right hidden sm:block" style="color:#374151;"></div>
-            <div class="text-gray-600 sm:hidden">↓</div>
-            <div class="px-3 py-2 rounded-lg border border-neon-green" style="background:rgba(57,255,20,.06);">
-              <div class="text-neon-green font-bold">Token</div>
-              <div class="text-gray-400">argmax → int</div>
-            </div>
-          </div>
-        </div>
-
+      <div class="grid-3 mt-16">
+        <div><span class="badge badge-violet">12 capas</span> <span style="font-size:.8rem; color:var(--muted);">capas del decoder</span></div>
+        <div><span class="badge badge-violet">768 dims</span> <span style="font-size:.8rem; color:var(--muted);">d_model</span></div>
+        <div><span class="badge badge-violet">12 cabezas</span> <span style="font-size:.8rem; color:var(--muted);">multi-head attention</span></div>
+        <div><span class="badge badge-violet">~117M params</span> <span style="font-size:.8rem; color:var(--muted);">total</span></div>
+        <div><span class="badge badge-violet">BPE 40K</span> <span style="font-size:.8rem; color:var(--muted);">vocabulario</span></div>
+        <div><span class="badge badge-violet">GELU</span> <span style="font-size:.8rem; color:var(--muted);">activación FFN</span></div>
       </div>
-    </section>
+    </div>
 
-    <!-- ━━━━━━━━━  SLIDE 7 — LIMITACIONES  ━━━━━━━━━ -->
-    <section id="slide-7" class="tab-section" style="order:7;">
-      <div class="slide-body w-full max-w-5xl mx-auto flex flex-col items-center gap-8 px-4 py-8">
-
-        <div class="text-center anim-item delay-1">
-          <p class="text-xs font-semibold tracking-widest uppercase text-neon-pink mb-2">Sección 7</p>
-          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Limitaciones</h1>
-          <p class="mt-3 text-gray-400 text-base max-w-xl mx-auto">Consideraciones críticas para uso en entornos clínicos</p>
-        </div>
-
-        <!-- Limitation cards -->
-        <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-5 anim-item delay-2">
-
-          <!-- Cost -->
-          <div class="rounded-2xl p-6 border-2 border-neon-pink flex flex-col gap-4" style="background:rgba(255,45,120,.06);">
-            <div class="text-5xl text-center">💸</div>
-            <div class="text-center">
-              <div class="text-neon-pink font-black text-lg">Costo Computacional</div>
-            </div>
-            <div class="space-y-2 text-sm text-gray-400">
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
-                <span>~140M parámetros entrenables</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
-                <span>Fine-tuning requiere GPUs de alta memoria</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
-                <span>Inferencia costosa vs. modelos más pequeños</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-neon-pink flex-shrink-0"></span>
-                <span>Pre-entrenamiento: semanas en clúster</span>
-              </div>
-            </div>
-            <div class="rounded-lg p-2 text-center text-xs" style="background:rgba(255,45,120,.12);">
-              <span class="text-neon-pink font-bold">Impacto:</span>
-              <span class="text-gray-400"> Barrera de acceso en entornos con recursos limitados</span>
-            </div>
-          </div>
-
-          <!-- Context limit -->
-          <div class="rounded-2xl p-6 border-2 border-neon-gold flex flex-col gap-4" style="background:rgba(255,215,0,.06);">
-            <div class="text-5xl text-center">📏</div>
-            <div class="text-center">
-              <div class="text-neon-gold font-black text-lg">Límite de Contexto</div>
-            </div>
-            <div class="space-y-2 text-sm text-gray-400">
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
-                <span>Encoder: máx. <strong class="text-white">1024 tokens</strong></span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
-                <span>Decoder: máx. <strong class="text-white">1024 tokens</strong> generados</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
-                <span>Historiales clínicos largos quedan truncados</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>
-                <span>Complejidad cuadrática: O(n²) en atención</span>
-              </div>
-            </div>
-            <div class="rounded-lg p-2 text-center text-xs" style="background:rgba(255,215,0,.12);">
-              <span class="text-neon-gold font-bold">Impacto:</span>
-              <span class="text-gray-400"> Inapropiado para notas clínicas extensas sin chunking</span>
-            </div>
-          </div>
-
-          <!-- Hallucinations -->
-          <div class="rounded-2xl p-6 border-2 border-neon-violet flex flex-col gap-4" style="background:rgba(191,95,255,.06);">
-            <div class="text-5xl text-center">⚠️</div>
-            <div class="text-center">
-              <div class="text-neon-violet font-black text-lg">Alucinaciones Clínicas</div>
-            </div>
-            <div class="space-y-2 text-sm text-gray-400">
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
-                <span>Puede generar dosificaciones <strong class="text-white">incorrectas</strong></span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
-                <span>Síntomas o diagnósticos plausibles pero falsos</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
-                <span>Sin mecanismo de verificación factual nativo</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"></span>
-                <span>El modelo no "sabe" lo que no sabe</span>
-              </div>
-            </div>
-            <div class="rounded-lg p-2 text-center text-xs" style="background:rgba(191,95,255,.12);">
-              <span class="text-neon-violet font-bold">⚠ Crítico:</span>
-              <span class="text-gray-400"> Requiere supervisión humana en aplicaciones clínicas reales</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Summary -->
-        <div class="w-full rounded-xl p-5 anim-item delay-3" style="background:#091524; border:1px solid #122845;">
-          <div class="text-center text-neon-green font-bold mb-3">Conclusión del Equipo</div>
-          <div class="text-gray-300 text-sm text-center max-w-2xl mx-auto">
-            BioBART representa un avance significativo en NLP biomédico al especializar BART con datos y técnicas de dominio. Sin embargo, su uso en entornos clínicos reales requiere <strong class="text-white">validación rigurosa</strong>, <strong class="text-white">supervisión experta</strong> y sistemas de <strong class="text-white">verificación factual</strong> complementarios.
-          </div>
-          <div class="mt-4 flex flex-wrap justify-center gap-3">
-            <span class="text-xs px-3 py-1 rounded-full border border-neon-green text-neon-green">🧬 Dominio especializado</span>
-            <span class="text-xs px-3 py-1 rounded-full border border-neon-cyan text-neon-cyan">🔬 Base: PubMed</span>
-            <span class="text-xs px-3 py-1 rounded-full border border-neon-violet text-neon-violet">🏗 Arquitectura: Encoder-Decoder</span>
-            <span class="text-xs px-3 py-1 rounded-full border border-neon-gold text-neon-gold">⚡ Potencial: Alto</span>
-          </div>
-        </div>
-
+    <hr class="divider"/>
+    <h2>Las 3 novedades de GPT frente a lo anterior</h2>
+    <div class="grid-3 mt-16">
+      <div class="card card-violet">
+        <div style="font-size:1.6rem; margin-bottom:8px;">📈</div>
+        <h3 style="color:var(--violet)">Pre-entrenamiento a gran escala con Transformers</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Antes de GPT, el pre-entrenamiento se hacía con LSTMs (alcance corto). GPT fue el primer modelo en demostrar que un Transformer decoder pre-entrenado transfiere conocimiento lingüístico de largo alcance de forma masiva.</p>
       </div>
-    </section>
+      <div class="card card-violet">
+        <div style="font-size:1.6rem; margin-bottom:8px;">🎯</div>
+        <h3 style="color:var(--violet)">Un modelo genérico supera a modelos especializados</h3>
+        <p style="font-size:.82rem; margin-top:6px;">GPT superó el estado del arte en 9 de 12 benchmarks usando el mismo modelo para tareas distintas: QA, entailment, similitud, clasificación. Antes se necesitaba una arquitectura distinta para cada tarea.</p>
+      </div>
+      <div class="card card-violet">
+        <div style="font-size:1.6rem; margin-bottom:8px;">🌟</div>
+        <h3 style="color:var(--violet)">Comportamiento zero-shot emergente</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Sin ningún entrenamiento supervisado, GPT muestra capacidad de resolver tareas lingüísticas básicas — sugiriendo que el modelo internalizó estructura del lenguaje solo con predecir la siguiente palabra a escala.</p>
+      </div>
+    </div>
 
-    
+    <hr class="divider"/>
+    <div class="card" style="border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.04);">
+      <div style="display:flex; gap:12px; align-items:flex-start;">
+        <span style="font-size:1.5rem; flex-shrink:0;">⚠️</span>
+        <div>
+          <h3 style="color:var(--pink)">Limitación estructural que BART resuelve</h3>
+          <p style="font-size:.85rem; margin-top:6px;">GPT solo ve contexto <strong style="color:var(--white)">hacia la izquierda</strong>. Para tareas seq2seq como resumen de reportes clínicos, necesita leer una entrada completa — pero no puede "releer" el input bidireccionalmente. BART resuelve esto con su encoder bidireccional que procesa toda la entrada antes de que el decoder genere.</p>
+        </div>
+      </div>
+    </div>
 
-  </main>
+    <hr class="divider"/>
+    <h2>Resultados GPT en benchmarks (Radford et al., 2018)</h2>
+    <div class="mt-16" style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr><th>Tarea</th><th>SOTA anterior</th><th>GPT</th><th>Mejora</th></tr></thead>
+        <tbody>
+          <tr><td>Story Cloze (razonamiento)</td><td>77.6%</td><td style="color:var(--green);">86.5%</td><td style="color:var(--green);">+8.9%</td></tr>
+          <tr><td>RACE (QA)</td><td>53.3%</td><td style="color:var(--green);">59.0%</td><td style="color:var(--green);">+5.7%</td></tr>
+          <tr><td>MultiNLI (entailment)</td><td>72.2%</td><td style="color:var(--green);">82.1%</td><td style="color:var(--green);">+9.9%</td></tr>
+          <tr><td>GLUE (general)</td><td>68.9</td><td style="color:var(--green);">72.8</td><td style="color:var(--green);">+3.9</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</section>
 
-  <!-- ══════════════════════  JAVASCRIPT — SIMPLE TAB LOGIC  ══════════════════════ -->
-  <script>
-    function showTab(tabId, btn) {
-      // Hide all sections
-      document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
-      // Remove active style from all tab buttons
-      document.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('active-tab');
-        b.style.color = '';
-      });
-      // Show target section
-      document.getElementById(tabId).classList.add('active');
-      // Mark button active
-      btn.classList.add('active-tab');
-      // Scroll to top
-      window.scrollTo(0, 0);
-    }
-  </script>
+<!-- ══════════════════ S4 — TOKENIZACIÓN ══════════════════ -->
+<section id="s4" class="section">
+<div class="container">
+  <div class="sec-label" style="color:var(--gold)">Sección 4 — Preprocesamiento</div>
+  <h1>Tokenización BPE</h1>
+  <p class="subtitle">Cómo el texto clínico se convierte en números que el modelo puede procesar — el paso crítico antes de cualquier cálculo.</p>
 
+  <div class="mt-24">
+
+    <div class="card card-gold">
+      <h2 style="color:var(--gold)">¿Por qué necesitamos tokenizar?</h2>
+      <p style="font-size:.85rem; margin-top:10px;">Los modelos de lenguaje no procesan texto directamente — procesan <strong style="color:var(--white)">números</strong>. La tokenización convierte cada unidad de texto en un ID numérico que corresponde a una entrada en la tabla de embeddings del modelo.</p>
+      <div class="code-block mt-16">
+        <span class="label">Flujo de tokenización</span>
+        <span class="hl-pink">"bilateral pulmonary edema"</span>
+                   ↓ BPE tokenizer
+        <span class="hl-cyan">["bilateral", "pulmonary", "edema"]</span>
+                   ↓ lookup en vocabulario
+        <span class="hl-gold">[14823, 7291, 3401]</span>
+                   ↓ embedding lookup
+        X ∈ ℝ<sup>3 × 768</sup>   (3 tokens, 768 dims cada uno)
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <h2>Byte-Pair Encoding (BPE) — el algoritmo de BioBART</h2>
+    <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">BPE construye el vocabulario fusionando iterativamente los pares de caracteres más frecuentes. Resultado: términos frecuentes como <code class="mono" style="color:var(--green)">hypertension</code> son un solo token; términos raros se fragmentan en subpalabras conocidas.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Proceso BPE paso a paso</h3>
+        <div class="step mt-16">
+          <div class="step-num" style="background:rgba(251,191,36,.15); color:var(--gold);">1</div>
+          <div class="step-body"><strong style="color:var(--white)">Corpus inicial:</strong> todo el texto de PubMed dividido en caracteres individuales</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(0,229,255,.15); color:var(--cyan);">2</div>
+          <div class="step-body"><strong style="color:var(--white)">Contar pares:</strong> identificar el par de símbolos más frecuente ("i" + "n" = "in")</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(192,132,252,.15); color:var(--violet);">3</div>
+          <div class="step-body"><strong style="color:var(--white)">Fusionar:</strong> reemplazar ese par por un nuevo token unificado en todo el corpus</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(52,211,153,.15); color:var(--green);">4</div>
+          <div class="step-body"><strong style="color:var(--white)">Repetir</strong> hasta alcanzar el tamaño de vocabulario deseado (~50,264 tokens en BioBART)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Ventaja en dominio biomédico</h3>
+        <p style="font-size:.82rem; margin-top:8px; margin-bottom:16px;">Un tokenizador general fragmentaría los términos médicos en subpalabras sin sentido. El tokenizador BPE de BioBART, entrenado en PubMed, reconoce la terminología médica como unidades completas:</p>
+
+        <div style="margin-bottom:10px;">
+          <div class="noise-label">Tokenizador general (GPT-2)</div>
+          <span class="token-box" style="color:var(--pink); border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.06);">my</span>
+          <span class="token-box" style="color:var(--pink); border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.06);">ocard</span>
+          <span class="token-box" style="color:var(--pink); border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.06);">ial</span>
+          <span style="font-size:.75rem; color:var(--muted);">← fragmentado, pierde significado</span>
+        </div>
+        <div>
+          <div class="noise-label">Tokenizador BPE biomédico (BioBART)</div>
+          <span class="token-box" style="color:var(--green); border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.06);">myocardial</span>
+          <span style="font-size:.75rem; color:var(--muted);">← token completo, preserva el concepto</span>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="noise-label">Más ejemplos de tokens biomédicos completos</div>
+          <span class="token-box" style="color:var(--green); border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.06);">sepsis</span>
+          <span class="token-box" style="color:var(--green); border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.06);">creatinine</span>
+          <span class="token-box" style="color:var(--green); border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.06);">cardiomegaly</span>
+          <span class="token-box" style="color:var(--green); border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.06);">pneumothorax</span>
+          <span class="token-box" style="color:var(--green); border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.06);">atelectasis</span>
+          <span class="token-box" style="color:var(--green); border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.06);">PICC</span>
+          <span class="token-box" style="color:var(--green); border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.06);">SVC</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <h2>Tokenización del reporte radiológico — Tarea 1 del notebook</h2>
+    <div class="code-block mt-16">
+      <span class="label">Código del notebook — preprocesamiento y tokenización</span>
+<span class="hl-cyan">reporte_radiologico</span> = <span class="hl-gold">"""
+Chest X-ray findings: The patient is a 72-year-old male with progressive dyspnea
+and hypoxemia. Bilateral ground-glass opacities are identified in the lower lung
+fields, with consolidation in the right lower lobe...
+"""</span>
+
+<span class="hl-violet"># Paso crítico: eliminar saltos de línea</span>
+<span class="hl-violet"># Sin esto aparecen artefactos de caracteres extraños en el output</span>
+reporte_limpio = <span class="hl-green">" ".join(</span>reporte_radiologico.<span class="hl-cyan">split()</span><span class="hl-green">)</span>
+
+<span class="hl-violet"># Tokenización con parámetros clave</span>
+inputs_resumen = tokenizer(
+    reporte_limpio,
+    max_length=<span class="hl-gold">512</span>,        <span class="hl-violet"># límite del encoder de BioBART</span>
+    truncation=<span class="hl-cyan">True</span>,      <span class="hl-violet"># corta si supera 512 — no lanza error</span>
+    return_tensors=<span class="hl-gold">"pt"</span>   <span class="hl-violet"># tensores PyTorch, formato que el modelo espera</span>
+).to(DEVICE)              <span class="hl-violet"># mueve a GPU — si no coinciden, PyTorch lanza error</span>
+
+<span class="hl-violet"># Resultado: ~130 tokens para este reporte</span>
+    </div>
+
+    <div class="grid-3 mt-16">
+      <div class="card card-gold">
+        <h3 style="color:var(--gold)">max_length=512</h3>
+        <p style="font-size:.82rem; margin-top:6px;">El encoder de BioBART procesa máximo 512 tokens. Si el reporte es más largo, <code class="mono" style="color:var(--cyan)">truncation=True</code> lo corta silenciosamente — la información al final se pierde.</p>
+      </div>
+      <div class="card card-gold">
+        <h3 style="color:var(--gold)">return_tensors="pt"</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Devuelve los IDs como tensores de PyTorch. Sin esto, serían listas de Python que el modelo no puede procesar directamente.</p>
+      </div>
+      <div class="card card-gold">
+        <h3 style="color:var(--gold)">.to(DEVICE)</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Mueve los tensores al mismo dispositivo que el modelo (GPU o CPU). Si el modelo está en CUDA y los tensores en CPU, PyTorch lanza un error de incompatibilidad.</p>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <h2>Tokens especiales de BioBART</h2>
+    <div class="mt-16" style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr><th>Token</th><th>ID</th><th>Función</th></tr></thead>
+        <tbody>
+          <tr><td><code class="mono" style="color:var(--green);">&lt;s&gt; / BOS</code></td><td>0</td><td>Beginning of Sequence — marca el inicio de la entrada al encoder y del output en el decoder</td></tr>
+          <tr><td><code class="mono" style="color:var(--pink);">&lt;/s&gt; / EOS</code></td><td>2</td><td>End of Sequence — le dice al decoder que deje de generar</td></tr>
+          <tr><td><code class="mono" style="color:var(--gold);">[MASK]</code></td><td>50264</td><td>Reemplaza spans de tokens durante el pre-entrenamiento con Text Infilling</td></tr>
+          <tr><td><code class="mono" style="color:var(--muted);">&lt;pad&gt;</code></td><td>1</td><td>Rellena secuencias cortas en batches para igualar longitudes</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ S5 — ARQUITECTURA ══════════════════ -->
+<section id="s5" class="section">
+<div class="container">
+  <div class="sec-label" style="color:var(--green)">Sección 5 — Encoder-Decoder</div>
+  <h1>Arquitectura Detallada BART / BioBART</h1>
+  <p class="subtitle">Encoder bidireccional + Decoder autoregresivo — cómo fluye la información desde el reporte radiológico hasta el resumen generado.</p>
+
+  <div class="mt-24">
+    <div class="grid-2">
+
+      <!-- ENCODER -->
+      <div class="card card-cyan">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+          <span style="width:10px; height:10px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan); display:inline-block;"></span>
+          <h2 style="color:var(--cyan); margin:0;">ENCODER — 6 capas (base) / 12 (large)</h2>
+        </div>
+
+        <div class="step">
+          <div class="step-num" style="background:rgba(0,229,255,.1); color:var(--cyan); font-size:.7rem;">IN</div>
+          <div class="step-body"><strong style="color:var(--white);">Input:</strong> reporte radiológico con ruido o texto clínico completo</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(0,229,255,.1); color:var(--cyan);">①</div>
+          <div class="step-body"><strong style="color:var(--white);">Token Embedding</strong> + <strong style="color:var(--violet);">Learned Positional Embedding W_pos</strong> → suma → X ∈ ℝ^(n × d_model)</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(0,229,255,.1); color:var(--cyan);">②</div>
+          <div class="step-body"><strong style="color:var(--white);">Multi-Head Self-Attention bidireccional</strong> — cada token atiende a todos los demás. No hay máscara causal aquí.</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(0,229,255,.1); color:var(--cyan);">③</div>
+          <div class="step-body"><strong style="color:var(--white);">Add & Norm</strong> — conexión residual + Layer Normalization para estabilidad del gradiente</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(0,229,255,.1); color:var(--cyan);">④</div>
+          <div class="step-body"><strong style="color:var(--white);">Feed Forward Network</strong> — activación <strong style="color:var(--violet);">GELU</strong> (no ReLU como el Transformer original). Expansión 4× interna.</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(0,229,255,.1); color:var(--cyan);">⑤</div>
+          <div class="step-body"><strong style="color:var(--white);">Add & Norm</strong> — segunda conexión residual</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(0,229,255,.1); color:var(--cyan); font-size:.7rem;">OUT</div>
+          <div class="step-body"><strong style="color:var(--white);">H_enc</strong> ∈ ℝ^(n × d_model) — representación contextual completa → genera <strong style="color:var(--gold);">K y V</strong> para el decoder</div>
+        </div>
+      </div>
+
+      <!-- DECODER -->
+      <div class="card card-violet">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+          <span style="width:10px; height:10px; border-radius:50%; background:var(--violet); box-shadow:0 0 8px var(--violet); display:inline-block;"></span>
+          <h2 style="color:var(--violet); margin:0;">DECODER — 6 capas (base) / 12 (large)</h2>
+        </div>
+
+        <div class="step">
+          <div class="step-num" style="background:rgba(192,132,252,.1); color:var(--violet); font-size:.7rem;">IN</div>
+          <div class="step-body"><strong style="color:var(--white);">Input:</strong> &lt;BOS&gt; + tokens ya generados (shifted right)</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(192,132,252,.1); color:var(--violet);">①</div>
+          <div class="step-body"><strong style="color:var(--white);">Token Embedding</strong> + <strong style="color:var(--violet);">Learned Positional Embedding W_pos</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(192,132,252,.1); color:var(--violet);">②</div>
+          <div class="step-body"><strong style="color:var(--white);">Masked Self-Attention</strong> — máscara causal triangular: cada token solo ve tokens anteriores. Garantiza causalidad.</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(192,132,252,.1); color:var(--violet);">③</div>
+          <div class="step-body"><strong style="color:var(--white);">Add & Norm</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(192,132,252,.1); color:var(--gold);">④</div>
+          <div class="step-body"><strong style="color:var(--gold);">Cross-Attention</strong> — Q del decoder · K y V del encoder. El decoder "consulta" el reporte original en cada paso de generación.</div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(192,132,252,.1); color:var(--violet);">⑤</div>
+          <div class="step-body"><strong style="color:var(--white);">Add & Norm</strong> + <strong style="color:var(--white);">Feed Forward (GELU)</strong> + <strong style="color:var(--white);">Add & Norm</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num" style="background:rgba(192,132,252,.1); color:var(--violet); font-size:.7rem;">OUT</div>
+          <div class="step-body"><strong style="color:var(--white);">Linear + Softmax</strong> → distribución sobre vocabulario (~50,264 tokens) → <strong style="color:var(--green);">token generado</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <h2>Diferencias clave vs. Transformer original</h2>
+    <div class="mt-16" style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr><th>Componente</th><th>Transformer (Vaswani 2017)</th><th>BART / BioBART</th></tr></thead>
+        <tbody>
+          <tr><td>Positional Encoding</td><td>Sinusoidal fijo (fórmula sen/cos)</td><td style="color:var(--green);">Learned W_pos — aprendido por backprop</td></tr>
+          <tr><td>Activación FFN</td><td>ReLU</td><td style="color:var(--green);">GELU — más suave, empíricamente superior</td></tr>
+          <tr><td>Pre-entrenamiento</td><td>Desde cero en cada tarea</td><td style="color:var(--green);">Denoising autoencoder (160 GB)</td></tr>
+          <tr><td>Dominio BioBART</td><td>Traducción (inglés→francés)</td><td style="color:var(--green);">Biomédico (abstracts PubMed)</td></tr>
+          <tr><td>Parámetros (large)</td><td>Variable</td><td style="color:var(--green);">~442 M (modelo del notebook)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider"/>
+    <h2>Por qué la arquitectura es innovadora</h2>
+    <div class="grid-2 mt-16">
+      <div class="card card-green">
+        <h3 style="color:var(--green);">① Unifica BERT y GPT</h3>
+        <p style="font-size:.82rem; margin-top:6px;">El encoder bidireccional comprende el contexto completo como BERT. El decoder autoregresivo genera texto coherente como GPT. Ninguno de los dos modelos originales podía hacer ambas cosas en pre-entrenamiento conjunto.</p>
+      </div>
+      <div class="card card-green">
+        <h3 style="color:var(--green);">② Pre-entrenamiento flexible</h3>
+        <p style="font-size:.82rem; margin-top:6px;">A diferencia de BERT (solo MLM) o GPT (solo causal LM), BART acepta <strong style="color:var(--white)">cualquier función de corrupción</strong> como objetivo. Esto lo hace adaptable a dominios como el biomédico sin rediseñar la arquitectura.</p>
+      </div>
+      <div class="card card-green">
+        <h3 style="color:var(--green);">③ Cross-Attention como puente semántico</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Permite al decoder consultar dinámicamente cualquier parte del reporte en cada paso de generación. Imposible en GPT (sin encoder) o BERT (sin decoder causal).</p>
+      </div>
+      <div class="card card-green">
+        <h3 style="color:var(--green);">④ Adaptación de dominio eficiente</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Para crear BioBART bastó continuar el pre-entrenamiento sobre PubMed. La arquitectura no cambia — solo los pesos se especializan. Esto democratiza la creación de modelos especializados.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ S6 — Q, K, V ══════════════════ -->
+<section id="s6" class="section">
+<div class="container">
+  <div class="sec-label" style="color:var(--gold)">Sección 6 — El corazón del Transformer</div>
+  <h1>Mecanismo de Atención — Q, K, V</h1>
+  <p class="subtitle">Cómo cada token decide a qué otros tokens prestar atención — y cómo esto permite al decoder leer el reporte radiológico mientras genera el resumen.</p>
+
+  <div class="mt-24">
+    <div class="grid-3">
+      <div class="card card-gold">
+        <div style="width:44px; height:44px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.2rem; color:#04080f; margin-bottom:12px;">Q</div>
+        <h3 style="color:var(--gold);">Query — La consulta</h3>
+        <p style="font-size:.82rem; margin-top:6px;"><strong style="color:var(--white);">"¿Qué información estoy buscando?"</strong></p>
+        <p style="font-size:.8rem; margin-top:6px; color:var(--muted);">Proviene del token actual. Representa lo que este token quiere saber de los demás. En Cross-Attention, Q viene del decoder.</p>
+        <div class="code-block mt-16" style="font-size:.74rem;">Q = X · W<sup>Q</sup>
+W<sup>Q</sup> ∈ ℝ^(d_model × d_k)</div>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px; font-style:italic;">Ej: El decoder generando "cardiomegaly" pregunta ¿dónde está esa información en el reporte?</p>
+      </div>
+
+      <div class="card card-cyan">
+        <div style="width:44px; height:44px; border-radius:50%; background:var(--cyan); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.2rem; color:#04080f; margin-bottom:12px;">K</div>
+        <h3 style="color:var(--cyan);">Key — El índice</h3>
+        <p style="font-size:.82rem; margin-top:6px;"><strong style="color:var(--white);">"¿Qué información puedo ofrecer como índice?"</strong></p>
+        <p style="font-size:.8rem; margin-top:6px; color:var(--muted);">Actúa como etiqueta de búsqueda de cada token. Se compara con Q mediante producto escalar. En Cross-Attention, K viene del encoder (del reporte).</p>
+        <div class="code-block mt-16" style="font-size:.74rem;">K = X · W<sup>K</sup>
+W<sup>K</sup> ∈ ℝ^(d_model × d_k)</div>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px; font-style:italic;">Ej: Los tokens "cardiomegaly", "ratio 0.58" del reporte tienen K con alta similitud al Q del decoder.</p>
+      </div>
+
+      <div class="card card-violet">
+        <div style="width:44px; height:44px; border-radius:50%; background:var(--violet); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:1.2rem; color:#04080f; margin-bottom:12px;">V</div>
+        <h3 style="color:var(--violet);">Value — El contenido</h3>
+        <p style="font-size:.82rem; margin-top:6px;"><strong style="color:var(--white);">"¿Cuál es mi contenido real?"</strong></p>
+        <p style="font-size:.8rem; margin-top:6px; color:var(--muted);">La información que realmente fluye cuando la atención entre Q y K es alta. En Cross-Attention, V viene del encoder — es el significado del reporte.</p>
+        <div class="code-block mt-16" style="font-size:.74rem;">V = X · W<sup>V</sup>
+W<sup>V</sup> ∈ ℝ^(d_model × d_v)</div>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px; font-style:italic;">Ej: El V de "cardiomegaly" transporta su representación semántica al decoder para ayudarlo a generar.</p>
+      </div>
+    </div>
+
+    <div class="card card-gold mt-24">
+      <h2 style="color:var(--gold);">Fórmula completa — Scaled Dot-Product Attention</h2>
+      <div class="code-block mt-16">
+        <span class="label">Attention(Q, K, V) — paso a paso</span>
+Attention(Q, K, V) = softmax( <span class="hl-cyan">Q · Kᵀ</span> / <span class="hl-violet">√d_k</span> ) · <span class="hl-gold">V</span>
+
+Paso 1: <span class="hl-cyan">Q · Kᵀ</span>     → matriz de scores ∈ ℝ^(n × n)
+          "qué tan relevante es cada token para cada otro"
+
+Paso 2: / <span class="hl-violet">√d_k</span>      → escala para prevenir saturación del softmax
+          sin esto, los dot products crecen y el gradiente desaparece
+
+Paso 3: softmax(·)    → pesos de atención normalizados (suman 1 por fila)
+          cada fila = distribución de atención de UN token sobre todos
+
+Paso 4: · <span class="hl-gold">V</span>         → suma ponderada del contenido = representación final
+          los tokens más relevantes contribuyen más al resultado
+      </div>
+      <div style="margin-top:16px; font-size:.8rem; color:var(--muted);">
+        <strong style="color:var(--white);">BioBART-large:</strong> d_model = 1024 · d_k = 64 por cabeza · 16 cabezas · 12 capas encoder + 12 capas decoder
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <h2>Ejemplo clínico — Cross-Attention en la Tarea 1 del notebook</h2>
+    <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">Cuando el decoder genera "cardiomegaly" en el resumen del reporte radiológico, su Q pregunta implícitamente por ese concepto. Los tokens del reporte con K similar reciben pesos de atención altos y sus V fluyen hacia el decoder:</p>
+
+    <div class="card">
+      <div class="noise-label" style="margin-bottom:16px;">Pesos de Cross-Attention — decoder generando "cardiomegaly" consulta el reporte:</div>
+      <div class="attn-bar">
+        <span class="attn-label">"cardiomegaly"</span>
+        <div class="attn-track"><div class="attn-fill" style="width:89%; background:linear-gradient(90deg,var(--cyan),rgba(0,229,255,.4));"></div></div>
+        <span class="attn-score" style="color:var(--cyan);">0.89</span>
+      </div>
+      <div class="attn-bar">
+        <span class="attn-label">"ratio 0.58"</span>
+        <div class="attn-track"><div class="attn-fill" style="width:76%; background:linear-gradient(90deg,var(--cyan),rgba(0,229,255,.4));"></div></div>
+        <span class="attn-score" style="color:var(--cyan);">0.76</span>
+      </div>
+      <div class="attn-bar">
+        <span class="attn-label">"cardiothoracic"</span>
+        <div class="attn-track"><div class="attn-fill" style="width:68%; background:linear-gradient(90deg,var(--cyan),rgba(0,229,255,.4));"></div></div>
+        <span class="attn-score" style="color:var(--cyan);">0.68</span>
+      </div>
+      <div class="attn-bar">
+        <span class="attn-label">"pulmonary edema"</span>
+        <div class="attn-track"><div class="attn-fill" style="width:45%; background:linear-gradient(90deg,var(--violet),rgba(192,132,252,.4));"></div></div>
+        <span class="attn-score" style="color:var(--violet);">0.45</span>
+      </div>
+      <div class="attn-bar">
+        <span class="attn-label">"72-year-old"</span>
+        <div class="attn-track"><div class="attn-fill" style="width:18%; background:linear-gradient(90deg,var(--muted),rgba(100,116,139,.4));"></div></div>
+        <span class="attn-score" style="color:var(--muted);">0.18</span>
+      </div>
+      <div class="attn-bar">
+        <span class="attn-label">"No pneumothorax"</span>
+        <div class="attn-track"><div class="attn-fill" style="width:9%; background:linear-gradient(90deg,var(--muted),rgba(100,116,139,.4));"></div></div>
+        <span class="attn-score" style="color:var(--muted);">0.09</span>
+      </div>
+      <p style="font-size:.75rem; color:var(--muted); margin-top:16px; font-style:italic;">Los V de los tokens con mayor score se suman ponderados y fluyen al decoder — el decoder "lee" selectivamente las partes del reporte más relevantes para cada palabra que genera.</p>
+    </div>
+
+    <hr class="divider"/>
+    <h2>Multi-Head Attention — 16 cabezas en paralelo</h2>
+    <p style="font-size:.85rem; margin-top:8px; margin-bottom:16px;">BART-large aplica 16 cabezas de atención en paralelo, cada una con sus propias matrices W^Q, W^K, W^V. Cada cabeza captura un tipo diferente de relación:</p>
+    <div class="grid-3">
+      <div class="card" style="border-color:rgba(0,229,255,.2); text-align:center;">
+        <span class="badge badge-cyan">Cabeza 1-4</span>
+        <p style="font-size:.8rem; margin-top:8px;">Relaciones sintácticas — sujeto-verbo, modificadores</p>
+      </div>
+      <div class="card" style="border-color:rgba(251,191,36,.2); text-align:center;">
+        <span class="badge badge-gold">Cabeza 5-10</span>
+        <p style="font-size:.8rem; margin-top:8px;">Semántica clínica — diagnósticos, hallazgos, ubicaciones</p>
+      </div>
+      <div class="card" style="border-color:rgba(192,132,252,.2); text-align:center;">
+        <span class="badge badge-violet">Cabeza 11-16</span>
+        <p style="font-size:.8rem; margin-top:8px;">Correferencia y coherencia — pronombres, entidades</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ S7 — PRE-ENTRENAMIENTO BART ══════════════════ -->
+<section id="s7" class="section">
+<div class="container">
+  <div class="sec-label" style="color:var(--pink)">Sección 7 — Cómo BART aprendió</div>
+  <h1>Pre-entrenamiento de BART</h1>
+  <p class="subtitle">El denoising autoencoder — cómo BART aprendió el lenguaje natural antes de ser adaptado al dominio biomédico.</p>
+
+  <div class="mt-24">
+
+    <div class="card" style="border-color:rgba(244,114,182,.3); background:rgba(244,114,182,.04); margin-bottom:24px;">
+      <h2 style="color:var(--pink);">¿Qué es un Denoising Autoencoder?</h2>
+      <p style="font-size:.85rem; margin-top:10px;">La idea central: <strong style="color:var(--white)">corromper texto y aprender a reconstruirlo</strong>. El encoder lee el texto dañado y produce H_enc. El decoder aprende a recuperar el texto original. Después de hacer esto con <strong style="color:var(--white)">160 GB de texto</strong>, el modelo desarrolla una comprensión profunda del lenguaje.</p>
+      <div class="code-block mt-16">
+        <span class="label">Función de pérdida — Cross-Entropy entre output del decoder y texto original</span>
+L(θ) = −Σ_(t=1)^T  log P(<span class="hl-green">y_t</span> | <span class="hl-cyan">y_&lt;t</span>, <span class="hl-gold">x_corrupted</span> ; θ)
+
+y_t = token original en posición t
+y_&lt;t = tokens ya generados por el decoder
+x_corrupted = texto con ruido (entrada al encoder)
+θ = todos los parámetros del modelo
+      </div>
+    </div>
+
+    <h2>Los 5 tipos de corrupción evaluados</h2>
+    <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">Lewis et al. (2019) experimentaron con múltiples funciones de ruido. La combinación óptima fue <strong style="color:var(--white)">Text Infilling + Sentence Permutation</strong>.</p>
+
+    <div class="grid-2">
+
+      <div class="card card-green" style="border-width:2px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+          <span style="background:var(--green); color:#04080f; font-size:.7rem; font-weight:800; padding:3px 10px; border-radius:12px;">⭐ MEJOR</span>
+          <h3 style="color:var(--green); margin:0;">Text Infilling</h3>
+        </div>
+        <p style="font-size:.82rem; margin-bottom:12px;">Tramos de varios tokens se reemplazan por un <strong style="color:var(--white)">solo [MASK]</strong>. El modelo no sabe cuántas palabras faltan — debe inferirlo. Es el tipo de ruido más poderoso.</p>
+        <div class="noise-before">
+          <div class="noise-label">Original</div>
+          <span class="mono" style="font-size:.78rem;">A B <span style="color:var(--green)">C D E</span> F G</span>
+        </div>
+        <div class="noise-after">
+          <div class="noise-label">Corrompido → modelo aprende cuántos faltan</div>
+          <span class="mono" style="font-size:.78rem;">A B <span class="token-box pulse" style="color:var(--gold); border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.1);">[MASK]</span> F G</span>
+        </div>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">Longitudes de span: distribución de Poisson (λ=3). Fuerza al modelo a razonar sobre la longitud de la secuencia.</p>
+      </div>
+
+      <div class="card card-green" style="border-width:2px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+          <span style="background:var(--green); color:#04080f; font-size:.7rem; font-weight:800; padding:3px 10px; border-radius:12px;">⭐ MEJOR</span>
+          <h3 style="color:var(--green); margin:0;">Sentence Permutation</h3>
+        </div>
+        <p style="font-size:.82rem; margin-bottom:12px;">Las oraciones del documento se mezclan en orden <strong style="color:var(--white)">aleatorio</strong>. El modelo aprende coherencia narrativa y la estructura lógica del texto clínico.</p>
+        <div class="noise-before">
+          <div class="noise-label">Original (orden correcto)</div>
+          <span class="mono" style="font-size:.78rem; color:var(--text);">
+            <span style="color:var(--green);">1.</span> Antecedentes.<br/>
+            <span style="color:var(--cyan);">2.</span> Diagnóstico.<br/>
+            <span style="color:var(--violet);">3.</span> Tratamiento.
+          </span>
+        </div>
+        <div class="noise-after">
+          <div class="noise-label">Permutado → modelo reordena</div>
+          <span class="mono" style="font-size:.78rem;">
+            <span style="color:var(--violet);">3.</span> Tratamiento.<br/>
+            <span style="color:var(--green);">1.</span> Antecedentes.<br/>
+            <span style="color:var(--cyan);">2.</span> Diagnóstico.
+          </span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Token Masking (como BERT)</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Tokens individuales → [MASK]. Similar a BERT MLM pero BART también tiene decoder autoregresivo para generar la respuesta.</p>
+        <div class="noise-after mt-16">
+          <span class="mono" style="font-size:.78rem;">A <span class="token-box" style="color:var(--gold); border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.1);">[M]</span> C <span class="token-box" style="color:var(--gold); border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.1);">[M]</span> E → A B C D E</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Token Deletion</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Tokens eliminados completamente — <strong style="color:var(--white)">sin dejar marcador</strong>. El modelo debe descubrir cuáles faltan Y en qué posición estaban. Más difícil que masking.</p>
+        <div class="noise-after mt-16">
+          <span class="mono" style="font-size:.78rem;">A C E → A B C D E</span>
+        </div>
+      </div>
+
+    </div>
+
+    <hr class="divider"/>
+    <h2>BioBART — Pre-entrenamiento de dominio</h2>
+    <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">Para crear BioBART, los autores (Yuan et al., 2022) tomaron los pesos de BART ya pre-entrenados y continuaron el entrenamiento sobre texto biomédico:</p>
+
+    <div class="grid-3">
+      <div class="card card-green">
+        <h3 style="color:var(--green);">📚 Corpus PubMed</h3>
+        <p style="font-size:.82rem; margin-top:6px;">~4.5 millones de abstracts de artículos biomédicos revisados por pares. El modelo aprende terminología, relaciones clínicas y patrones del lenguaje científico médico.</p>
+      </div>
+      <div class="card card-green">
+        <h3 style="color:var(--green);">🔤 Vocabulario BPE Médico</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Vocabulario de ~50,264 tokens optimizado para texto biomédico. Términos como <code class="mono" style="color:var(--green);">myocardial</code>, <code class="mono" style="color:var(--green);">sepsis</code>, <code class="mono" style="color:var(--green);">creatinine</code> son tokens únicos.</p>
+      </div>
+      <div class="card card-green">
+        <h3 style="color:var(--green);">🎯 Resultado</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Mejora en diálogo médico, resumen clínico, NER biomédico y entity linking. El checkpoint usado en el notebook es fine-tuned sobre 70,000 reportes de radiología.</p>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <h2>Comparativa de objetivos de pre-entrenamiento (del paper BART)</h2>
+    <div class="mt-16" style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr><th>Modelo</th><th>Objetivo de pre-entrenamiento</th><th>SQuAD F1</th><th>XSum ROUGE-1</th></tr></thead>
+        <tbody>
+          <tr><td>BERT Base</td><td>Masked Language Model</td><td>88.5</td><td>—</td></tr>
+          <tr><td>GPT</td><td>Causal Language Model (izq→der)</td><td>76.7</td><td>—</td></tr>
+          <tr><td>BART (Token Masking)</td><td>Denoising — token masking</td><td>90.4</td><td>7.08</td></tr>
+          <tr><td>BART (Text Infilling)</td><td>Denoising — text infilling</td><td>90.8</td><td>6.61</td></tr>
+          <tr><td style="color:var(--green);"><strong>BART (Infilling + Shuffle)</strong></td><td style="color:var(--green);">Denoising — combinación óptima</td><td style="color:var(--green);">90.8</td><td style="color:var(--green);">6.62</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ S8 — GENERACIÓN ══════════════════ -->
+<section id="s8" class="section">
+<div class="container">
+  <div class="sec-label" style="color:var(--green)">Sección 8 — Inferencia</div>
+  <h1>Generación de Texto</h1>
+  <p class="subtitle">Cómo BioBART transforma un reporte radiológico en un resumen clínico — paso a paso desde el tensor de entrada hasta el texto generado.</p>
+
+  <div class="mt-24">
+
+    <!-- TAREA 1 -->
+    <div class="card card-cyan">
+      <h2 style="color:var(--cyan);">Tarea 1 — Summarization con Beam Search</h2>
+      <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">El modelo recibe el reporte completo, el encoder lo procesa bidireccionalmente y el decoder genera el resumen con 4 hipótesis en paralelo.</p>
+
+      <div class="noise-before">
+        <div class="noise-label">Entrada — Reporte radiológico (72-year-old male)</div>
+        <p class="mono" style="font-size:.78rem; color:var(--text); line-height:1.7;">"Chest X-ray findings: The patient is a 72-year-old male with progressive dyspnea and hypoxemia. Bilateral ground-glass opacities are identified in the lower lung fields, with consolidation in the right lower lobe. Mild cardiomegaly is noted with a cardiothoracic ratio of 0.58. Blunting of the right costophrenic angle suggests small pleural effusion. No pneumothorax identified. Endotracheal tube tip is 4 cm above the carina, in appropriate position. Left-sided PICC line with tip projecting over the lower SVC..."</p>
+      </div>
+
+      <div class="noise-after mt-16">
+        <div class="noise-label">Salida generada por BioBART — Beam Search (num_beams=4)</div>
+        <p class="mono" style="font-size:.82rem; color:var(--green);">"leftsided picc line with the tip projecting over the lower svc no pneumothorax cardiomegaly and pulmonary edema no acute pulmonary abnormalities are identified the endotracheal tube is in good position"</p>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">52 tokens generados de 120 posibles. El modelo emitió EOS antes del límite — consideró el resumen completo.</p>
+      </div>
+
+      <div class="mt-16">
+        <h3>Hiperparámetros de generación — Tarea 1</h3>
+        <div class="mt-8" style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr><th>Parámetro</th><th>Valor</th><th>Frase clave</th></tr></thead>
+            <tbody>
+              <tr><td><code class="mono" style="color:var(--cyan);">torch.no_grad()</code></td><td>—</td><td>Solo leer, no aprender — desactiva cálculo de gradientes</td></tr>
+              <tr><td><code class="mono" style="color:var(--cyan);">num_beams</code></td><td>4</td><td>4 borradores en paralelo, gana el mejor</td></tr>
+              <tr><td><code class="mono" style="color:var(--cyan);">max_new_tokens</code></td><td>120</td><td>Máximo 120 tokens de resumen</td></tr>
+              <tr><td><code class="mono" style="color:var(--cyan);">min_length</code></td><td>40</td><td>Prohibido terminar antes de tiempo</td></tr>
+              <tr><td><code class="mono" style="color:var(--cyan);">no_repeat_ngram_size</code></td><td>3</td><td>No repetir la misma frase dos veces</td></tr>
+              <tr><td><code class="mono" style="color:var(--cyan);">length_penalty</code></td><td>1.5</td><td>Premia resúmenes más completos</td></tr>
+              <tr><td><code class="mono" style="color:var(--cyan);">early_stopping</code></td><td>True</td><td>Para cuando todos los beams terminaron</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- TAREA 2 -->
+    <div class="card card-violet">
+      <h2 style="color:var(--violet);">Tarea 2 — QA Médico con Nucleus Sampling</h2>
+      <p style="font-size:.85rem; margin-top:8px; margin-bottom:20px;">El modelo recibe un prompt estructurado <code class="mono" style="color:var(--gold);">question: ... context: ...</code> que le indica qué tarea realizar. El decoder usa muestreo probabilístico para mayor fluidez.</p>
+
+      <div class="noise-before">
+        <div class="noise-label">Entrada — Prompt QA (58-year-old female)</div>
+        <p class="mono" style="font-size:.78rem; color:var(--text);">"question: What are the main radiological findings and their clinical significance? context: Chest X-ray: 58-year-old female with worsening shortness of breath. Bilateral perihilar opacities with air bronchograms in both lower lobes. Increased interstitial markings consistent with pulmonary edema. Moderate right pleural effusion. Cardiomegaly with cardiothoracic ratio 0.62..."</p>
+      </div>
+
+      <div class="noise-after mt-16">
+        <div class="noise-label">Respuesta generada — Nucleus Sampling (top_p=0.92)</div>
+        <p class="mono" style="font-size:.82rem; color:var(--violet);">"worsening pulmonary edema with bilateral pleural effusions and left lower lobe atelectasis"</p>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">20 tokens generados. El modelo identificó los hallazgos clínicamente más relevantes para la pregunta formulada.</p>
+      </div>
+
+      <div class="mt-16">
+        <h3>Hiperparámetros de generación — Tarea 2</h3>
+        <div class="mt-8" style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr><th>Parámetro</th><th>Valor</th><th>Frase clave</th></tr></thead>
+            <tbody>
+              <tr><td><code class="mono" style="color:var(--violet);">do_sample</code></td><td>True</td><td>Muestreo probabilístico — no siempre el más probable</td></tr>
+              <tr><td><code class="mono" style="color:var(--violet);">temperature</code></td><td>0.7</td><td>Distribución más concentrada: respuestas más seguras</td></tr>
+              <tr><td><code class="mono" style="color:var(--violet);">top_k</code></td><td>50</td><td>Descarta tokens con probabilidad muy baja</td></tr>
+              <tr><td><code class="mono" style="color:var(--violet);">top_p</code></td><td>0.92</td><td>Nucleus: mínimo conjunto que acumula 92% de probabilidad</td></tr>
+              <tr><td><code class="mono" style="color:var(--violet);">repetition_penalty</code></td><td>1.3</td><td>Reduce probabilidad de tokens ya generados</td></tr>
+              <tr><td><code class="mono" style="color:var(--violet);">max_new_tokens</code></td><td>150</td><td>Máximo 150 tokens de respuesta</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- COMPARATIVA -->
+    <h2>Comparativa — Greedy vs Beam Search (Tarea 1)</h2>
+    <div class="grid-2 mt-16">
+      <div class="card" style="border-color:rgba(100,116,139,.3);">
+        <h3 style="color:var(--muted);">Greedy Search</h3>
+        <p style="font-size:.8rem; margin-top:6px; color:var(--muted);">Siempre elige el token más probable — argmax local.</p>
+        <div class="noise-before mt-16">
+          <span class="mono" style="font-size:.78rem; color:var(--text);">"no pneumothorax is identified on this portable chest xray leftsided picc line with the tip projecting over the lower svc with bilateral pulmonary edema"</span>
+        </div>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">Menciona neumotórax, PICC y edema. Estructura menos organizada — encadena hallazgos con "with". <strong style="color:var(--pink);">Omite cardiomegalia y tubo endotraqueal.</strong></p>
+      </div>
+      <div class="card card-green">
+        <h3 style="color:var(--green);">Beam Search (num_beams=4)</h3>
+        <p style="font-size:.8rem; margin-top:6px;">Mantiene 4 hipótesis en paralelo — maximiza probabilidad conjunta.</p>
+        <div class="noise-after mt-16">
+          <span class="mono" style="font-size:.78rem; color:var(--green);">"leftsided picc line with the tip projecting over the lower svc no pneumothorax cardiomegaly and pulmonary edema no acute pulmonary abnormalities are identified the endotracheal tube is in good position"</span>
+        </div>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;"><strong style="color:var(--green);">Agrega cardiomegalia y posición del tubo endotraqueal</strong> que Greedy omitió. Sigue el formato estándar de una impresión radiológica.</p>
+      </div>
+    </div>
+    <div class="card mt-16" style="background:var(--bg3); border-color:var(--border);">
+      <p style="font-size:.85rem;"><strong style="color:var(--white);">Conclusión:</strong> Beam Search produjo un resumen más completo porque al explorar 4 hipótesis en paralelo encontró una secuencia con mayor probabilidad conjunta — una que incluía más hallazgos relevantes. Greedy quedó atrapado en la secuencia localmente más probable. Esto ilustra directamente por qué Beam Search es la estrategia preferida para resúmenes clínicos donde la completitud factual es crítica.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════ S9 — LIMITACIONES ══════════════════ -->
+<section id="s9" class="section">
+<div class="container">
+  <div class="sec-label" style="color:var(--pink)">Sección 9 — Consideraciones críticas</div>
+  <h1>Limitaciones</h1>
+  <p class="subtitle">Restricciones técnicas y clínicas que deben considerarse antes de usar BioBART en entornos reales.</p>
+
+  <div class="mt-24">
+    <div class="grid-3">
+
+      <div class="card card-pink">
+        <div style="font-size:2rem; margin-bottom:8px;">📏</div>
+        <h3 style="color:var(--pink);">Ventana de 1024 tokens</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Notas clínicas completas, historiales o artículos extensos deben truncarse. Información más allá del token 1024 se pierde silenciosamente — puede omitir hallazgos críticos.</p>
+        <p style="font-size:.75rem; color:var(--muted); margin-top:8px;">En el notebook: max_length=512 en el encoder, lo que limita aún más los reportes largos.</p>
+      </div>
+
+      <div class="card card-pink">
+        <div style="font-size:2rem; margin-bottom:8px;">🐢</div>
+        <h3 style="color:var(--pink);">Generación lenta — un token a la vez</h3>
+        <p style="font-size:.82rem; margin-top:6px;">El decoder es secuencial en inferencia: genera un token, lo agrega, genera el siguiente. Para 100 tokens = 100 pasos secuenciales. Limita uso en tiempo real sin optimización.</p>
+      </div>
+
+      <div class="card card-pink">
+        <div style="font-size:2rem; margin-bottom:8px;">🎯</div>
+        <h3 style="color:var(--pink);">Requiere fine-tuning por tarea</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Como demostró el notebook: <code class="mono" style="color:var(--pink);">GanjinZero/biobart-large</code> base sin fine-tuning reproduce la entrada en lugar de resumirla. Cada tarea downstream requiere fine-tuning específico.</p>
+      </div>
+
+      <div class="card card-pink">
+        <div style="font-size:2rem; margin-bottom:8px;">📉</div>
+        <h3 style="color:var(--pink);">Exposure Bias</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Durante entrenamiento se usa teacher forcing (tokens reales). En inferencia usa sus propios tokens generados. Esta discrepancia hace que los errores se propaguen y acumulen.</p>
+      </div>
+
+      <div class="card card-pink">
+        <div style="font-size:2rem; margin-bottom:8px;">⚠️</div>
+        <h3 style="color:var(--pink);">Alucinaciones clínicas</h3>
+        <p style="font-size:.82rem; margin-top:6px;">Puede generar términos médicos, dosis o diagnósticos plausibles pero incorrectos. En el notebook se observó que el modelo radiológico no mencionó todos los hallazgos del reporte.</p>
+        <p style="font-size:.75rem; color:var(--pink); margin-top:8px; font-weight:700;">⚠ Requiere validación médica obligatoria en uso clínico real.</p>
+      </div>
+
+      <div class="card card-pink">
+        <div style="font-size:2rem; margin-bottom:8px;">🌍</div>
+        <h3 style="color:var(--pink);">Solo inglés</h3>
+        <p style="font-size:.82rem; margin-top:6px;">BioBART fue entrenado exclusivamente en abstracts de PubMed en inglés. Como demostró el notebook, los prompts en español producen texto incoherente o vacío.</p>
+      </div>
+
+    </div>
+
+    <hr class="divider"/>
+
+    <div class="card card-green">
+      <h2 style="color:var(--green);">Conclusión del equipo</h2>
+      <p style="font-size:.88rem; margin-top:12px; line-height:1.8;">BioBART representa un avance significativo en NLP biomédico al unificar la comprensión bidireccional de BERT con la generación autoregresiva de GPT, adaptado al dominio biomédico mediante pre-entrenamiento sobre PubMed. Las dos tareas del notebook demostraron que <strong style="color:var(--white)">el modelo base sin fine-tuning específico no puede resumir</strong> — lo que ilustra exactamente el punto central del paper de Yuan et al. (2022): el pre-entrenamiento provee el conocimiento del dominio, pero el fine-tuning por tarea downstream es obligatorio.</p>
+      <p style="font-size:.88rem; margin-top:12px; line-height:1.8;">La elección de la estrategia de decodificación tiene impacto directo: <strong style="color:var(--white)">Beam Search</strong> para resúmenes clínicos que exigen fidelidad factual completa, <strong style="color:var(--white)">Nucleus Sampling</strong> para respuestas conversacionales que requieren fluidez y variabilidad natural.</p>
+      <div class="flex flex-wrap gap-8 mt-16">
+        <span class="badge badge-green">🧬 Dominio PubMed</span>
+        <span class="badge badge-cyan">🔵 Encoder bidireccional</span>
+        <span class="badge badge-violet">🟣 Decoder autoregresivo</span>
+        <span class="badge badge-gold">⚡ Pre-entrenamiento denoising</span>
+        <span class="badge badge-green">✓ Fine-tuning = clave</span>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+    <h2>Referencias</h2>
+    <div class="mt-16" style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr><th>#</th><th>Referencia</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--muted);">1</td><td>Vaswani, A. et al. (2017). <em>Attention is all you need.</em> NeurIPS. <span style="color:var(--cyan);">arxiv.org/abs/1706.03762</span></td></tr>
+          <tr><td style="color:var(--muted);">2</td><td>Lewis, M. et al. (2019). <em>BART: Denoising Sequence-to-Sequence Pre-training.</em> Facebook AI. <span style="color:var(--cyan);">arxiv.org/abs/1910.13461</span></td></tr>
+          <tr><td style="color:var(--muted);">3</td><td>Yuan, H. et al. (2022). <em>BioBART: Pretraining and Evaluation of A Biomedical Generative Language Model.</em> BioNLP @ ACL. <span style="color:var(--cyan);">aclanthology.org/2022.bionlp-1.9/</span></td></tr>
+          <tr><td style="color:var(--muted);">4</td><td>Devlin, J. et al. (2019). <em>BERT: Pre-training of Deep Bidirectional Transformers.</em> NAACL. <span style="color:var(--cyan);">arxiv.org/abs/1810.04805</span></td></tr>
+          <tr><td style="color:var(--muted);">5</td><td>Radford, A. et al. (2018). <em>Improving Language Understanding by Generative Pre-Training.</em> OpenAI.</td></tr>
+          <tr><td style="color:var(--muted);">6</td><td>Malik, H. I. (2023). <em>Biobart radiology summarization</em> [Modelo]. Hugging Face. <span style="color:var(--cyan);">huggingface.co/hamzamalik11/Biobart_radiology_summarization</span></td></tr>
+          <tr><td style="color:var(--muted);">7</td><td>Sinsky, C. et al. (2016). <em>Allocation of Physician Time in Ambulatory Practice.</em> Annals of Internal Medicine, 165(11). <span style="color:var(--cyan);">doi.org/10.7326/M16-0961</span></td></tr>
+          <tr><td style="color:var(--muted);">8</td><td>Anthropic. (2025). <em>Claude</em> (claude-sonnet-4-6) [IA generativa]. Usado como apoyo en la elaboración del marco teórico. <span style="color:var(--cyan);">claude.ai</span></td></tr>
+          <tr><td style="color:var(--muted);">9</td><td>Google DeepMind. (2025). <em>Gemini</em> [IA generativa]. Usado como apoyo en la generación del diagrama comparativo de arquitecturas. <span style="color:var(--cyan);">gemini.google.com</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
 </body>
 </html>
