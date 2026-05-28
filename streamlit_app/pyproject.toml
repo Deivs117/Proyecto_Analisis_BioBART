@@ -1,0 +1,67 @@
+[project]
+name = "biobart-streamlit-app"
+version = "0.1.0"
+description = "Interfaz web Streamlit para demo de inferencia con BioBART"
+requires-python = ">=3.10"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Dependencias de producción
+# Se instalan con: uv pip install -e .
+# ──────────────────────────────────────────────────────────────────────────────
+dependencies = [
+    # Motor principal de modelos pre-entrenados
+    "transformers>=4.40.0",
+    # Backend de cómputo tensorial (CPU/GPU)
+    "torch>=2.2.0",
+    # Tokenizador SentencePiece requerido por BioBART
+    "sentencepiece>=0.1.99",
+    # Aceleración de inferencia con Hugging Face Accelerate
+    "accelerate>=0.28.0",
+    # Interfaz web
+    "streamlit>=1.35.0",
+    # Barra de progreso usada internamente por transformers
+    "tqdm>=4.66.0",
+    "torchvision>=0.27.0",
+]
+
+[project.optional-dependencies]
+# Dependencias de desarrollo — no necesarias para la demo
+dev = [
+    "ruff>=0.4.0",
+]
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Configuración de herramientas
+# ──────────────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = [
+    "app.py",
+    "config.py",
+    "inference.py",
+    "model_loader.py",
+]
+
+# ──────────────────────────────────────────────────────────────────────────────
+# INSTRUCCIONES DE USO CON uv
+# ──────────────────────────────────────────────────────────────────────────────
+# 1) Instalar uv (si no está instalado):
+#       curl -Lsf https://astral.sh/uv/install.sh | sh
+#
+# 2) Desde la carpeta streamlit_app/:
+#       make setup   → crea entorno e instala dependencias
+#       make run     → lanza la app en http://localhost:8501
+#
+# O paso a paso:
+#       uv venv .venv
+#       source .venv/bin/activate
+#       uv pip install -e .
+#       streamlit run app.py
+# ──────────────────────────────────────────────────────────────────────────────
