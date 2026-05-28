@@ -447,46 +447,6 @@
     </div>
 
     <hr class="divider"/>
-    <h2>Tokenización del reporte radiológico — Tarea 1 del notebook</h2>
-    <div class="code-block mt-16">
-      <span class="label">Código del notebook — preprocesamiento y tokenización</span>
-<span class="hl-cyan">reporte_radiologico</span> = <span class="hl-gold">"""
-Chest X-ray findings: The patient is a 72-year-old male with progressive dyspnea
-and hypoxemia. Bilateral ground-glass opacities are identified in the lower lung
-fields, with consolidation in the right lower lobe...
-"""</span>
-
-<span class="hl-violet"># Paso crítico: eliminar saltos de línea</span>
-<span class="hl-violet"># Sin esto aparecen artefactos de caracteres extraños en el output</span>
-reporte_limpio = <span class="hl-green">" ".join(</span>reporte_radiologico.<span class="hl-cyan">split()</span><span class="hl-green">)</span>
-
-<span class="hl-violet"># Tokenización con parámetros clave</span>
-inputs_resumen = tokenizer(
-    reporte_limpio,
-    max_length=<span class="hl-gold">512</span>,        <span class="hl-violet"># límite del encoder de BioBART</span>
-    truncation=<span class="hl-cyan">True</span>,      <span class="hl-violet"># corta si supera 512 — no lanza error</span>
-    return_tensors=<span class="hl-gold">"pt"</span>   <span class="hl-violet"># tensores PyTorch, formato que el modelo espera</span>
-).to(DEVICE)              <span class="hl-violet"># mueve a GPU — si no coinciden, PyTorch lanza error</span>
-
-<span class="hl-violet"># Resultado: ~130 tokens para este reporte</span>
-    </div>
-
-    <div class="grid-3 mt-16">
-      <div class="card card-gold">
-        <h3 style="color:var(--gold)">max_length=512</h3>
-        <p style="font-size:.82rem; margin-top:6px;">El encoder de BioBART procesa máximo 512 tokens. Si el reporte es más largo, <code class="mono" style="color:var(--cyan)">truncation=True</code> lo corta silenciosamente — la información al final se pierde.</p>
-      </div>
-      <div class="card card-gold">
-        <h3 style="color:var(--gold)">return_tensors="pt"</h3>
-        <p style="font-size:.82rem; margin-top:6px;">Devuelve los IDs como tensores de PyTorch. Sin esto, serían listas de Python que el modelo no puede procesar directamente.</p>
-      </div>
-      <div class="card card-gold">
-        <h3 style="color:var(--gold)">.to(DEVICE)</h3>
-        <p style="font-size:.82rem; margin-top:6px;">Mueve los tensores al mismo dispositivo que el modelo (GPU o CPU). Si el modelo está en CUDA y los tensores en CPU, PyTorch lanza un error de incompatibilidad.</p>
-      </div>
-    </div>
-
-    <hr class="divider"/>
     <h2>Tokens especiales de BioBART</h2>
     <div class="mt-16" style="overflow-x:auto;">
       <table class="tbl">
@@ -695,25 +655,6 @@ z(47) = E["cardiomegaly"]  +  W_pos[47]
       </table>
     </div>
 
-    <hr class="divider"/>
-    <h2>Por qué la arquitectura es innovadora</h2>
-    <div class="grid-2 mt-16">
-      <div class="card card-green">
-        <h3 style="color:var(--green);">① Unifica BERT y GPT</h3>
-        <p style="font-size:.82rem; margin-top:6px;">El encoder bidireccional comprende el contexto completo como BERT. El decoder autoregresivo genera texto coherente como GPT. Ninguno de los dos modelos originales podía hacer ambas cosas en pre-entrenamiento conjunto.</p>
-      </div>
-      <div class="card card-green">
-        <h3 style="color:var(--green);">② Pre-entrenamiento flexible</h3>
-        <p style="font-size:.82rem; margin-top:6px;">A diferencia de BERT (solo MLM) o GPT (solo causal LM), BART acepta <strong style="color:var(--white)">cualquier función de corrupción</strong> como objetivo. Esto lo hace adaptable a dominios como el biomédico sin rediseñar la arquitectura.</p>
-      </div>
-      <div class="card card-green">
-        <h3 style="color:var(--green);">③ Cross-Attention como puente semántico</h3>
-        <p style="font-size:.82rem; margin-top:6px;">Permite al decoder consultar dinámicamente cualquier parte del reporte en cada paso de generación. Imposible en GPT (sin encoder) o BERT (sin decoder causal).</p>
-      </div>
-      <div class="card card-green">
-        <h3 style="color:var(--green);">④ Adaptación de dominio eficiente</h3>
-        <p style="font-size:.82rem; margin-top:6px;">Para crear BioBART bastó continuar el pre-entrenamiento sobre PubMed. La arquitectura no cambia — solo los pesos se especializan. Esto democratiza la creación de modelos especializados.</p>
-      </div>
     </div>
   </div>
 </div>
@@ -759,28 +700,6 @@ W<sup>V</sup> ∈ ℝ^(d_model × d_v)</div>
       </div>
     </div>
 
-    <div class="card card-gold mt-24">
-      <h2 style="color:var(--gold);">Fórmula completa — Scaled Dot-Product Attention</h2>
-      <div class="code-block mt-16">
-        <span class="label">Attention(Q, K, V) — paso a paso</span>
-Attention(Q, K, V) = softmax( <span class="hl-cyan">Q · Kᵀ</span> / <span class="hl-violet">√d_k</span> ) · <span class="hl-gold">V</span>
-
-Paso 1: <span class="hl-cyan">Q · Kᵀ</span>     → matriz de scores ∈ ℝ^(n × n)
-          "qué tan relevante es cada token para cada otro"
-
-Paso 2: / <span class="hl-violet">√d_k</span>      → escala para prevenir saturación del softmax
-          sin esto, los dot products crecen y el gradiente desaparece
-
-Paso 3: softmax(·)    → pesos de atención normalizados (suman 1 por fila)
-          cada fila = distribución de atención de UN token sobre todos
-
-Paso 4: · <span class="hl-gold">V</span>         → suma ponderada del contenido = representación final
-          los tokens más relevantes contribuyen más al resultado
-      </div>
-      <div style="margin-top:16px; font-size:.8rem; color:var(--muted);">
-        <strong style="color:var(--white);">BioBART-large:</strong> d_model = 1024 · d_k = 64 por cabeza · 16 cabezas · 12 capas encoder + 12 capas decoder
-      </div>
-    </div>
 
     <hr class="divider"/>
     <h2>Ejemplo clínico — Cross-Attention en la Tarea 1 del notebook</h2>
@@ -1166,25 +1085,6 @@ logits → softmax → P[50K tokens]
     </div>
     <div class="card mt-16" style="background:var(--bg3); border-color:var(--border);">
       <p style="font-size:.85rem;"><strong style="color:var(--white);">Conclusión:</strong> Beam Search produjo un resumen más completo porque al explorar 4 hipótesis en paralelo encontró una secuencia con mayor probabilidad conjunta — una que incluía más hallazgos relevantes del reporte. Greedy quedó atrapado en la secuencia localmente más probable. Esto ilustra directamente por qué Beam Search es la estrategia preferida para resúmenes clínicos donde la completitud factual es crítica.</p>
-    </div>
-
-    <hr class="divider"/>
-    <h2>Resumen comparativo de hiperparámetros</h2>
-    <div class="mt-16" style="overflow-x:auto;">
-      <table class="tbl">
-        <thead><tr><th>Hiperparámetro</th><th>Tarea 1 (Resumen)</th><th>Tarea 2 (QA)</th><th>Efecto</th></tr></thead>
-        <tbody>
-          <tr><td><code class="mono">max_new_tokens</code></td><td style="color:var(--cyan);">120</td><td style="color:var(--violet);">150</td><td>Longitud máxima del output generado</td></tr>
-          <tr><td><code class="mono">num_beams</code></td><td style="color:var(--cyan);">4</td><td style="color:var(--muted);">—</td><td>Beam Search: explora 4 hipótesis en paralelo</td></tr>
-          <tr><td><code class="mono">do_sample</code></td><td style="color:var(--cyan);">False</td><td style="color:var(--violet);">True</td><td>Beam Search vs. muestreo probabilístico</td></tr>
-          <tr><td><code class="mono">temperature</code></td><td style="color:var(--muted);">—</td><td style="color:var(--violet);">0.7</td><td>Distribución más concentrada: respuestas más seguras</td></tr>
-          <tr><td><code class="mono">top_k</code></td><td style="color:var(--muted);">—</td><td style="color:var(--violet);">50</td><td>Descarta tokens con probabilidad muy baja</td></tr>
-          <tr><td><code class="mono">top_p</code></td><td style="color:var(--muted);">—</td><td style="color:var(--violet);">0.92</td><td>Nucleus: mínimo conjunto que acumula 92% de probabilidad</td></tr>
-          <tr><td><code class="mono">no_repeat_ngram_size</code></td><td style="color:var(--cyan);">3</td><td style="color:var(--violet);">3</td><td>Prohíbe repetir la misma secuencia de 3 palabras</td></tr>
-          <tr><td><code class="mono">length_penalty</code></td><td style="color:var(--cyan);">1.5</td><td style="color:var(--muted);">—</td><td>Premia resúmenes más completos en Beam Search</td></tr>
-          <tr><td><code class="mono">repetition_penalty</code></td><td style="color:var(--muted);">—</td><td style="color:var(--violet);">1.3</td><td>Reduce probabilidad de tokens ya generados</td></tr>
-        </tbody>
-      </table>
     </div>
 
   </div>
