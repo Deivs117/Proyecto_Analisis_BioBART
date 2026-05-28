@@ -408,6 +408,268 @@ a mayor libertad generativa, mayor distancia entre métricas léxicas y semánti
 
 ---
 
+### 6.4 Aplicativo Web Interactivo — Metodología de Desarrollo y Pruebas (Streamlit)
+
+Esta sección documenta el aplicativo web construido como evidencia de implementación
+práctica del sistema de inferencia BioBART, orientado a la evaluación de la asignatura.
+
+---
+
+#### A. Metodología de Desarrollo de la Interfaz
+
+##### A.1 Arquitectura de la solución interactiva
+
+El aplicativo web fue desarrollado con **Streamlit**, un framework Python que permite
+construir interfaces de usuario reactivas sin necesidad de JavaScript ni HTML manual.
+La arquitectura sigue un diseño modular de tres capas que separa responsabilidades de
+forma explícita:
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  app.py  ←  Capa de presentación (UI / Streamlit)       │
+│             Pestañas, controles, visualización          │
+├─────────────────────────────────────────────────────────┤
+│  inference.py  ←  Capa de lógica de inferencia          │
+│                   generar_resumen() / generar_respuesta_qa()
+├─────────────────────────────────────────────────────────┤
+│  model_loader.py  ←  Capa de gestión del modelo         │
+│                      Descarga, caché, detección de GPU  │
+├─────────────────────────────────────────────────────────┤
+│  config.py  ←  Capa de configuración centralizada       │
+│                Hiperparámetros, ejemplos, disclaimer     │
+└─────────────────────────────────────────────────────────┘
+```
+
+Esta separación garantiza que el módulo de UI (`app.py`) no contenga lógica de
+inferencia, facilitando el mantenimiento y la extensibilidad del sistema.
+
+##### A.2 Integración modular con los scripts de inferencia
+
+La interfaz se conecta con el backend de inferencia a través de llamadas directas a
+funciones Python importadas. El flujo de integración es el siguiente:
+
+```python
+# app.py — Llamada desde la capa de presentación
+from inference import generar_resumen, generar_respuesta_qa
+from model_loader import cargar_modelo
+
+# Carga única del modelo con caché de Streamlit (evita re-cargas costosas)
+tokenizador, modelo, dispositivo = cargar_modelo()
+
+# Invocación de inferencia desde la UI
+resumen, n_tokens = generar_resumen(
+    texto_limpio, tokenizador, modelo, dispositivo, params_resumen
+)
+```
+
+El módulo `model_loader.py` emplea el decorador `@st.cache_resource` para garantizar
+que los pesos del modelo `hamzamalik11/Biobart_radiology_summarization` se descarguen
+desde HuggingFace Hub **una sola vez** por sesión, independientemente de cuántas
+inferencias se realicen:
+
+```python
+# model_loader.py
+@st.cache_resource(show_spinner="⏳ Cargando modelo BioBART… (solo ocurre la primera vez)")
+def cargar_modelo():
+    dispositivo = detectar_dispositivo()  # CUDA si hay GPU, CPU en caso contrario
+    tokenizador = BartTokenizer.from_pretrained(MODEL_NAME)
+    modelo = BartForConditionalGeneration.from_pretrained(MODEL_NAME)
+    modelo.to(dispositivo)
+    modelo.eval()  # desactiva dropout en modo inferencia
+    return tokenizador, modelo, dispositivo
+```
+
+El módulo `config.py` centraliza todos los hiperparámetros de generación, el nombre
+del modelo y los ejemplos precargados, evitando valores mágicos dispersos en el código:
+
+```python
+# config.py — fragmento
+MODEL_NAME = "hamzamalik11/Biobart_radiology_summarization"
+MAX_INPUT_TOKENS = 512
+
+SUMMARIZATION_PARAMS = {
+    "max_new_tokens": 150, "num_beams": 4, "min_length": 30,
+    "no_repeat_ngram_size": 3, "length_penalty": 2.0, "early_stopping": True,
+}
+QA_PARAMS = {
+    "max_new_tokens": 200, "num_beams": 4, "min_length": 10,
+    "no_repeat_ngram_size": 3, "early_stopping": True,
+}
+GREEDY_PARAMS = {
+    "max_new_tokens": 150, "num_beams": 1, "no_repeat_ngram_size": 3,
+}
+```
+
+##### A.3 Modos de operación implementados
+
+El aplicativo expone tres modos mediante un sistema de **pestañas nativas de Streamlit**
+(`st.tabs`), diseñados para cubrir los requisitos de la rúbrica de evaluación:
+
+| Pestaña | Modo | Estrategia de generación | Propósito académico |
+|---------|------|--------------------------|---------------------|
+| 📄 Resumen Radiológico | Generación de resúmenes clínicos | Beam Search (`num_beams=4`) | Demostrar capacidad de síntesis abstractiva |
+| ❓ Pregunta / Respuesta Médica | Question Answering clínico | Beam Search (`num_beams=4`) | Demostrar comprensión contextual y generación guiada |
+| ⚖️ Demo Comparativa | Contraste de estrategias en paralelo | Greedy Search vs. Beam Search | Evidenciar el impacto de la estrategia de decodificación |
+
+**Modo 1 — Generación de Resúmenes Radiológicos:**
+El usuario ingresa un reporte clínico en inglés (hasta 512 tokens). La interfaz
+construye los tensores de entrada vía `BartTokenizer`, los pasa al encoder BioBART
+y activa el decoder con Beam Search. Los parámetros `max_new_tokens`, `num_beams`,
+`min_length`, `no_repeat_ngram_size`, `length_penalty` y `early_stopping` son
+ajustables en tiempo real mediante controles deslizantes.
+
+**Modo 2 — Question Answering Clínico:**
+El usuario provee una pregunta y un contexto clínico por separado. La interfaz
+construye el prompt concatenado `"question: <pregunta> context: <contexto>"` antes
+de la tokenización, instruyendo al Cross-Attention del decoder a anclar la generación
+a las regiones relevantes del contexto. Este diseño de prompt sigue la convención
+establecida en los benchmarks BioASQ y MedQA.
+
+**Modo 3 — Demo Comparativa:**
+Ejecuta el mismo texto de entrada con dos configuraciones simultáneas en columnas
+paralelas (`st.columns`): Greedy Search (`num_beams=1`) y Beam Search (`num_beams=4`).
+Esta pestaña es la herramienta más directa para demostrar a nivel visual las diferencias
+en completitud factual y coherencia narrativa entre ambas estrategias.
+
+##### A.4 Algoritmos de decodificación implementados y justificación de diseño
+
+El aplicativo implementa y evalúa dos estrategias de decodificación. La decisión de
+**excluir Nucleus Sampling** de la interfaz final obedece a criterios de fidelidad
+clínica documentados a continuación:
+
+| Estrategia | Mecanismo | Ventajas en texto clínico | Limitaciones |
+|-----------|-----------|--------------------------|--------------|
+| **Greedy Search** | Selecciona en cada paso el token con mayor probabilidad (`argmax`) | Determinista, reproducible, tiempo de inferencia mínimo | Queda atrapado en óptimos locales; omite hallazgos clínicos de baja probabilidad individual pero alta relevancia conjunta |
+| **Beam Search** | Mantiene `k` hipótesis en paralelo y maximiza la probabilidad conjunta de la secuencia | Mayor completitud factual; encuentra secuencias con probabilidad global más alta; reduce omisión de hallazgos | Mayor costo computacional O(k·n); tendencia a salidas conservadoras y repetitivas |
+| ~~Nucleus Sampling~~ | Muestrea tokens del núcleo de probabilidad acumulada `top_p` | Alta variabilidad y fluidez natural del texto | No determinista — dos ejecuciones sobre el mismo reporte producen resúmenes diferentes; inaceptable en contexto clínico donde la reproducibilidad es requisito de seguridad |
+
+**Justificación del descarte de Nucleus Sampling para contextos clínicos:**
+En reportes radiológicos, la exactitud factual prima sobre la variabilidad estilística.
+Nucleus Sampling introduce estocasticidad controlada por `temperature` y `top_p`
+que puede mutar o suprimir hallazgos clínicos críticos (p. ej., cambiar "bilateral
+pleural effusion" por "unilateral effusion" en distintas ejecuciones). En el
+Notebook de Inferencia (`biobart_inferencia_final_(1).ipynb`) se realizaron pruebas
+comparativas que confirmaron que Beam Search produce resúmenes con mayor cobertura
+de hallazgos relevantes y BERTScore más alto, mientras que Nucleus Sampling generó
+variabilidad no justificada en el dominio clínico.
+
+---
+
+#### B. Documentación Visual de Pruebas Realizadas
+
+> **Nota:** Las capturas de pantalla de las pruebas ejecutadas se almacenan en
+> `./streamlit_app/screen/`. Las siguientes imágenes documentan las pruebas
+> realizadas durante el ciclo de validación del aplicativo.
+
+##### B.1 Interfaz principal — Vista general
+
+![Interfaz Principal BioBART](./streamlit_app/screen/01_interfaz_principal.png)
+
+*Vista general de la interfaz web al iniciar la aplicación. Se observan las tres
+pestañas principales (Resumen Radiológico, Pregunta/Respuesta Médica, Demo Comparativa),
+la barra lateral con la información del sistema (modelo activo, dispositivo detectado
+y ventana máxima de tokens) y el aviso de uso académico. El modelo
+`hamzamalik11/Biobart_radiology_summarization` aparece ya cargado en memoria gracias
+al mecanismo `@st.cache_resource`.*
+
+---
+
+##### B.2 Prueba de Resumen Radiológico con Beam Search
+
+![Resumen Radiológico - Beam Search](./streamlit_app/screen/02_resumen_beam_search.png)
+
+*Inferencia exitosa en el Modo 1 usando Beam Search con `num_beams=4`. El reporte
+de entrada corresponde al caso de ejemplo precargado (paciente de 54 años con
+elevación del segmento ST en V1-V4, troponina elevada e hipotensión). Se aprecian
+el contador de tokens de entrada (inferior a 512), el resumen abstractivo generado
+en el cuadro informativo azul y los controles de parámetros expandidos en el panel
+de configuración.*
+
+---
+
+##### B.3 Prueba de Question Answering Clínico con Beam Search
+
+![QA Clínico - Beam Search](./streamlit_app/screen/03_qa_beam_search.png)
+
+*Inferencia exitosa en el Modo 2 (Question Answering). Pregunta de entrada:
+"What is the most likely diagnosis based on the clinical findings?". Contexto:
+caso de TEP con defecto de llenado en arteria pulmonar derecha, D-dímero elevado
+y saturación de oxígeno al 88%. Se visualiza el prompt estructurado enviado al
+modelo en formato `question: ... context: ...`, la respuesta generada y el conteo
+de tokens del prompt combinado.*
+
+---
+
+##### B.4 Demo Comparativa — Greedy Search vs. Beam Search en paralelo
+
+![Demo Comparativa - Greedy vs Beam](./streamlit_app/screen/04_demo_comparativa.png)
+
+*Ejecución simultánea de Greedy Search (columna izquierda) y Beam Search (columna
+derecha) sobre el mismo reporte clínico. La comparación visual evidencia la
+diferencia en completitud factual: Beam Search (`num_beams=4`) incluye más hallazgos
+relevantes del reporte, mientras que Greedy Search tiende a generar un resumen
+más corto que omite patologías de menor frecuencia en el dataset de entrenamiento.
+Debajo de ambas columnas se muestran las notas de interpretación explicando el
+mecanismo de cada estrategia.*
+
+---
+
+##### B.5 Parámetros de generación ajustables en tiempo real
+
+![Parámetros de Generación](./streamlit_app/screen/05_parametros_avanzados.png)
+
+*Detalle del panel de parámetros avanzados expandido en el Modo 1 (Resumen
+Radiológico). Los controles deslizantes permiten ajustar `max_new_tokens` (50–300),
+`num_beams` (1–8), `min_length` (10–100), `no_repeat_ngram_size` (1–5),
+`length_penalty` (0.5–4.0) y el checkbox `early_stopping`. Esta funcionalidad
+permite demostrar en tiempo real durante la sustentación el efecto de cada
+hiperparámetro sobre la calidad del resumen generado.*
+
+---
+
+##### B.6 Resumen de la arquitectura del aplicativo
+
+```text
+streamlit_app/
+├── app.py              ← UI principal: pestañas, controles, visualización (Streamlit)
+├── inference.py        ← Lógica de inferencia: generar_resumen() y generar_respuesta_qa()
+├── model_loader.py     ← Gestión del modelo: carga con @st.cache_resource
+├── config.py           ← Configuración centralizada: hiperparámetros, ejemplos
+├── Makefile            ← Automatización: make all / make setup / make run / make lint
+├── pyproject.toml      ← Dependencias gestionadas con uv
+└── screen/             ← Capturas de pantalla de las pruebas realizadas
+    ├── 01_interfaz_principal.png
+    ├── 02_resumen_beam_search.png
+    ├── 03_qa_beam_search.png
+    ├── 04_demo_comparativa.png
+    └── 05_parametros_avanzados.png
+```
+
+##### B.7 Instrucciones de ejecución del aplicativo
+
+```bash
+# Opción A — Un solo comando (recomendado para sustentación)
+cd streamlit_app/
+make all
+# Este comando: crea el entorno .venv → instala dependencias con uv → lanza en http://localhost:8501
+
+# Opción B — Comandos separados
+make setup   # crea entorno e instala dependencias
+make run     # lanza la app (modelo ya en caché)
+
+# Opción C — Manual sin Make
+uv venv .venv
+source .venv/bin/activate          # Linux / macOS
+# .venv\Scripts\activate           # Windows PowerShell
+uv pip install -e .
+```
+
+> **Nota de sustentación:** ejecutar `make setup` con antelación para descargar los
+> pesos del modelo (~560 MB). Las interacciones posteriores a la primera carga son
+> prácticamente instantáneas gracias al mecanismo de caché de Streamlit.
+
+---
+
 ## 7. Conclusiones
 
 ### Aprendizajes
@@ -504,6 +766,15 @@ Proyecto_Analisis_BioBART/
 ├── notebooks/
 │   ├── biobart_inferencia.ipynb    ← implementación y pruebas
 │   └── README.md                   ← instrucciones del notebook
+├── streamlit_app/
+│   ├── app.py                      ← interfaz Streamlit principal (UI)
+│   ├── inference.py                ← funciones de inferencia (resumen y QA)
+│   ├── model_loader.py             ← carga del modelo con caché de Streamlit
+│   ├── config.py                   ← constantes, parámetros e hiperparámetros
+│   ├── Makefile                    ← comandos de setup y ejecución
+│   ├── pyproject.toml              ← dependencias gestionadas con uv
+│   ├── screen/                     ← capturas de pantalla de las pruebas
+│   └── README.md                   ← documentación del aplicativo web
 ├── .gitignore
 ├── pyproject.toml                  ← dependencias gestionadas con uv
 ├── requirements.txt                ← dependencias de respaldo
