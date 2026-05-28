@@ -5,14 +5,25 @@
 **Repositorio:** [github.com/Deivs117/Proyecto_Analisis_BioBART](https://github.com/Deivs117/Proyecto_Analisis_BioBART)
 **Sustentación:** https://deivs117.github.io/Proyecto_Analisis_BioBART/
 
-
 ---
 
 ## 1. Resumen
 
-Este proyecto estudia e implementa **BioBART**, una adaptación del modelo de lenguaje BART al dominio biomédico, para tareas de generación de texto especializado. Se analiza en profundidad la arquitectura Encoder-Decoder basada en el paper *"Attention Is All You Need"* (Vaswani et al., 2017) y el paper *"BART: Denoising Sequence-to-Sequence Pre-training"* (Lewis et al., 2019), con énfasis en los mecanismos de **Self-Attention**, **Masked Self-Attention** y **Cross-Attention**.
+Este proyecto estudia e implementa **BioBART**, una adaptación del modelo de
+lenguaje BART al dominio biomédico, para tareas de generación de texto
+especializado. Se analiza en profundidad la arquitectura Encoder-Decoder basada
+en el paper *"Attention Is All You Need"* (Vaswani et al., 2017) y el paper
+*"BART: Denoising Sequence-to-Sequence Pre-training"* (Lewis et al., 2019),
+con énfasis en los mecanismos de **Self-Attention**, **Masked Self-Attention**
+y **Cross-Attention**.
 
-La implementación demuestra que BioBART puede generar texto médico coherente y estructurado a partir de notas clínicas, superando las limitaciones de modelos solo-encoder (BioBERT, PubMedBERT) que únicamente comprenden texto pero no pueden producirlo. Los experimentos realizados en el notebook de inferencia validan la capacidad del modelo para resumir historias clínicas y responder preguntas médicas de forma abstractiva.
+La implementación demuestra que BioBART puede generar texto médico coherente y
+estructurado a partir de reportes radiológicos, superando las limitaciones de
+modelos solo-encoder (BioBERT, PubMedBERT) que únicamente comprenden texto pero
+no pueden producirlo. Los experimentos realizados en el notebook de inferencia
+validan la capacidad del modelo para resumir reportes clínicos y responder
+preguntas médicas de forma abstractiva, evaluados con métricas estándar de NLP
+biomédico (ROUGE-L, Token F1, BERTScore).
 
 ---
 
@@ -25,15 +36,28 @@ Yuan et al., 2022 — [arxiv.org/abs/2204.03905](https://arxiv.org/abs/2204.0390
 
 ### Contexto del problema
 
-En el dominio biomédico, tareas clínicas críticas como la generación automática de resúmenes de historias clínicas, la simplificación de textos médicos para pacientes, el diálogo clínico automatizado o la codificación de diagnósticos (ICD-10) requieren no solo *comprender* el lenguaje sino también *producirlo* de forma coherente y especializada.
+En el dominio biomédico, tareas clínicas críticas como la generación automática
+de resúmenes de historias clínicas, la simplificación de textos médicos para
+pacientes, el diálogo clínico automatizado o la codificación de diagnósticos
+(ICD-10) requieren no solo *comprender* el lenguaje sino también *producirlo*
+de forma coherente y especializada.
 
-Cada año se generan millones de notas clínicas, reportes de laboratorio y resúmenes de alta que los médicos deben leer, interpretar y documentar manualmente, consumiendo hasta el 50% de su tiempo de trabajo. Un sistema que *comprenda* ese texto no resuelve el problema — se necesita uno que lo **genere**.
+Cada año se generan millones de notas clínicas, reportes de laboratorio y
+resúmenes de alta que los médicos deben leer, interpretar y documentar
+manualmente, consumiendo hasta el 50% de su tiempo de trabajo. Un sistema que
+*comprenda* ese texto no resuelve el problema — se necesita uno que lo **genere**.
 
-Modelos previos como BioBERT o PubMedBERT, basados en arquitecturas solo-encoder, son poderosos para clasificación y extracción de entidades, pero son estructuralmente incapaces de generar secuencias de texto nuevas. Entrenar un modelo generativo biomédico desde cero implicaría costos computacionales y de datos enormes.
+Modelos previos como BioBERT o PubMedBERT, basados en arquitecturas solo-encoder,
+son poderosos para clasificación y extracción de entidades, pero son
+estructuralmente incapaces de generar secuencias de texto nuevas.
 
 ### Objetivo
 
-Adaptar **BART** —que combina un encoder bidireccional con un decoder autoregresivo— al dominio biomédico mediante pre-entrenamiento continuo sobre abstracts de PubMed, obteniendo **BioBART**: un modelo que transforma texto médico desordenado o incompleto en salidas útiles y estructuradas sin necesidad de construir una arquitectura nueva desde cero.
+Adaptar **BART** —que combina un encoder bidireccional con un decoder
+autoregresivo— al dominio biomédico mediante pre-entrenamiento continuo sobre
+abstracts de PubMed, obteniendo **BioBART**: un modelo que transforma texto
+médico en salidas útiles y estructuradas sin necesidad de construir una
+arquitectura nueva desde cero.
 
 ---
 
@@ -43,42 +67,33 @@ Adaptar **BART** —que combina un encoder bidireccional con un decoder autoregr
 
 | Modelo | Año | Arquitectura | Innovación clave | Limitación |
 |--------|-----|-------------|-----------------|------------|
-| Transformer | 2017 | Encoder + Decoder | Self-Attention paralela, reemplaza RNN | Requiere datos paralelos (traducción) |
-| GPT | 2018 | Solo Decoder | Pre-entrenamiento causal a gran escala | Solo ve contexto izquierdo |
-| BERT | 2019 | Solo Encoder | Pre-entrenamiento bidireccional (MLM) | No puede generar texto |
-| BART | 2019 | Encoder + Decoder | Denoising autoencoder — unifica BERT + GPT | Mayor costo computacional |
-| BioBART | 2022 | Encoder + Decoder | BART adaptado a dominio biomédico (PubMed) | Ventana máx. 1024 tokens |
+| Transformer | 2017 | Encoder + Decoder | Self-Attention paralela | Requiere datos paralelos |
+| GPT | 2018 | Solo Decoder | Pre-entrenamiento causal | Solo ve contexto izquierdo |
+| BERT | 2019 | Solo Encoder | Pre-entrenamiento bidireccional | No genera texto |
+| BART | 2019 | Encoder + Decoder | Denoising autoencoder | Mayor costo computacional |
+| BioBART | 2022 | Encoder + Decoder | BART adaptado a PubMed | Ventana máx. 1024 tokens |
 
 ### 3.2 Arquitectura Transformer (Vaswani et al., 2017)
 
-El Transformer elimina la recurrencia de las RNN y reemplaza el procesamiento secuencial con **Self-Attention**: cada token computa su relación con todos los demás simultáneamente, permitiendo paralelización completa en GPU.
+El Transformer elimina la recurrencia de las RNN y reemplaza el procesamiento
+secuencial con **Self-Attention**: cada token computa su relación con todos los
+demás simultáneamente, permitiendo paralelización completa en GPU.
 
 **Componentes de cada bloque:**
-1. **Multi-Head Self-Attention** — cada token atiende a todos los demás en paralelo con `h` cabezas independientes
-2. **Add & Norm** — conexión residual + Layer Normalization para estabilidad del gradiente
+1. **Multi-Head Self-Attention** — cada token atiende a todos los demás con `h` cabezas independientes
+2. **Add & Norm** — conexión residual + Layer Normalization
 3. **Feed Forward Network** — transformación no lineal token a token (expansión 4×)
 4. **Add & Norm** — segunda conexión residual
 
 ### 3.3 Mecanismo de atención — Q, K y V
 
-El mecanismo central del Transformer. Dado un embedding de entrada `X`, se generan tres proyecciones lineales:
-
 ```
 Q = X · W^Q    →  "¿Qué información estoy buscando?"
 K = X · W^K    →  "¿Qué información puedo ofrecer como índice?"
 V = X · W^V    →  "¿Cuál es mi contenido real?"
-```
 
-La atención se calcula como:
-
-```
 Attention(Q, K, V) = softmax( Q · Kᵀ / √d_k ) · V
 ```
-
-- `Q · Kᵀ` → matriz de scores (qué tan relevante es cada token para cada otro)
-- `/ √d_k` → escala para evitar saturación del softmax
-- `softmax(·)` → pesos de atención normalizados (suman 1)
-- `· V` → suma ponderada del contenido = representación contextual final
 
 **En BioBART-base:** `d_model=768`, `d_k=64` por cabeza, `h=12` cabezas
 **En BioBART-large:** `d_model=1024`, `d_k=64` por cabeza, `h=16` cabezas
@@ -86,60 +101,55 @@ Attention(Q, K, V) = softmax( Q · Kᵀ / √d_k ) · V
 ### 3.4 Los tres tipos de atención en BART
 
 #### Self-Attention bidireccional (Encoder)
-Cada token puede atender a **todos los demás tokens** de la secuencia sin restricciones. El token "Troponina" puede ver tanto los síntomas anteriores como los posteriores en la misma nota clínica.
+Cada token puede atender a **todos los demás** sin restricciones. Permite al
+modelo construir representaciones contextuales completas del reporte clínico.
 
 #### Masked Self-Attention (Decoder)
-Igual que Self-Attention pero con máscara causal: cada token solo puede atender a los tokens **anteriores a él**. Esto impide que el decoder "haga trampa" viendo el futuro durante el entrenamiento y permite la generación autoregresiva durante inferencia.
+Máscara causal: cada token solo atiende a los **anteriores**. Impide ver el
+futuro durante entrenamiento y habilita la generación autoregresiva en inferencia.
 
 #### Cross-Attention (Decoder → Encoder)
-El puente entre encoder y decoder. Las queries `Q` vienen del decoder (lo que se está generando) y las keys/values `K, V` vienen del encoder (la nota clínica original). Esto permite al decoder consultar dinámicamente qué parte de la entrada es relevante en cada paso de generación.
+El puente semántico entre encoder y decoder. Las queries `Q` vienen del decoder
+(lo que se genera) y las keys/values `K, V` vienen del encoder (el reporte
+original). Permite al decoder consultar dinámicamente qué parte de la entrada
+es relevante en cada paso de generación.
 
 ```
-Cross-Attention:
-  Q  ←  estado actual del decoder  ("¿qué necesito ahora?")
-  K  ←  H_enc del encoder           ("índice de la nota clínica")
-  V  ←  H_enc del encoder           ("contenido de la nota clínica")
+Q  ←  estado actual del decoder  ("¿qué necesito ahora?")
+K  ←  H_enc del encoder           ("índice del reporte clínico")
+V  ←  H_enc del encoder           ("contenido del reporte clínico")
 ```
 
 ### 3.5 Positional Encoding — Learned vs. Sinusoidal
 
-La Self-Attention es invariante a la permutación: sin información posicional, el modelo trata "el médico trató al paciente" y "el paciente trató al médico" como idénticas.
-
-**Transformer original:** usa funciones seno/coseno fijas (no se aprenden):
+**Transformer original:** funciones seno/coseno fijas:
 ```
 PE(pos, 2i)   = sin( pos / 10000^(2i/d_model) )
 PE(pos, 2i+1) = cos( pos / 10000^(2i/d_model) )
 ```
 
-**BART y BioBART:** usan **learned positional embeddings** — una tabla `W_pos ∈ ℝ^(1024 × d_model)` que se aprende durante el pre-entrenamiento igual que los embeddings de palabras:
+**BART y BioBART:** learned positional embeddings — tabla
+`W_pos ∈ ℝ^(1024 × d_model)` aprendida durante pre-entrenamiento:
 ```
 z(pos) = TokenEmbedding(token) + W_pos[pos]
 ```
-Ventaja: el modelo aprende exactamente qué patrón posicional es óptimo para el lenguaje biomédico. Limitación: no generaliza más allá de 1024 tokens.
+Ventaja: el modelo aprende el patrón posicional óptimo para lenguaje biomédico.
+Limitación: no generaliza más allá de 1024 tokens.
 
 ### 3.6 Pre-entrenamiento BART — Denoising Autoencoder
-
-BART se pre-entrena corrompiendo texto y aprendiendo a reconstruirlo. La combinación más efectiva encontrada por Lewis et al. fue:
 
 | Tipo de ruido | Descripción | Efecto aprendido |
 |--------------|-------------|-----------------|
 | **Text Infilling ⭐** | Tramo de tokens → un solo `[MASK]` | Predice cuántos tokens faltan y cuáles son |
 | Sentence Permutation | Oraciones en orden aleatorio | Coherencia narrativa global |
-| Token Masking | Tokens individuales → `[MASK]` | Similar a BERT MLM |
+| Token Masking | Tokens → `[MASK]` | Similar a BERT MLM |
 | Token Deletion | Tokens eliminados sin marca | Detecta ausencias implícitas |
 
-### 3.7 Por qué la arquitectura es innovadora
-
-1. **Unifica BERT y GPT** en un solo modelo pre-entrenado conjuntamente
-2. **Pre-entrenamiento flexible** — acepta cualquier función de corrupción
-3. **Cross-Attention como puente semántico** — imposible en GPT (sin encoder) o BERT (sin decoder causal)
-4. **Adaptación de dominio eficiente** — para BioBART basta continuar el pre-entrenamiento sin rediseñar la arquitectura
-
-### 3.8 Limitaciones
+### 3.7 Limitaciones arquitectónicas
 
 - Ventana máxima de **1024 tokens** — notas clínicas largas deben truncarse
-- **Exposure bias** — discrepancia entre entrenamiento (teacher forcing) e inferencia (tokens propios)
-- Generación **secuencial y lenta** — un token a la vez en inferencia
+- **Exposure bias** — discrepancia entre entrenamiento (teacher forcing) e inferencia
+- Generación **secuencial** — un token a la vez en inferencia
 - Riesgo de **alucinaciones clínicas** — puede inventar términos médicos plausibles pero incorrectos
 
 ---
@@ -151,24 +161,24 @@ BART se pre-entrena corrompiendo texto y aprendiendo a reconstruirlo. La combina
 | Herramienta | Versión | Uso |
 |-------------|---------|-----|
 | Python | ≥ 3.10 | Lenguaje principal |
-| `transformers` (HuggingFace) | ≥ 4.35 | Carga de modelo y tokenizador BioBART |
+| `transformers` (HuggingFace) | ≥ 4.35 | Modelo y tokenizador BioBART |
 | `torch` | ≥ 2.0 | Backend de inferencia |
-| `datasets` | ≥ 2.14 | Manejo de datos de prueba |
-| `jupyterlab` | ≥ 4.0 | Entorno de ejecución del notebook |
+| `rouge-score` | 0.1.2 | Cálculo de ROUGE-L |
+| `bert-score` | 0.3.13 | BERTScore con encoder biomédico |
+| `jupyterlab` | ≥ 4.0 | Entorno de ejecución |
 | `uv` | latest | Gestión de entornos y dependencias |
 
 ### 4.2 Modelo pre-entrenado
 
-Se utilizan los pesos pre-entrenados oficiales de BioBART publicados en HuggingFace:
+Pesos oficiales de BioBART publicados en HuggingFace:
 
 - **BioBART-base:** `GanjinZero/biobart-base`
 - **BioBART-large:** `GanjinZero/biobart-large`
 
-Los pesos incluyen el tokenizador BPE especializado en vocabulario biomédico (~50,264 tokens) y los parámetros del modelo encoder-decoder pre-entrenados sobre el corpus PubMed Central Open Access.
+Los pesos incluyen el tokenizador BPE especializado (~50,264 tokens) y los
+parámetros del modelo pre-entrenados sobre el corpus PubMed Central Open Access.
 
 ### 4.3 Proceso de inferencia
-
-El flujo de inferencia sigue estos pasos:
 
 ```
 Texto clínico
@@ -193,13 +203,13 @@ Texto generado
 ### 5.1 Requisitos del sistema
 
 - Python ≥ 3.10
-- GPU recomendada (CPU es posible pero lento)
+- GPU recomendada (CPU posible pero lento)
 - RAM ≥ 8 GB
 - Espacio en disco ≥ 3 GB (pesos del modelo)
 
 ### 5.2 Instalación paso a paso
 
-**1) Instalar `uv`** (gestor de entornos moderno — una sola vez)
+**1) Instalar `uv`**
 ```bash
 curl -Lsf https://astral.sh/uv/install.sh | sh
 ```
@@ -231,86 +241,161 @@ Abrir `notebooks/biobart_inferencia.ipynb` y seleccionar el kernel **"BioBART (u
 ```python
 from transformers import BartTokenizer, BartForConditionalGeneration
 
-# Carga del tokenizador y modelo BioBART-base desde HuggingFace
 tokenizer = BartTokenizer.from_pretrained("GanjinZero/biobart-base")
 model     = BartForConditionalGeneration.from_pretrained("GanjinZero/biobart-base")
-
-# Los pesos se descargan automáticamente (~560 MB para base)
-# y se cachean en ~/.cache/huggingface/hub/
+# Pesos descargados automáticamente (~560 MB) y cacheados en
+# ~/.cache/huggingface/hub/
 ```
 
 ### 5.4 Preprocesamiento e inferencia
 
 ```python
-# ── Preprocesamiento ──────────────────────────────────────────────
-nota_clinica = """
-Paciente femenina 54 años. Dolor torácico opresivo irradiado a brazo
-izquierdo 2h evolución. ECG: elevación ST en V1-V4.
-Troponina I: 2.8 ng/mL. PA: 95/60 mmHg. Antecedente HTA, DM2.
-"""
+# ── Tarea 1: Resumen con Beam Search ─────────────────────────────
+inputs = tokenizer(reporte_radiologico, return_tensors="pt",
+                   max_length=512, truncation=True).to(DEVICE)
 
-# Tokenización BPE — convierte texto a IDs numéricos
-inputs = tokenizer(
-    nota_clinica,
-    return_tensors="pt",
-    max_length=512,
-    truncation=True
+ids = model.generate(
+    **inputs,
+    max_new_tokens=120, min_length=40,
+    num_beams=4, early_stopping=True,
+    no_repeat_ngram_size=3, length_penalty=1.5
 )
-# inputs["input_ids"] → tensor de IDs   e.g. [[5, 14823, 891, ...]]
-# inputs["attention_mask"] → máscara de padding
+resumen_generado = tokenizer.decode(ids[0], skip_special_tokens=True)
 
-# ── Inferencia ────────────────────────────────────────────────────
-# Beam Search (recomendado para resúmenes clínicos — máxima fidelidad)
-outputs = model.generate(
-    inputs["input_ids"],
-    num_beams=4,                # 4 hipótesis en paralelo
-    max_new_tokens=150,         # longitud máxima del resumen
-    no_repeat_ngram_size=3,     # evita repetición de trigramas
-    early_stopping=True
+# ── Tarea 2: QA con Nucleus Sampling ─────────────────────────────
+prompt_qa = f"question: {pregunta}  context: {contexto_limpio}"
+inputs_qa = tokenizer(prompt_qa, return_tensors="pt",
+                      max_length=512, truncation=True).to(DEVICE)
+
+ids_qa = model.generate(
+    **inputs_qa,
+    max_new_tokens=150, do_sample=True,
+    temperature=0.7, top_k=50, top_p=0.92,
+    repetition_penalty=1.3, no_repeat_ngram_size=3
 )
-
-# Decodificación — convierte IDs de vuelta a texto
-resumen = tokenizer.decode(outputs[0], skip_special_tokens=True)
-print(resumen)
+respuesta_generada = tokenizer.decode(ids_qa[0], skip_special_tokens=True)
 ```
 
 ---
 
 ## 6. Resultados y Análisis
 
-> **Nota:** Las capturas de pantalla de las pruebas realizadas se encuentran en el notebook `notebooks/biobart_inferencia.ipynb`, ejecutado en el entorno local con el kernel BioBART (uv).
+### 6.1 Tarea 1 — Resumen de reporte radiológico (Beam Search)
 
-### 6.1 Tarea 1 — Resumen de nota clínica (Beam Search)
+**Input:** Reporte radiológico de tórax — paciente masculino 72 años con disnea
+progresiva e hipoxemia. Opacidades bilaterales en vidrio esmerilado, consolidación
+en lóbulo inferior derecho, cardiomegalia, derrame pleural derecho, edema pulmonar.
 
-**Configuración:** `num_beams=4`, `max_new_tokens=150`, `no_repeat_ngram_size=3`
+**Configuración:** `num_beams=4`, `max_new_tokens=120`, `min_length=40`,
+`no_repeat_ngram_size=3`, `length_penalty=1.5`
 
 **Observaciones:**
-- El modelo identificó correctamente el diagnóstico principal (IAMCEST) a partir de la combinación de hallazgos ECG + Troponina + síntomas
-- Priorizó información clínicamente crítica mediante cross-attention sobre tokens de alta relevancia diagnóstica
-- Generó texto estructurado y coherente, no solo extracción de fragmentos
+- BioBART identificó correctamente cardiomegalia, edema pulmonar y posición
+  del tubo endotraqueal y línea PICC
+- Generó texto clínico nuevo y coherente — no extrajo fragmentos del input
+  sino que sintetizó los hallazgos mediante el decoder autoregresivo
+- Tokens generados: **52 de 120 posibles** — el modelo emitió EOS al
+  considerar el resumen completo (`early_stopping=True`)
 
 **Limitaciones observadas:**
-- En notas > 400 tokens, se observó pérdida de información del contexto final
-- Algunas abreviaturas clínicas poco frecuentes (< 5 apariciones en PubMed) generaron paráfrasis imprecisas
+- `leftsided` sin espacio: artifact del tokenizador BPE al reconstruir subpalabras
+- Consolidación del lóbulo inferior derecho y derrame pleural omitidos —
+  el modelo priorizó patrones más frecuentes en su dataset de entrenamiento
+
+#### Métricas — Tarea 1
+
+| Métrica    | Precision | Recall | F1     |
+|------------|-----------|--------|--------|
+| ROUGE-L    | 0.2667    | 0.1667 | 0.2051 |
+| BERTScore  | 0.6309    | 0.5383 | 0.5809 |
+
+**ROUGE-L F1: 0.2051** — El modelo genera ~27% de sus tokens con coincidencia
+léxica en la referencia, pero solo cubre el 17% del vocabulario del gold summary.
+La asimetría Precision > Recall indica outputs precisos pero incompletos. En
+contexto, modelos fine-tuned sobre MIMIC-CXR reportan ROUGE-L entre 0.28–0.35;
+BioBART sin fine-tuning en 0.20 es coherente.
+
+**BERTScore F1: 0.5809** — La Precision de 0.63 indica que los embeddings de
+los tokens generados son semánticamente cercanos a la referencia. Con SciBERT
+como encoder, esto confirma que BioBART usa terminología biomédica equivalente
+aunque léxicamente distinta.
+
+**Brecha ROUGE↔BERTScore: 0.376 puntos** — Señal de paráfrasis clínica:
+BioBART describe hallazgos con formulaciones equivalentes que ROUGE no detecta
+pero BERTScore reconoce. Usar ROUGE como métrica única subestimaría la calidad
+real del modelo.
+
+---
 
 ### 6.2 Tarea 2 — QA Médico Abstractivo (Nucleus Sampling)
 
-**Configuración:** `do_sample=True`, `top_p=0.92`, `temperature=0.7`
+**Input:** Reporte radiológico — paciente femenina 58 años con disnea progresiva.
+Opacidades perihiliares bilaterales, derrame pleural derecho moderado,
+cardiomegalia (CTR 0.62), atelectasia lóbulo inferior izquierdo.
+
+**Pregunta:** *"What are the main radiological findings and their clinical significance?"*
+
+**Configuración:** `do_sample=True`, `top_p=0.92`, `temperature=0.7`,
+`top_k=50`, `repetition_penalty=1.3`
 
 **Observaciones:**
-- Las respuestas generadas integraron información de múltiples partes del contexto clínico
-- La variabilidad controlada por `temperature=0.7` produjo respuestas más naturales que Beam Search para diálogo clínico
-- Se detectaron 2 casos de alucinación en 20 pruebas: valores de laboratorio inventados plausibles pero incorrectos
+- BioBART generó una interpretación clínica nueva, no copió el input
+- Identificó correctamente edema pulmonar, derrame pleural y atelectasia
+  como hallazgos de mayor relevancia diagnóstica para la presentación clínica
+- Tokens generados: **20 tokens** — EOS prematuro al completar el patrón
+  aprendido de "impresión radiológica", ignorando `max_new_tokens=150`
 
-### 6.3 Comparación de estrategias de decodificación
+**Limitaciones observadas:**
+- Respuesta corta: listó hallazgos sin elaborar la significancia clínica
+  solicitada — refleja fine-tuning orientado a impresiones concisas, no QA abierto
+- Nucleus Sampling no aumentó longitud porque el patrón aprendido domina
+  sobre los hiperparámetros de muestreo
 
-| Estrategia | ROUGE-1 | ROUGE-2 | ROUGE-L | Coherencia clínica | Velocidad |
-|-----------|---------|---------|---------|-------------------|----------|
-| Greedy | 0.38 | 0.18 | 0.34 | Media | Rápida |
-| Beam Search (k=4) | 0.44 | 0.22 | 0.41 | Alta | Media |
-| Nucleus (p=0.92) | 0.41 | 0.20 | 0.38 | Alta | Media |
+#### Métricas — Tarea 2
 
-> Los valores ROUGE son aproximados sobre el conjunto de prueba local (20 notas clínicas sintéticas).
+| Métrica       | Score          |
+|---------------|----------------|
+| Exact Match   | 0  (binario)   |
+| Token F1      | 0.4156         |
+| BERTScore P   | 0.6883         |
+| BERTScore R   | 0.5590         |
+| BERTScore F1  | 0.6169         |
+
+**Exact Match: 0** — Esperado en QA generativo. Confirma que BioBART redacta
+en lugar de extraer spans. Se incluye como baseline de comparabilidad con la
+literatura (SQuAD, BioASQ).
+
+**Token F1: 0.4156** — El modelo comparte ~42% de tokens con la referencia.
+Para una pregunta abierta sobre significancia clínica, indica cobertura
+razonable de hallazgos con vocabulario coincidente.
+
+**BERTScore F1: 0.6169** — Subió ~0.036 puntos respecto al resumen (0.5809 →
+0.6169): en QA el contexto está explícitamente en el prompt, dando más ancla
+semántica al Cross-Attention. La Precision de 0.69 indica que casi 7 de cada
+10 tokens generados tienen equivalente semántico directo en la referencia.
+
+**Brecha Token F1↔BERTScore: 0.201 puntos** — Menor que en Tarea 1 (0.376),
+lo que refleja menor paráfrasis: el prompt de QA restringe más el espacio
+generativo del decoder.
+
+---
+
+### 6.3 Comparativa entre tareas
+
+| Tarea             | Léxico (ROUGE-L / Token F1) | BERTScore F1 | Brecha |
+|-------------------|-----------------------------|--------------|--------|
+| Tarea 1 — Resumen | 0.2051                      | 0.5809       | 0.376  |
+| Tarea 2 — QA      | 0.4156                      | 0.6169       | 0.201  |
+
+QA obtiene mejores scores en ambas métricas por razones arquitectónicas directas.
+En QA, el prompt estructura explícitamente qué buscar (`question: ... context: ...`)
+y el Cross-Attention del decoder se ancla a regiones específicas del contexto,
+aumentando la coincidencia léxica con la referencia. En resumen, el decoder opera
+con mayor libertad generativa — sin pregunta que guíe la atención — produciendo
+paráfrasis semánticamente correctas pero léxicamente distantes.
+
+La brecha es **inversamente proporcional a cuánto constraña el prompt al decoder**:
+a mayor libertad generativa, mayor distancia entre métricas léxicas y semánticas.
 
 ---
 
@@ -318,39 +403,86 @@ print(resumen)
 
 ### Aprendizajes
 
-- La arquitectura Encoder-Decoder con pre-entrenamiento denoising es significativamente superior a enfoques solo-encoder para tareas de **generación** en el dominio biomédico
-- El mecanismo de **Cross-Attention** es el componente crítico que permite al modelo "consultar" dinámicamente la nota clínica original en cada paso de generación
-- Los **learned positional embeddings** de BART/BioBART permiten al modelo aprender patrones posicionales específicos del lenguaje biomédico, a diferencia del positional encoding sinusoidal fijo del Transformer original
-- La elección de la estrategia de decodificación (**Beam Search** vs. **Nucleus Sampling**) tiene impacto directo en la calidad de la salida según el tipo de tarea
+- La arquitectura Encoder-Decoder con pre-entrenamiento denoising es
+  significativamente superior a enfoques solo-encoder para tareas de
+  **generación** en el dominio biomédico
+- El **Cross-Attention** es el componente crítico que permite al modelo
+  consultar dinámicamente el reporte clínico en cada paso de generación,
+  explicando directamente la diferencia de scores entre tareas
+- Los **learned positional embeddings** de BioBART aprenden patrones
+  posicionales específicos del lenguaje biomédico, a diferencia del
+  positional encoding sinusoidal fijo del Transformer original
+- La elección de estrategia de decodificación tiene impacto directo en
+  la calidad del output: **Beam Search** para fidelidad factual,
+  **Nucleus Sampling** para fluidez y variabilidad clínica
+- La brecha sistemática entre métricas léxicas (ROUGE-L, Token F1) y
+  semánticas (BERTScore) no es un problema de evaluación — es información
+  sobre cómo el modelo genera: parafrasea en lugar de copiar
 
 ### Limitaciones
 
-- La ventana de contexto de **1024 tokens** es insuficiente para notas clínicas completas de hospitalización prolongada
-- El riesgo de **alucinaciones clínicas** (valores de laboratorio o dosis de medicamentos inventados) hace inviable el uso clínico directo sin validación médica
-- El pre-entrenamiento en **abstracts de PubMed** (lenguaje de artículos científicos) introduce un sesgo respecto al lenguaje coloquial de notas clínicas reales
+- Ventana de **1024 tokens** insuficiente para notas clínicas completas
+- **EOS prematuro** en QA: el modelo completa su patrón de "impresión
+  radiológica" antes de elaborar la significancia clínica solicitada
+- **Alucinaciones clínicas** (valores de laboratorio o hallazgos inventados
+  plausibles pero incorrectos) hacen inviable el uso clínico directo sin
+  validación médica
+- Pre-entrenamiento en **abstracts de PubMed** introduce sesgo respecto
+  al lenguaje de notas clínicas reales
 
 ### Posibles mejoras
 
-- Fine-tuning supervisado sobre datasets de notas clínicas reales anonimizadas (MIMIC-III/IV)
-- Evaluación con métricas específicas de NLP biomédico (BERTScore con modelo biomédico, METEOR clínico)
-- Explorar modelos con ventanas de contexto extendidas (Longformer, BigBird-Pegasus) para notas largas
-- Implementar mecanismos de detección de alucinaciones mediante modelos de verificación factual
+- Fine-tuning supervisado sobre pares reporte→abstract de **MIMIC-CXR** o
+  **BioASQ** para reducir la brecha léxico-semántica y subir ROUGE-L a 0.28+
+- Ajustar `min_length` y `length_penalty` por tarea para evitar EOS prematuro
+  en QA explicativo
+- Explorar modelos con ventanas extendidas (**Longformer**, **BigBird-Pegasus**)
+  para notas clínicas largas
+- Implementar mecanismos de detección de alucinaciones mediante modelos de
+  verificación factual
 
 ---
 
 ## 8. Referencias
 
-1. Vaswani, A. et al. (2017). *Attention Is All You Need.* NeurIPS. [arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762)
-2. Lewis, M. et al. (2019). *BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation, Translation, and Comprehension.* Facebook AI. [arxiv.org/abs/1910.13461](https://arxiv.org/abs/1910.13461)
-3. Yuan, Z. et al. (2022). *BioBART: Pretraining and Evaluation of A Biomedical Generative Language Model.* [arxiv.org/abs/2204.03905](https://arxiv.org/abs/2204.03905)
-4. Devlin, J. et al. (2019). *BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding.* Google AI. [arxiv.org/abs/1810.04805](https://arxiv.org/abs/1810.04805)
-5. Radford, A. et al. (2018). *Improving Language Understanding by Generative Pre-Training.* OpenAI.
-6. Lee, J. et al. (2020). *BioBERT: a pre-trained biomedical language representation model.* Bioinformatics.
-7. Gu, Y. et al. (2021). *Domain-Specific Language Model Pretraining for Biomedical Natural Language Processing (PubMedBERT).* ACM CHIL.
+### Arquitectura y modelos
+
+1. Vaswani, A. et al. (2017). *Attention Is All You Need.* NeurIPS.
+   https://arxiv.org/abs/1706.03762
+
+2. Lewis, M. et al. (2019). *BART: Denoising Sequence-to-Sequence Pre-training
+   for Natural Language Generation, Translation, and Comprehension.* ACL 2020.
+   https://arxiv.org/abs/1910.13461
+
+3. Yuan, Z. et al. (2022). *BioBART: Pretraining and Evaluation of A Biomedical
+   Generative Language Model.* BioNLP Workshop at ACL 2022.
+   https://arxiv.org/abs/2204.03905
+
+4. Devlin, J. et al. (2019). *BERT: Pre-training of Deep Bidirectional
+   Transformers for Language Understanding.* Google AI.
+   https://arxiv.org/abs/1810.04805
+
+5. Lee, J. et al. (2020). *BioBERT: a pre-trained biomedical language
+   representation model for biomedical text mining.* Bioinformatics.
+   https://arxiv.org/abs/1901.08746
+
+6. Gu, Y. et al. (2021). *Domain-Specific Language Model Pretraining for
+   Biomedical Natural Language Processing (PubMedBERT).* ACM CHIL.
+   https://arxiv.org/abs/2007.15779
+
+### Métricas de evaluación
+
+7. Lin, C.-Y. (2004). *ROUGE: A Package for Automatic Evaluation of Summaries.*
+   ACL Workshop on Text Summarization Branches Out.
+   https://aclanthology.org/W04-1013
+
+8. Zhang, T. et al. (2020). *BERTScore: Evaluating Text Generation with BERT.*
+   ICLR 2020.
+   https://arxiv.org/abs/1904.09675
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 Proyecto_Analisis_BioBART/
@@ -367,13 +499,13 @@ Proyecto_Analisis_BioBART/
 
 ---
 
-## 🔧 Comandos Git — Primer push a `main`
+## Comandos Git — Primer push a `main`
 
 ```bash
 git init
 git branch -M main
 git remote add origin https://github.com/Deivs117/Proyecto_Analisis_BioBART.git
 git add .
-git commit -m "feat: estructura inicial del proyecto BioBART (docs + notebooks + setup)"
+git commit -m "feat: estructura inicial del proyecto BioBART"
 git push -u origin main
 ```
