@@ -63,6 +63,9 @@ arquitectura nueva desde cero.
 
 ## 3. Marco Teórico
 
+<img width="1457" height="720" alt="image" src="https://github.com/user-attachments/assets/5452e743-5963-46e5-b687-f7a30f18f4c2" />
+
+
 ### 3.1 Evolución de la arquitectura
 
 | Modelo | Año | Arquitectura | Innovación clave | Limitación |
@@ -248,6 +251,11 @@ model     = BartForConditionalGeneration.from_pretrained("GanjinZero/biobart-bas
 ```
 
 ### 5.4 Preprocesamiento e inferencia
+<img width="1024" height="394" alt="image" src="https://github.com/user-attachments/assets/e9519da0-82bb-40c6-be8d-e3b7bd87181a" />
+
+<img width="1024" height="394" alt="image" src="https://github.com/user-attachments/assets/edce297d-74bf-49d4-bbe6-c21f678362bd" />
+
+
 
 ```python
 # ── Tarea 1: Resumen con Beam Search ─────────────────────────────
@@ -381,6 +389,8 @@ generativo del decoder.
 ---
 
 ### 6.3 Comparativa entre tareas
+<img width="1024" height="394" alt="image" src="https://github.com/user-attachments/assets/eb140c7d-24bb-4807-88dc-650feb9050e8" />
+
 
 | Tarea             | Léxico (ROUGE-L / Token F1) | BERTScore F1 | Brecha |
 |-------------------|-----------------------------|--------------|--------|
