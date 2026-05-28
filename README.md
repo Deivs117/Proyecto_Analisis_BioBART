@@ -253,10 +253,6 @@ model     = BartForConditionalGeneration.from_pretrained("GanjinZero/biobart-bas
 ### 5.4 Preprocesamiento e inferencia
 <img width="1024" height="394" alt="image" src="https://github.com/user-attachments/assets/e9519da0-82bb-40c6-be8d-e3b7bd87181a" />
 
-<img width="1024" height="394" alt="image" src="https://github.com/user-attachments/assets/edce297d-74bf-49d4-bbe6-c21f678362bd" />
-
-
-
 ```python
 # ── Tarea 1: Resumen con Beam Search ─────────────────────────────
 inputs = tokenizer(reporte_radiologico, return_tensors="pt",
@@ -336,6 +332,8 @@ real del modelo.
 ---
 
 ### 6.2 Tarea 2 — QA Médico Abstractivo (Nucleus Sampling)
+<img width="1024" height="394" alt="image" src="https://github.com/user-attachments/assets/d5263897-a536-4f32-b449-5cef9561a188" />
+
 
 **Input:** Reporte radiológico — paciente femenina 58 años con disnea progresiva.
 Opacidades perihiliares bilaterales, derrame pleural derecho moderado,
