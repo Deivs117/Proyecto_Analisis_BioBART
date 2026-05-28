@@ -861,22 +861,64 @@ x_corrupted = texto con ruido (entrada al encoder)
       </div>
     </div>
 
-    <!-- FLUJO GENERAL -->
-    <div class="card" style="margin-bottom:24px; border-color:rgba(100,116,139,.3);">
+    <!-- FLUJO GENERAL (FORMATO GRAFICO) -->
+    <div class="card" style="margin-bottom:24px; border-color:rgba(100,116,139,.3); background:rgba(100,116,139,.03);">
       <h3>Flujo de tensores — inferencia completa</h3>
-      <div class="code-block mt-16">
-        <span class="label">Pipeline — del texto al token generado</span>
-Texto de entrada (reporte radiológico)
-        ↓ tokenizador BPE + .join().split()
-input_ids: <span class="hl-cyan">[1, S]</span>  int64
-        ↓ encoder (Self-Attention bidireccional, 12 capas)
-H_enc: <span class="hl-gold">[1, S, 1024]</span>  float32   ← matrices K y V para el decoder
-        ↓ decoder (Masked Self-Attn + Cross-Attn, 12 capas)
-h_t: <span class="hl-violet">[1, t, 1024]</span>  float32   ← hidden state en paso t
-        ↓ Linear (d_model → vocabulario)
-logits: <span class="hl-pink">[1, V≈85K]</span>  float32
-        ↓ Greedy Search (argmax) / Beam Search (4 hipótesis)
-token_t: <span class="hl-green">int</span>   ← se agrega al output, repite hasta &lt;EOS&gt;
+
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; margin-bottom:16px;">
+        <span class="badge badge-cyan">Batch = 1</span>
+        <span class="badge badge-gold">Entrada ~140 tokens</span>
+        <span class="badge badge-violet">d_model = 1024</span>
+        <span class="badge badge-pink">Vocab ≈ 85K</span>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0; align-items:stretch; margin-top:8px;">
+        <div style="padding:12px 20px; background:rgba(100,116,139,.08); border:1px solid rgba(100,116,139,.3); border-radius:10px 10px 0 0; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+          <span style="font-size:.7rem; font-weight:800; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; min-width:80px;">Entrada</span>
+          <span style="font-size:.82rem; color:var(--text);">Reporte radiológico en texto plano → tokenizador BPE</span>
+          <code class="mono" style="font-size:.78rem; color:var(--cyan);">input_ids [1, S] int64</code>
+        </div>
+
+        <div style="margin:0; display:flex; justify-content:center; padding:4px 0; background:rgba(0,0,0,.3); border-left:1px solid rgba(100,116,139,.3); border-right:1px solid rgba(100,116,139,.3);">
+          <div class="arr-down" style="border-top-color:rgba(0,229,255,.5);"></div>
+        </div>
+
+        <div style="padding:12px 20px; background:rgba(0,229,255,.05); border:1px solid rgba(0,229,255,.25); border-top:none; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+          <span style="font-size:.7rem; font-weight:800; letter-spacing:.12em; color:var(--cyan); text-transform:uppercase; min-width:80px;">Encoder</span>
+          <span style="font-size:.82rem; color:var(--text);">Self-Attention bidireccional (12 capas)</span>
+          <code class="mono" style="font-size:.78rem; color:var(--gold);">H_enc [1, S, 1024] float32</code>
+          <span style="font-size:.75rem; color:var(--muted);">genera K y V para el decoder</span>
+        </div>
+
+        <div style="margin:0; display:flex; justify-content:center; padding:4px 0; background:rgba(0,0,0,.3); border-left:1px solid rgba(0,229,255,.25); border-right:1px solid rgba(0,229,255,.25);">
+          <div class="arr-down" style="border-top-color:rgba(192,132,252,.6);"></div>
+        </div>
+
+        <div style="padding:12px 20px; background:rgba(192,132,252,.05); border:1px solid rgba(192,132,252,.25); border-top:none; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+          <span style="font-size:.7rem; font-weight:800; letter-spacing:.12em; color:var(--violet); text-transform:uppercase; min-width:80px;">Decoder</span>
+          <span style="font-size:.82rem; color:var(--text);">Masked Self-Attn + Cross-Attn (12 capas)</span>
+          <code class="mono" style="font-size:.78rem; color:var(--violet);">h_t [1, t, 1024] float32</code>
+          <span style="font-size:.75rem; color:var(--muted);">estado oculto del paso t</span>
+        </div>
+
+        <div style="margin:0; display:flex; justify-content:center; padding:4px 0; background:rgba(0,0,0,.3); border-left:1px solid rgba(192,132,252,.25); border-right:1px solid rgba(192,132,252,.25);">
+          <div class="arr-down" style="border-top-color:rgba(244,114,182,.6);"></div>
+        </div>
+
+        <div style="padding:12px 20px; background:rgba(244,114,182,.05); border:1px solid rgba(244,114,182,.25); border-top:none; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+          <span style="font-size:.7rem; font-weight:800; letter-spacing:.12em; color:var(--pink); text-transform:uppercase; min-width:80px;">Proyección</span>
+          <span style="font-size:.82rem; color:var(--text);">Linear (d_model → vocabulario) + softmax</span>
+          <code class="mono" style="font-size:.78rem; color:var(--pink);">logits [1, V≈85K] float32</code>
+        </div>
+
+        <div style="margin:0; display:flex; justify-content:center; padding:4px 0; background:rgba(0,0,0,.3); border-left:1px solid rgba(244,114,182,.25); border-right:1px solid rgba(244,114,182,.25);">
+          <div class="arr-down" style="border-top-color:rgba(52,211,153,.6);"></div>
+        </div>
+
+        <div style="padding:10px 20px; background:rgba(52,211,153,.06); border:1px solid rgba(52,211,153,.25); border-top:none; border-radius:0 0 10px 10px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <span style="font-size:.7rem; font-weight:800; letter-spacing:.12em; color:var(--green); text-transform:uppercase; min-width:80px;">Decisión</span>
+          <span style="font-size:.8rem; color:var(--text);">argmax (Greedy) o Beam Search → <strong style="color:var(--green)">token_t</strong> → repetir hasta <code class="mono" style="color:var(--gold);">&lt;EOS&gt;</code></span>
+        </div>
       </div>
     </div>
 

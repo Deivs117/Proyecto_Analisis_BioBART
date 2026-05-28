@@ -197,15 +197,15 @@ with tab_qa:
         col_d, col_e = st.columns(2)
         with col_d:
             max_new_tokens_q = st.slider(
-                "max_new_tokens", 50, 400, QA_PARAMS["max_new_tokens"], 10
+                "max_new_tokens", 50, 400, QA_PARAMS["max_new_tokens"], 10, key="qa_max_new_tokens"
             )
-            num_beams_q = st.slider("num_beams", 1, 8, QA_PARAMS["num_beams"])
+            num_beams_q = st.slider("num_beams", 1, 8, QA_PARAMS["num_beams"], key="qa_num_beams")
         with col_e:
             min_length_q = st.slider(
-                "min_length", 0, 80, QA_PARAMS["min_length"], 5
+                "min_length", 0, 80, QA_PARAMS["min_length"], 5, key="qa_min_length"
             )
             no_repeat_ngram_q = st.slider(
-                "no_repeat_ngram_size", 1, 5, QA_PARAMS["no_repeat_ngram_size"]
+                "no_repeat_ngram_size", 1, 5, QA_PARAMS["no_repeat_ngram_size"], key="qa_no_repeat_ngram_size"
             )
 
     params_qa = {
