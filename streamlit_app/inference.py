@@ -88,7 +88,7 @@ def generar_respuesta_qa(
 ) -> tuple[str, int]:
     """
     Genera una respuesta a una pregunta médica dado un contexto clínico,
-    usando Nucleus Sampling (do_sample=True) para mayor naturalidad.
+    usando Beam Search para mayor coherencia y fidelidad factual.
 
     El prompt sigue la convención: "question: <pregunta> context: <contexto>"
 

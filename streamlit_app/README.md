@@ -14,8 +14,8 @@ Esta app permite demostrar, de forma visual e interactiva, las tres capacidades 
 | Modo | Tarea | Estrategia de generación |
 |------|-------|-------------------------|
 | **Resumen radiológico** | Resume un reporte clínico largo | Beam Search (`num_beams=4`) |
-| **QA médico** | Responde preguntas dado un contexto clínico | Nucleus Sampling (`do_sample=True, top_p=0.92`) |
-| **Demo comparativa** | Compara ambas estrategias sobre el mismo texto | Ambas en paralelo |
+| **QA médico** | Responde preguntas dado un contexto clínico | Beam Search (`num_beams=4`) |
+| **Demo comparativa** | Compara ambas estrategias sobre el mismo texto | Greedy Search vs. Beam Search en paralelo |
 
 ---
 
@@ -118,22 +118,21 @@ streamlit run app.py
 
 - **Entrada:** pregunta clínica + contexto radiológico (en inglés)
 - **Prompt:** `question: <pregunta> context: <contexto>`
-- **Proceso:** concatenación estructurada → tokenización → Nucleus Sampling decoder
+- **Proceso:** concatenación estructurada → tokenización → Beam Search decoder
 - **Salida:** respuesta generada de forma abstractiva
 - **Parámetros ajustables desde la UI:**
 
 | Parámetro | Valor por defecto | Descripción |
 |-----------|:-----------------:|-------------|
 | `max_new_tokens` | 200 | Longitud máxima de la respuesta |
-| `temperature` | 0.7 | Controla aleatoriedad (menor = más determinista) |
-| `top_p` | 0.92 | Nucleus sampling: considera tokens del top 92% de prob. |
-| `top_k` | 50 | Limita el muestreo a los 50 tokens más probables |
+| `num_beams` | 4 | Número de hipótesis de Beam Search |
+| `min_length` | 10 | Longitud mínima de la respuesta |
 | `no_repeat_ngram_size` | 3 | Evita repetición de n-gramas |
 
 ### 3. ⚖️ Demo Comparativa
 
-- Genera la salida del mismo texto con **ambas estrategias** en paralelo
-- Útil para demostrar diferencias en coherencia, diversidad y longitud durante la sustentación
+- Genera la salida del mismo texto con **Greedy Search** y **Beam Search** en paralelo
+- Útil para demostrar diferencias en completitud factual y coherencia durante la sustentación
 
 ---
 
@@ -204,7 +203,7 @@ make help    # Muestra todos los comandos disponibles
 2. **Durante la sustentación:** usar `make run` para iniciar la app ya con el modelo en caché.
 3. **Ejemplos de texto:** la app incluye botones "💡 Cargar ejemplo" en cada modo para no tener que escribir texto durante la demo.
 4. **Parámetros:** los controles deslizantes permiten demostrar en tiempo real el efecto de cada hiperparámetro.
-5. **Comparativa:** la pestaña "⚖️ Demo Comparativa" es ideal para explicar diferencias entre Beam Search y Nucleus Sampling.
+5. **Comparativa:** la pestaña "⚖️ Demo Comparativa" es ideal para explicar diferencias entre Greedy Search y Beam Search.
 
 ---
 

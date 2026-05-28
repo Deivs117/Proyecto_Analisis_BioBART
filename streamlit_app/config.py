@@ -23,13 +23,19 @@ SUMMARIZATION_PARAMS = {
     "early_stopping": True,
 }
 
-# ── Parámetros de QA médico (Nucleus Sampling) ───────────────────────────────
+# ── Parámetros de QA médico (Beam Search) ────────────────────────────────────
 QA_PARAMS = {
     "max_new_tokens": 200,
-    "do_sample": True,
-    "temperature": 0.7,
-    "top_p": 0.92,
-    "top_k": 50,
+    "num_beams": 4,
+    "min_length": 10,
+    "no_repeat_ngram_size": 3,
+    "early_stopping": True,
+}
+
+# ── Parámetros de Greedy Search (baseline) ───────────────────────────────────
+GREEDY_PARAMS = {
+    "max_new_tokens": 150,
+    "num_beams": 1,
     "no_repeat_ngram_size": 3,
 }
 

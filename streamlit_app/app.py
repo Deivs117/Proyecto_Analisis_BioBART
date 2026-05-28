@@ -8,6 +8,7 @@ from config import (
     EJEMPLO_CONTEXTO,
     EJEMPLO_PREGUNTA,
     EJEMPLO_REPORTE,
+    GREEDY_PARAMS,
     MODEL_NAME,
     QA_PARAMS,
     SUMMARIZATION_PARAMS,
@@ -52,8 +53,8 @@ with st.sidebar:
     st.markdown("### 📋 Modos disponibles")
     st.markdown(
         "1. **Resumen radiológico** — Beam Search\n"
-        "2. **QA médico** — Nucleus Sampling\n"
-        "3. **Demo comparativa** — Compara ambas estrategias"
+        "2. **QA médico** — Beam Search\n"
+        "3. **Demo comparativa** — Greedy Search vs. Beam Search"
     )
     st.markdown("---")
     st.warning(DISCLAIMER)
@@ -159,8 +160,8 @@ with tab_qa:
     st.subheader("❓ Pregunta / Respuesta médica radiológica")
     st.markdown(
         "Ingresa una **pregunta clínica** y el **contexto** del caso. "
-        "BioBART generará una respuesta usando **Nucleus Sampling** "
-        "(`do_sample=True`, `top_p=0.92`, `temperature=0.7`)."
+        "BioBART generará una respuesta usando **Beam Search** "
+        "(`num_beams=4`) para mayor coherencia y fidelidad factual."
     )
 
     # ── Controles de ejemplo / limpiar ────────────────────────────────────
@@ -192,24 +193,27 @@ with tab_qa:
     )
 
     # ── Parámetros avanzados (desplegable) ────────────────────────────────
-    with st.expander("⚙️ Parámetros de generación (Nucleus Sampling)"):
+    with st.expander("⚙️ Parámetros de generación (Beam Search)"):
         col_d, col_e = st.columns(2)
         with col_d:
             max_new_tokens_q = st.slider(
                 "max_new_tokens", 50, 400, QA_PARAMS["max_new_tokens"], 10
             )
-            temperature = st.slider("temperature", 0.1, 1.5, QA_PARAMS["temperature"], 0.05)
+            num_beams_q = st.slider("num_beams", 1, 8, QA_PARAMS["num_beams"])
         with col_e:
-            top_p = st.slider("top_p", 0.5, 1.0, QA_PARAMS["top_p"], 0.01)
-            top_k = st.slider("top_k", 0, 100, QA_PARAMS["top_k"], 5)
+            min_length_q = st.slider(
+                "min_length", 0, 80, QA_PARAMS["min_length"], 5
+            )
+            no_repeat_ngram_q = st.slider(
+                "no_repeat_ngram_size", 1, 5, QA_PARAMS["no_repeat_ngram_size"]
+            )
 
     params_qa = {
         "max_new_tokens": max_new_tokens_q,
-        "do_sample": True,
-        "temperature": temperature,
-        "top_p": top_p,
-        "top_k": top_k,
-        "no_repeat_ngram_size": QA_PARAMS["no_repeat_ngram_size"],
+        "num_beams": num_beams_q,
+        "min_length": min_length_q,
+        "no_repeat_ngram_size": no_repeat_ngram_q,
+        "early_stopping": True,
     }
 
     # ── Botón de inferencia ───────────────────────────────────────────────
@@ -255,11 +259,11 @@ with tab_qa:
 # PESTAÑA 3 — Demo comparativa
 # ═════════════════════════════════════════════════════════════════════════════
 with tab_comparativa:
-    st.subheader("⚖️ Demo comparativa — Beam Search vs. Nucleus Sampling")
+    st.subheader("⚖️ Demo comparativa — Greedy Search vs. Beam Search")
     st.markdown(
         "Ingresa un texto clínico y genera la salida con **ambas estrategias** "
-        "simultáneamente para comparar diferencias en coherencia, diversidad "
-        "y longitud de las respuestas generadas."
+        "simultáneamente para comparar diferencias en completitud, coherencia "
+        "y fidelidad factual de los resúmenes generados."
     )
 
     col5, col6 = st.columns([1, 1])
@@ -282,7 +286,24 @@ with tab_comparativa:
         if not texto_comp_limpio:
             st.warning("Por favor ingresa un texto antes de comparar.")
         else:
-            col_bs, col_ns = st.columns(2)
+            col_gs, col_bs = st.columns(2)
+            with col_gs:
+                st.markdown("### 🎯 Greedy Search")
+                with st.spinner("Generando con Greedy Search…"):
+                    try:
+                        salida_gs, n_tok_gs = generar_resumen(
+                            texto_comp_limpio,
+                            tokenizador,
+                            modelo,
+                            dispositivo,
+                            params=GREEDY_PARAMS,
+                        )
+                        st.success("✅ Completado")
+                        st.info(salida_gs)
+                        st.caption(f"Tokens entrada: **{n_tok_gs}**")
+                    except Exception as exc:
+                        st.error(f"❌ Error: {exc}")
+
             with col_bs:
                 st.markdown("### 🎯 Beam Search")
                 with st.spinner("Generando con Beam Search…"):
@@ -296,36 +317,23 @@ with tab_comparativa:
                     except Exception as exc:
                         st.error(f"❌ Error: {exc}")
 
-            with col_ns:
-                st.markdown("### 🎲 Nucleus Sampling")
-                with st.spinner("Generando con Nucleus Sampling…"):
-                    try:
-                        salida_ns, n_tok_ns = generar_resumen(
-                            texto_comp_limpio,
-                            tokenizador,
-                            modelo,
-                            dispositivo,
-                            params={
-                                "max_new_tokens": 150,
-                                "do_sample": True,
-                                "temperature": 0.7,
-                                "top_p": 0.92,
-                                "no_repeat_ngram_size": 3,
-                            },
-                        )
-                        st.success("✅ Completado")
-                        st.info(salida_ns)
-                        st.caption(f"Tokens entrada: **{n_tok_ns}**")
-                    except Exception as exc:
-                        st.error(f"❌ Error: {exc}")
-
             st.markdown("---")
             st.markdown(
-                "**Notas de interpretación:**\n"
-                "- **Beam Search** tiende a generar salidas más deterministas y coherentes, "
-                "ideal para resúmenes donde la fidelidad al contenido es crítica.\n"
-                "- **Nucleus Sampling** introduce variabilidad controlada, "
-                "produciendo respuestas más naturales y diversas, adecuado para diálogo clínico."
+                "**Notas de interpretación:**\n\n"
+                "**Greedy Search** — selecciona en cada paso el token de mayor probabilidad "
+                "(argmax local). Es el método más simple y rápido, útil como baseline. Su "
+                "principal desventaja es que queda atrapado en óptimos locales: al no explorar "
+                "alternativas, puede omitir hallazgos clínicos relevantes y producir resúmenes "
+                "menos completos o con estructura menos coherente. Para textos clínicos, esto "
+                "se traduce en resúmenes que priorizan los primeros hallazgos y omiten los menos "
+                "inmediatos, aunque sean críticos.\n\n"
+                "**Beam Search** — mantiene simultáneamente varias hipótesis (num_beams=4) y "
+                "maximiza la probabilidad conjunta de toda la secuencia generada. Para resúmenes "
+                "clínicos y radiológicos, donde la completitud factual y la fidelidad al reporte "
+                "son críticas, Beam Search es la estrategia preferida: al explorar múltiples "
+                "caminos en paralelo, encuentra secuencias con mayor probabilidad global que "
+                "incluyen más hallazgos relevantes. Su desventaja es el mayor costo computacional "
+                "y una tendencia a generar salidas más conservadoras y predecibles."
             )
 
 # ─────────────────────────────────────────────────────────────────────────────
