@@ -13,8 +13,10 @@ PORT      := 8501
 # Detecta el activador según OS
 ifeq ($(OS),Windows_NT)
     ACTIVATE := $(VENV)/Scripts/activate
+    VENV_BIN := $(VENV)/Scripts
 else
-    ACTIVATE := $(VENV_BIN)/activate
+    ACTIVATE := $(VENV)/bin/activate
+    VENV_BIN := $(VENV)/bin
 endif
 
 .DEFAULT_GOAL := help

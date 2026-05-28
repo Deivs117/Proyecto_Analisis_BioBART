@@ -27,3 +27,34 @@ ENV/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Artefactos de construcción
+*.egg-info/
+dist/
+build/
+
+# Artefactos de herramientas
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Caché de modelos de Hugging Face (puede ser muy pesado)
+# Si prefieres cachear el modelo dentro del proyecto, comenta esta línea
+# .cache/
