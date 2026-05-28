@@ -12,10 +12,12 @@ dist/
 pip-wheel-metadata/
 
 # Virtual environments
-.venv/
+*.venv/
 venv/
 env/
 ENV/
+
+uv.lock
 
 # Jupyter Notebooks
 .ipynb_checkpoints/

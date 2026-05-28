@@ -1,81 +1,83 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Makefile — BioBART Streamlit App
+# Makefile - BioBART Streamlit App
 # Uso: desde la carpeta streamlit_app/ ejecutar `make <comando>`
 # ─────────────────────────────────────────────────────────────────────────────
 
-PYTHON    := python3
 UV        := uv
-VENV      := .venv
-VENV_BIN  := $(VENV)/bin
 APP       := app.py
 PORT      := 8501
-
-# Detecta el activador según OS
-ifeq ($(OS),Windows_NT)
-    ACTIVATE := $(VENV)/Scripts/activate
-    VENV_BIN := $(VENV)/Scripts
-else
-    ACTIVATE := $(VENV)/bin/activate
-    VENV_BIN := $(VENV)/bin
-endif
 
 .DEFAULT_GOAL := help
 
 # ─────────────────────────────────────────────────────────────────────────────
-# help — muestra los comandos disponibles
+# help - muestra los comandos disponibles
 # ─────────────────────────────────────────────────────────────────────────────
 .PHONY: help
 help:
 	@echo ""
-	@echo "  BioBART Streamlit App — Comandos disponibles"
+	@echo "  BioBART Streamlit App - Comandos disponibles"
 	@echo "  ─────────────────────────────────────────────"
-	@echo "  make setup   → Crea el entorno virtual e instala dependencias"
-	@echo "  make run     → Lanza la app en http://localhost:$(PORT)"
-	@echo "  make all     → setup + run (todo en un solo comando)"
-	@echo "  make lint    → Ejecuta ruff para verificar el código"
-	@echo "  make clean   → Elimina el entorno virtual y artefactos"
+	@echo "  make setup   -> Crea el entorno virtual e instala dependencias"
+	@echo "  make add pkg=<paquete> -> Agrega una dependencia solo si es necesario"
+	@echo "  make run     -> Lanza la app en http://localhost:$(PORT)"
+	@echo "  make all     -> setup + run (todo en un solo comando)"
+	@echo "  make lint    -> Ejecuta ruff para verificar el codigo"
+	@echo "  make clean   -> Elimina el entorno virtual y artefactos"
 	@echo ""
 
 # ─────────────────────────────────────────────────────────────────────────────
-# setup — crea el entorno virtual e instala dependencias con uv
+# setup - crea el entorno virtual e instala dependencias con uv
 # ─────────────────────────────────────────────────────────────────────────────
 .PHONY: setup
 setup:
-	@echo ">>> Creando entorno virtual con uv..."
-	$(UV) venv $(VENV)
-	@echo ">>> Instalando dependencias..."
-	$(UV) pip install --python $(VENV_BIN)/python -e .
+	@echo ">>> Sincronizando entorno con uv sync (incluye dependencias de desarrollo, sin instalar paquete local)..."
+	$(UV) sync --extra dev --no-install-project
 	@echo ""
-	@echo "✅ Entorno listo. Ejecuta: make run"
+	@echo "OK Entorno listo. Ejecuta: make run"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# run — lanza la app Streamlit
+# add - agrega dependencias solo cuando sea necesario
+# Uso: make add pkg=<nombre-paquete>
+# ─────────────────────────────────────────────────────────────────────────────
+.PHONY: add
+add:
+	@if [ -z "$(pkg)" ]; then \
+		echo "ERROR Debes indicar el paquete: make add pkg=<nombre-paquete>"; \
+		exit 1; \
+	fi
+	@echo ">>> Agregando dependencia con uv add..."
+	$(UV) add $(pkg)
+	@echo "OK Dependencia agregada. Ejecuta: make setup"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# run - lanza la app Streamlit
 # ─────────────────────────────────────────────────────────────────────────────
 .PHONY: run
 run:
 	@echo ">>> Iniciando BioBART Streamlit App en http://localhost:$(PORT) ..."
-	$(VENV_BIN)/streamlit run $(APP) \
+	$(UV) run --no-project streamlit run $(APP) \
 		--server.port $(PORT) \
-		--server.headless false
+		--server.headless false \
+		--server.fileWatcherType none
 
 # ─────────────────────────────────────────────────────────────────────────────
-# all — atajo para setup + run
+# all - atajo para setup + run
 # ─────────────────────────────────────────────────────────────────────────────
 .PHONY: all
 all: setup run
 
 # ─────────────────────────────────────────────────────────────────────────────
-# lint — verifica el código con ruff
+# lint - verifica el codigo con ruff
 # ─────────────────────────────────────────────────────────────────────────────
 .PHONY: lint
 lint:
-	$(VENV_BIN)/ruff check app.py inference.py model_loader.py config.py
+	$(UV) run --no-project ruff check app.py inference.py model_loader.py config.py
 
 # ─────────────────────────────────────────────────────────────────────────────
-# clean — elimina entorno virtual y artefactos de Python
+# clean - elimina entorno virtual y artefactos de Python
 # ─────────────────────────────────────────────────────────────────────────────
 .PHONY: clean
 clean:
 	@echo ">>> Eliminando entorno virtual y artefactos..."
-	rm -rf $(VENV) __pycache__ *.egg-info .ruff_cache
-	@echo "✅ Limpieza completada."
+	rm -rf .venv __pycache__ *.egg-info .ruff_cache
+	@echo "OK Limpieza completada."

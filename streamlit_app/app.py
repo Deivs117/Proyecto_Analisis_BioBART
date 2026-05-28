@@ -80,15 +80,14 @@ with tab_resumen:
     col1, col2 = st.columns([1, 1])
     with col1:
         if st.button("💡 Cargar ejemplo", key="ejemplo_resumen"):
-            st.session_state["texto_resumen"] = EJEMPLO_REPORTE
+            st.session_state["input_resumen"] = EJEMPLO_REPORTE
     with col2:
         if st.button("🗑️ Limpiar", key="limpiar_resumen"):
-            st.session_state["texto_resumen"] = ""
+            st.session_state["input_resumen"] = ""
 
     # ── Área de texto ─────────────────────────────────────────────────────
     texto_resumen = st.text_area(
         "Reporte clínico / radiológico",
-        value=st.session_state.get("texto_resumen", ""),
         height=220,
         placeholder=(
             "Pega aquí el reporte en inglés. "
@@ -168,24 +167,22 @@ with tab_qa:
     col3, col4 = st.columns([1, 1])
     with col3:
         if st.button("💡 Cargar ejemplo", key="ejemplo_qa"):
-            st.session_state["pregunta_qa"] = EJEMPLO_PREGUNTA
-            st.session_state["contexto_qa"] = EJEMPLO_CONTEXTO
+            st.session_state["input_pregunta"] = EJEMPLO_PREGUNTA
+            st.session_state["input_contexto"] = EJEMPLO_CONTEXTO
     with col4:
         if st.button("🗑️ Limpiar", key="limpiar_qa"):
-            st.session_state["pregunta_qa"] = ""
-            st.session_state["contexto_qa"] = ""
+            st.session_state["input_pregunta"] = ""
+            st.session_state["input_contexto"] = ""
 
     # ── Campos de entrada ─────────────────────────────────────────────────
     pregunta_qa = st.text_input(
         "Pregunta clínica (en inglés)",
-        value=st.session_state.get("pregunta_qa", ""),
         placeholder="What is the most likely diagnosis based on the findings?",
         key="input_pregunta",
     )
 
     contexto_qa = st.text_area(
         "Contexto clínico / radiológico (en inglés)",
-        value=st.session_state.get("contexto_qa", ""),
         height=200,
         placeholder=(
             "Pega aquí la nota clínica o hallazgos radiológicos relevantes para responder "
@@ -268,14 +265,13 @@ with tab_comparativa:
     col5, col6 = st.columns([1, 1])
     with col5:
         if st.button("💡 Cargar ejemplo", key="ejemplo_comp"):
-            st.session_state["texto_comp"] = EJEMPLO_REPORTE
+            st.session_state["input_comp"] = EJEMPLO_REPORTE
     with col6:
         if st.button("🗑️ Limpiar", key="limpiar_comp"):
-            st.session_state["texto_comp"] = ""
+            st.session_state["input_comp"] = ""
 
     texto_comp = st.text_area(
         "Texto clínico / radiológico (en inglés)",
-        value=st.session_state.get("texto_comp", ""),
         height=200,
         placeholder="Pega aquí el texto clínico en inglés para comparar estrategias…",
         key="input_comp",
@@ -339,6 +335,6 @@ st.markdown("---")
 st.caption(
     "🎓 Demo académica — BioBART (Yuan et al., 2022) · "
     "Procesamiento de Datos Secuenciales · "
-    "Modelo: `GanjinZero/biobart-base` · "
+    "Modelo: `hamzamalik11/Biobart_radiology_summarization` · "
     "No apto para uso clínico real."
 )

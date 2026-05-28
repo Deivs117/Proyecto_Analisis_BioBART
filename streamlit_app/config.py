@@ -3,9 +3,9 @@
 
 # ── Modelo ────────────────────────────────────────────────────────────────────
 # Checkpoint principal de BioBART usado en el notebook de inferencia.
-# GanjinZero/biobart-base  (~560 MB) — recomendado para CPU
-# GanjinZero/biobart-large (~1.6 GB) — recomendado si se dispone de GPU
-MODEL_NAME = "GanjinZero/biobart-base"
+# hamzamalik11/Biobart_radiology_summarization (~560 MB) — recomendado para CPU
+# hamzamalik11/Biobart_radiology_summarization_large (~1.6 GB) — recomendado si se dispone de GPU
+MODEL_NAME = "hamzamalik11/Biobart_radiology_summarization"
 
 # Longitud máxima de tokens de entrada para esta demo.
 # La arquitectura BioBART soporta hasta 1024 tokens, pero se limita a 512
