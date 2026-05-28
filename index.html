@@ -948,8 +948,9 @@ token_t: <span class="hl-green">int</span>   ← se agrega al output, repite has
         <p style="font-size:.82rem; margin-top:6px;"><strong style="color:var(--white);">"¿Qué información estoy buscando?"</strong></p>
         <p style="font-size:.8rem; margin-top:6px; color:var(--muted);">Proviene del token actual del decoder. En Cross-Attention representa <em>lo que el decoder quiere saber</em> del reporte en cada paso de generación.</p>
         <div class="code-block mt-16" style="font-size:.74rem;">Q = X · W<sup>Q</sup>
-W<sup>Q</sup> ∈ ℝ^(1024 × 64)
-Shape Q: (1, t, 1024)</div>
+W<sup>Q</sup> ∈ ℝ^(1024 × 1024)
+Pre-split: (1, t, 1024)
+Per head:  (1, t, 64) × 16</div>
         <p style="font-size:.75rem; color:var(--muted); margin-top:8px; font-style:italic;">Ej: El decoder generando "cardiomegaly" emite un Q que consulta ¿dónde está ese hallazgo en el reporte?</p>
       </div>
 
@@ -959,8 +960,9 @@ Shape Q: (1, t, 1024)</div>
         <p style="font-size:.82rem; margin-top:6px;"><strong style="color:var(--white);">"¿Qué información puedo ofrecer como índice?"</strong></p>
         <p style="font-size:.8rem; margin-top:6px; color:var(--muted);">En Cross-Attention, K viene del encoder (de H_enc) — es la etiqueta de búsqueda de cada token del reporte. Se compara con Q mediante producto escalar.</p>
         <div class="code-block mt-16" style="font-size:.74rem;">K = H_enc · W<sup>K</sup>
-W<sup>K</sup> ∈ ℝ^(1024 × 64)
-Shape K: (1, 140, 1024)</div>
+W<sup>K</sup> ∈ ℝ^(1024 × 1024)
+Pre-split: (1, 140, 1024)
+Per head:  (1, 140, 64) × 16</div>
         <p style="font-size:.75rem; color:var(--muted); margin-top:8px; font-style:italic;">Ej: "cardiomegaly", "ratio 0.58" tienen K con alta similitud al Q del decoder → pesos altos.</p>
       </div>
 
@@ -970,8 +972,9 @@ Shape K: (1, 140, 1024)</div>
         <p style="font-size:.82rem; margin-top:6px;"><strong style="color:var(--white);">"¿Cuál es mi información real?"</strong></p>
         <p style="font-size:.8rem; margin-top:6px; color:var(--muted);">En Cross-Attention, V viene del encoder — es la representación semántica de cada token del reporte. Cuando la similitud Q·K es alta, ese V fluye al decoder.</p>
         <div class="code-block mt-16" style="font-size:.74rem;">V = H_enc · W<sup>V</sup>
-W<sup>V</sup> ∈ ℝ^(1024 × 64)
-Shape V: (1, 140, 1024)</div>
+W<sup>V</sup> ∈ ℝ^(1024 × 1024)
+Pre-split: (1, 140, 1024)
+Per head:  (1, 140, 64) × 16</div>
         <p style="font-size:.75rem; color:var(--muted); margin-top:8px; font-style:italic;">Ej: El V de "cardiomegaly" transporta su semántica biomédica al decoder para la generación.</p>
       </div>
     </div>
