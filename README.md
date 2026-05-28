@@ -479,13 +479,17 @@ a mayor libertad generativa, mayor distancia entre métricas léxicas y semánti
    Biomedical Natural Language Processing (PubMedBERT).* ACM CHIL.
    https://arxiv.org/abs/2007.15779
 
+7. Anthropic. (2025). Claude (claude-sonnet-4-6) [Modelo de lenguaje de gran escala]. Utilizado como apoyo en la elaboración del desarrollo del notebook. https://claude.ai
+
+8. Google DeepMind. (2025). Gemini [Modelo de lenguaje de gran escala]. Utilizado como apoyo en la elaboración del desarrollo del notebook https://gemini.google.com
+
 ### Métricas de evaluación
 
-7. Lin, C.-Y. (2004). *ROUGE: A Package for Automatic Evaluation of Summaries.*
+9. Lin, C.-Y. (2004). *ROUGE: A Package for Automatic Evaluation of Summaries.*
    ACL Workshop on Text Summarization Branches Out.
    https://aclanthology.org/W04-1013
 
-8. Zhang, T. et al. (2020). *BERTScore: Evaluating Text Generation with BERT.*
+10. Zhang, T. et al. (2020). *BERTScore: Evaluating Text Generation with BERT.*
    ICLR 2020.
    https://arxiv.org/abs/1904.09675
 
