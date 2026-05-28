@@ -660,8 +660,8 @@ make run     # lanza la app (modelo ya en caché)
 # Opción C — Manual sin Make
 uv venv .venv
 source .venv/bin/activate          # Linux / macOS
+# .venv\Scripts\activate           # Windows PowerShell
 uv pip install -e .
-streamlit run app.py
 ```
 
 > **Nota de sustentación:** ejecutar `make setup` con antelación para descargar los
