@@ -7,7 +7,10 @@
 # GanjinZero/biobart-large (~1.6 GB) — recomendado si se dispone de GPU
 MODEL_NAME = "GanjinZero/biobart-base"
 
-# Longitud máxima de tokens de entrada que acepta el modelo (límite arquitectural)
+# Longitud máxima de tokens de entrada para esta demo.
+# La arquitectura BioBART soporta hasta 1024 tokens, pero se limita a 512
+# para reducir el tiempo de inferencia en CPU durante la sustentación y
+# evitar errores de memoria en hardware limitado.
 MAX_INPUT_TOKENS = 512
 
 # ── Parámetros de resumen (Beam Search) ──────────────────────────────────────
