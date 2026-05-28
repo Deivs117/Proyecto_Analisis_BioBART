@@ -251,7 +251,7 @@ model     = BartForConditionalGeneration.from_pretrained("GanjinZero/biobart-bas
 ```
 
 ### 5.4 Preprocesamiento e inferencia
-<img width="1024" height="394" alt="image" src="https://github.com/user-attachments/assets/e9519da0-82bb-40c6-be8d-e3b7bd87181a" />
+
 
 ```python
 # ── Tarea 1: Resumen con Beam Search ─────────────────────────────
@@ -285,6 +285,7 @@ respuesta_generada = tokenizer.decode(ids_qa[0], skip_special_tokens=True)
 ## 6. Resultados y Análisis
 
 ### 6.1 Tarea 1 — Resumen de reporte radiológico (Beam Search)
+<img width="1024" height="394" alt="image" src="https://github.com/user-attachments/assets/e9519da0-82bb-40c6-be8d-e3b7bd87181a" />
 
 **Input:** Reporte radiológico de tórax — paciente masculino 72 años con disnea
 progresiva e hipoxemia. Opacidades bilaterales en vidrio esmerilado, consolidación
